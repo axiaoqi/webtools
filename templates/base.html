@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Website{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <!-- 居中的返回首页菜单 -->
+    <nav>
+        <ul class="center-menu">
+            <li><a href="{{ url_for('home') }}" class="nav-btn">首页</a></li>
+        </ul>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <p>©2024 XiaoQi</p>
+    </footer>
+</body>
+</html>

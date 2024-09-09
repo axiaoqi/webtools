@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Python程序管理系统{% endblock %}
+
+{% block content %}
+<h1>管理自己的Python小程序</h1>
+<p>点击运行自己的Python程序</p>
+
+<div class="button-container">
+    <a href="{{ url_for('run_program1') }}" class="btn">Run Program 1</a>
+    <a href="{{ url_for('run_program2') }}" class="btn">Run Program 2</a>
+    <a href="{{ url_for('run_program3') }}" class="btn">Run Program 3</a>
+    <a href="{{ url_for('run_program4') }}" class="btn">Run Program 4</a>
+    <!-- 添加更多按钮 -->
+</div>
+{% endblock %}

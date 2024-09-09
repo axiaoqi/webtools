@@ -1,0 +1,97 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+p {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 菜单样式：居中显示 */
+nav {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.center-menu {
+    list-style-type: none;
+    padding: 0;
+}
+
+.center-menu li {
+    display: inline;
+}
+
+.center-menu li a.nav-btn {
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #28a745; /* 导航按钮颜色 */
+    color: white;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.center-menu li a.nav-btn:hover {
+    background-color: #218838;
+}
+
+/* 主页功能按钮样式 */
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    text-align: center;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+
+/* 按钮容器居中对齐 */
+.center-button {
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center;      /* 垂直居中 */
+    margin-top: 20px;         /* 可根据需要调整顶部间距 */
+}
+
+.center-button .btn {
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.center-button .btn:hover {
+    background-color: #0056b3;
+}
+
+/* 页脚样式 */
+footer {
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+
