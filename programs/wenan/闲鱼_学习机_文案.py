@@ -1,14 +1,14 @@
 from pathlib import Path
 try:
-    from icopywriter import XianyuCopywritingGenerator, XianyuImgTxt, generate_price
+    from wenan import XianyuCopywritingGenerator, XianyuImgTxt, generate_price
 except ModuleNotFoundError:
     import os
     import sys
     curPath = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
     sys.path.append(curPath)
-    from icopywriter import XianyuCopywritingGenerator, XianyuImgTxt, generate_price
+    from wenan import XianyuCopywritingGenerator, XianyuImgTxt, generate_price
 
-from .settings import SynologyDrive
+from programs.wenan.examples.settings import SynologyDrive
 
 
 def run():

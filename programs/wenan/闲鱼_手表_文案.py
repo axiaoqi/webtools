@@ -3,13 +3,13 @@ from pathlib import Path
 
 
 try:
-    from icopywriter.icopywriter import CopywritingGenerator
+    from wenan.icopywriter import CopywritingGenerator
 except ModuleNotFoundError:
     import os
     import sys
     curPath = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
     sys.path.append(curPath)
-    from icopywriter.icopywriter import CopywritingGenerator
+    from wenan.icopywriter import CopywritingGenerator
 
 
 class XianYuWatch(CopywritingGenerator):
