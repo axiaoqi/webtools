@@ -7,7 +7,7 @@ from pathlib import Path
 import shutil
 
 
-def copy_random_images(n, folder_paths, target_folder):
+def copy_random_images(n, folder_paths, target_folder, image_name=None):
     """
     功能1：从多个文件夹选取n张图片到目标文件夹
     批量填充2图，尾图
@@ -35,8 +35,12 @@ def copy_random_images(n, folder_paths, target_folder):
     target_path = Path(target_folder)
     target_path.mkdir(parents=True, exist_ok=True)
 
+    # 复制一张图时候，可以自己命名
     if n == 1:
-        shutil.copy2(selected_images[0], target_path)
+        if image_name is None:  # 不自己命名，就保持默认
+            shutil.copy2(selected_images[0], target_path)
+        else:  # 自己命名就保留原来的扩展名
+            shutil.copy2(selected_images[0], target_path / (image_name + selected_images[0].suffix))
         print(f"已复制 {selected_images[0]} 到 {target_folder}")
     else:
         # 复制每张图片到目标文件夹
@@ -45,7 +49,7 @@ def copy_random_images(n, folder_paths, target_folder):
             print(f"已复制 {image} 到 {target_folder}")
 
 
-def copy_image_to_folders(folder_paths, target_folder):
+def copy_image_to_folders(folder_paths, target_folder, image_name=None):
     """
     功能2：从多个文件夹读取所有的图片，复制到目标文件夹当主图
     用来批量生成主图的
@@ -69,7 +73,11 @@ def copy_image_to_folders(folder_paths, target_folder):
                 dst_folders.append(dst_folder)  # 目标文件夹列表
 
                 # 复制图片到目标文件夹
-                dst_file_path = dst_folder / image_file.name
+                if image_name is None:
+                    dst_file_path = dst_folder / image_file.name  # 不自定义名字
+                else:
+                    dst_file_path = dst_folder / (image_name + image_file.suffix)  # 自定义名字
+
                 shutil.copy2(image_file, dst_file_path)
                 print(f"图片 {image_file.name} 已复制到文件夹 {dst_folder}")
 
