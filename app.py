@@ -11,10 +11,10 @@ def home():
 
 
 # 数据处理
-@app.route('/xianyu_wenan', methods=['GET', 'POST'])
+@app.route('/xianyu_text', methods=['GET', 'POST'])
 def run_program1():
-    result = 闲鱼_学习机_文案.run()  # 假设 program1.py 里面有一个 run() 方法
-    return render_template('xianyu_wenan.html', result=result)
+    result = 闲鱼_学习机_文案1.run()  # 假设 program1.py 里面有一个 run() 方法
+    return render_template('xianyu_text.html', result=result)
 
 
 @app.route('/run_program2', methods=['GET', 'POST'])
