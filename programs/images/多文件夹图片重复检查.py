@@ -47,18 +47,8 @@ def delete_selected_duplicates(duplicates):
 
 if __name__ == "__main__":
 
-    white_primary = SynologyDrive / r'01新项目记录\咸鱼项目\AI学习机\白色主图收集'
-    white_secondary = SynologyDrive / r'01新项目记录\咸鱼项目\AI学习机\白色副图收集'
-
-    black_primary = SynologyDrive / r'01新项目记录\咸鱼项目\AI学习机\黑色主图收集'
-    black_secondary = SynologyDrive / r'01新项目记录\咸鱼项目\AI学习机\黑色副图收集'
-
     folders = [
-        white_primary,
-        white_secondary,
-        black_primary,
-        black_secondary,
-        SynologyDrive / r'temp\未分类--学习机原始图片',
+        SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\02图片\01主图'
     ]
 
     # 查找重复的图片
