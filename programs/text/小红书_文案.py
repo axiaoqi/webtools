@@ -1,11 +1,11 @@
 try:
-    from wenan.xiaohongshu import XiaohongshuCopywritingGenerator
+    from __wenan.xiaohongshu import XiaohongshuCopywritingGenerator
 except ModuleNotFoundError:
     import os
     import sys
     curPath = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
     sys.path.append(curPath)
-    from wenan.xiaohongshu import XiaohongshuCopywritingGenerator
+    from __wenan.xiaohongshu import XiaohongshuCopywritingGenerator
 
 
 from settings import SynologyDrive

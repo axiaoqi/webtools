@@ -1,14 +1,14 @@
 from pathlib import Path
 try:
-    from wenan import XianyuCopywritingGenerator, XianyuImgTxt, generate_price
+    from programs.text.xianyu_text import XianyuTextGenerator, XianyuImgTxt, generate_price
 except ModuleNotFoundError:
     import os
     import sys
     curPath = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
     sys.path.append(curPath)
-    from wenan import XianyuCopywritingGenerator, XianyuImgTxt, generate_price
+    from programs.text.xianyu_text import XianyuTextGenerator, XianyuImgTxt, generate_price
 
-from programs.text.examples.settings import SynologyDrive
+from programs.settings import SynologyDrive
 
 
 def run():
@@ -21,7 +21,7 @@ def run():
     图片文案
     """
 
-    img_txt_path = SynologyDrive / r'01新项目记录\咸鱼项目\AI学习机\图片内容'
+    img_txt_path = SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\01文案\图片内容'
     xianyuimg = XianyuImgTxt()
 
     # 打印所有的文件
@@ -41,10 +41,11 @@ def run():
     """
     咸鱼AI学习机
     """
-    data_dir = SynologyDrive / r'01新项目记录\咸鱼项目\AI学习机\文案素材'
-    xianyu = XianyuCopywritingGenerator(data_dir)
+    data_dir = SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\01文案\文案素材1'
+    xianyu = XianyuTextGenerator(data_dir)
 
     xianyu.run()  # start=4, end=7
+    print(xianyu)
     return xianyu
 
 

@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from programs import program1, program2, program4, program3
-from programs.text import 闲鱼_学习机_文案
+from programs.text import 闲鱼_学习机_文案1
 
 app = Flask(__name__)
 

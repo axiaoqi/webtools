@@ -19,7 +19,10 @@ class BaseTextGenerator:
 
 class TextGenerator(BaseTextGenerator):
     """
-    文案生成器基本功能的实现
+    文案生成器基本功能的实现。
+
+    实现的一些方法：
+
     """
     def __init__(self, data_dir: Path = None):
         self.data_dir = data_dir
@@ -27,23 +30,6 @@ class TextGenerator(BaseTextGenerator):
 
         if self.data_dir:
             self._add_data()  # 初始化文件名称列表
-
-    def _add_data(self):
-        """
-        初始化txt数据
-        """
-        # 文件按文件名排序一下
-        txt_files = sorted([item for item in self.data_dir.iterdir() if item.name.endswith('.txt')],
-                           key=lambda x: int(x.stem.split('_')[0]))
-        # 数据添加进去
-        self.data_files_path.extend(txt_files)
-
-    def _open_all_file(self):
-        data_list = []
-        for item in self.data_files_path:
-            _data = self._open_file(item)
-            data_list.append(_data)
-        return data_list
 
     @staticmethod
     def _open_file(file_path: Path) -> list:
@@ -55,9 +41,19 @@ class TextGenerator(BaseTextGenerator):
         data = [item.strip() for item in file_list]  # 解析一下数据
         return data
 
+    @staticmethod
+    def _open_file_by_sep(file_path: Path, sep: str):
+        """
+        打开txt文件，根据特殊字符分割成列表
+        """
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        data = content.split(sep)  # 解析一下数据
+        return data
+
     def _open_files(self, file_paths: List[Path]):
         """
-        打开txt文件，转为列表
+        打开多个txt文件，转为列表
         """
         data_list = []
         for item in file_paths:
@@ -77,15 +73,22 @@ class TextGenerator(BaseTextGenerator):
 
         return data
 
-    @staticmethod
-    def _open_file_by_sep(file_path: Path, sep: str):
+    def _add_data(self):
         """
-        打开txt文件，根据特殊字符分割成列表
+        初始化txt数据
         """
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        data = content.split(sep)  # 解析一下数据
-        return data
+        # 文件按文件名排序一下
+        txt_files = sorted([item for item in self.data_dir.iterdir() if item.name.endswith('.txt')],
+                           key=lambda x: int(x.stem.split('_')[0]))
+        # 数据添加进去
+        self.data_files_path.extend(txt_files)
+
+    def _open_all_file(self):
+        data_list = []
+        for item in self.data_files_path:
+            _data = self._open_file(item)
+            data_list.append(_data)
+        return data_list
 
     def run(self):
         pass
