@@ -1,13 +1,4 @@
-from pathlib import Path
-try:
-    from programs.text.xianyu_text import XianyuTextGenerator, XianyuImgTxt, generate_price
-except ModuleNotFoundError:
-    import os
-    import sys
-    curPath = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
-    sys.path.append(curPath)
-    from programs.text.xianyu_text import XianyuTextGenerator, XianyuImgTxt, generate_price
-
+from programs.text.xianyu_text import XianyuTextGenerator, XianyuImgTxt, generate_price
 from programs.settings import SynologyDrive
 
 
