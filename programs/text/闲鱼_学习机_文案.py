@@ -8,7 +8,7 @@ except ModuleNotFoundError:
     sys.path.append(curPath)
     from wenan import XianyuCopywritingGenerator, XianyuImgTxt, generate_price
 
-from programs.wenan.examples.settings import SynologyDrive
+from programs.text.examples.settings import SynologyDrive
 
 
 def run():
