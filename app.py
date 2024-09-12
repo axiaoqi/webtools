@@ -1,43 +1,29 @@
-from flask import Flask, render_template
-from programs import program1, program2, program4, program3
-from programs.text import 闲鱼_学习机_文案1
+from flask import Flask, render_template, request
+from programs.text import 闲鱼_学习机_文案1, 闲鱼_学习机_文案2_王
 
 app = Flask(__name__)
 
 
+# 首页
 @app.route('/')
 def home():
     return render_template('index.html')
 
 
-# 数据处理
-@app.route('/xianyu_text', methods=['GET', 'POST'])
-def run_program1():
-    result = 闲鱼_学习机_文案1.run()  # 假设 program1.py 里面有一个 run() 方法
-    return render_template('xianyu_text.html', result=result)
+# 通用的程序运行路由
+@app.route('/run_program/<program_name>', methods=['GET', 'POST'])
+def run_program(program_name):
+    result = None
 
+    # 根据传入的 program_name 动态调用不同的程序
+    if program_name == '闲鱼_学习机_文案1':
+        result = 闲鱼_学习机_文案1.run()
+    elif program_name == '闲鱼_学习机_文案2_王':
+        result = 闲鱼_学习机_文案2_王.run()
 
-@app.route('/run_program2', methods=['GET', 'POST'])
-def run_program2():
-    result = program2.run()
-    return render_template('program2.html', result=result)
+    # 继续为其他程序添加分支
+    return render_template('program.html', program_name=program_name, result=result)
 
-
-# 图像处理
-@app.route('/program3', methods=['GET', 'POST'])
-def run_program3():
-    result = program3.run()
-    return render_template('program3.html', result=result)
-
-
-# 文本处理
-@app.route('/program4', methods=['GET', 'POST'])
-def run_program4():
-    result = program4.run()
-    return render_template('result.html', result=result)
-
-
-# 添加更多功能路由
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=7000)
+    app.run(debug=True, host='0.0.0.0', port=6000)

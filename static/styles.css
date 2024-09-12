@@ -1,3 +1,47 @@
+/* 针对移动端页面进行基本布局调整 */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    max-width: 100%;
+    overflow-x: hidden;  /* 避免水平滚动 */
+}
+
+/* 中心按钮容器，使用flexbox布局 */
+.center-button {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+/* 设置按钮样式，调整适应移动设备的大小 */
+button.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+button.btn:hover {
+    background-color: #45a049;
+}
+
+/* 让文本和按钮可以根据屏幕大小调整 */
+pre#result-text {
+    white-space: pre-wrap;  /* 保持换行符并适应屏幕宽度 */
+    word-wrap: break-word;  /* 让长单词换行 */
+    font-size: 16px;
+    background-color: #f4f4f4;
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;  /* 避免超出屏幕时的水平滚动 */
+}
+
+
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
@@ -64,14 +108,6 @@ nav {
 }
 
 
-/* 按钮容器居中对齐 */
-.center-button {
-    display: flex;
-    justify-content: center; /* 水平居中 */
-    align-items: center;      /* 垂直居中 */
-    margin-top: 20px;         /* 可根据需要调整顶部间距 */
-}
-
 .center-button .btn {
     padding: 10px 20px;
     background-color: #007BFF;
@@ -87,11 +123,32 @@ nav {
 
 /* 页脚样式 */
 footer {
-    text-align: center;
-    padding: 10px;
     position: fixed;
-    width: 100%;
     bottom: 0;
+    width: 100%;
+    text-align: center;
+    background-color: #f4f4f4;
+    padding: 10px 0;
+    border-top: 1px solid #ccc;
+}
+
+/* 确保页脚和按钮不会重叠 */
+main {
+    margin-bottom: 100px;  /* 给页面内容留出空间，避免与页脚重叠 */
+}
+
+/* 提示框的样式 */
+#copy-alert {
+    display: none;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000; /* 确保它在其他元素之上显示 */
 }
 
 

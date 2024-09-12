@@ -3,10 +3,13 @@ from programs.settings import SynologyDrive
 
 
 def run():
+    all_str = []
+
     """
     价格
     """
-    print(f'价格：{generate_price(intervals=[(310, 370)])}元\n')
+    price_str = f'价格：{generate_price(intervals=[(310, 370)])}元\n'
+    all_str.append(price_str)
 
     """
     图片文案
@@ -27,7 +30,7 @@ def run():
         else:
             xianyuimg.get_items(file)
 
-    print(xianyuimg)
+    all_str.append(str(xianyuimg))
 
     """
     咸鱼AI学习机
@@ -36,13 +39,15 @@ def run():
     xianyu = XianyuTextGenerator(data_dir)
 
     xianyu.run()  # start=4, end=7
-    print(xianyu)
-    return xianyu
+
+    all_str.append(str(xianyu))
+
+    return '\n'.join(all_str)
 
 
 if __name__ == '__main__':
     while True:
-        run()
+        print(run())
         print('\n')
         input("按 Enter 键运行一次，或 Ctrl+C 退出: ")
         print('\n')

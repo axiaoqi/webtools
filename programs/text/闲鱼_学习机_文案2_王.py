@@ -42,10 +42,12 @@ class XianyuTextGenerator2(XianyuTextGenerator):
 
 
 def run():
+    all_str = []
     """
     价格
     """
-    print(f'价格：{generate_price(intervals=[(310, 370)])}元\n')
+    price_str = f'价格：{generate_price(intervals=[(310, 370)])}元\n'
+    all_str.append(price_str)
 
     """
     图片文案
@@ -66,15 +68,15 @@ def run():
         else:
             xianyuimg.get_items(file)
 
-    print(xianyuimg)
+    all_str.append(str(xianyuimg))
 
     """
     咸鱼AI学习机
     """
     x = XianyuTextGenerator2(SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\01文案\文案素材2_抄王')
     x.run()
-    print(x)
-
+    all_str.append(str(x))
+    return '\n'.join(all_str)
 
 if __name__ == '__main__':
     while True:
