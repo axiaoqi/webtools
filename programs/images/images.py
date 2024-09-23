@@ -9,7 +9,7 @@ import shutil
 
 def copy_random_images(n, folder_paths, target_folder, image_name=None):
     """
-    功能1：从多个文件夹选取n张图片到目标文件夹
+    功能1：从多个文件夹随机选取n张图片到目标文件夹
     批量填充2图，尾图
     """
     all_images = []
@@ -51,7 +51,7 @@ def copy_random_images(n, folder_paths, target_folder, image_name=None):
 
 def copy_image_to_folders(folder_paths, target_folder, image_name=None):
     """
-    功能2：从多个文件夹读取所有的图片，复制到目标文件夹当主图
+    功能2：从多个文件夹读取所有的图片，复制到目标文件夹当主图，一张图片
     用来批量生成主图的
     """
     dst_folders = []

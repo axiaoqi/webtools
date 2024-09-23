@@ -48,7 +48,8 @@ def delete_selected_duplicates(duplicates):
 if __name__ == "__main__":
 
     folders = [
-        SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\02图片\01主图'
+        # SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\02图片\01主图'
+        r'C:\Users\e5\Desktop\新建文件夹'
     ]
 
     # 查找重复的图片
