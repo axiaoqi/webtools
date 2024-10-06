@@ -10,7 +10,7 @@ def run_web_images():
     # 主图文件夹
     primary_images_dir = [SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\00_学习机原图\源文件\闲鱼主图-娜娜子']
     # 目标文件夹
-    destination = SynologyDrive / fr'01新项目记录\闲鱼项目\AI学习机\00_学习机原图\娜娜子图片'  # 目的地路径
+    destination = SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\00_学习机原图\娜娜子图片'  # 目的地路径
 
     # 首图
     target_folders = copy_image_to_folders(primary_images_dir, destination, image_name='主图')
