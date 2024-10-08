@@ -1,4 +1,5 @@
 import datetime
+import os
 import random
 import re
 import time
@@ -35,6 +36,33 @@ def get_file_respnse(url, timeout=60, retries=5):
             print(f"尝试 {attempt + 1} 失败: {e}")
             if attempt == retries - 1:
                 return None  # 重试结束，返回 None
+
+
+# def download_file(url, file_path, max_duration=600):
+#     start_time = time.time()
+#     resume_header = {}
+#
+#     # 检查已下载的文件大小
+#     if file_path.exists():
+#         resume_header['Range'] = f'bytes={file_path.stat().st_size}-'
+#
+#     total_size = 0
+#     while total_size < (file_path.stat().st_size if file_path.exists() else 0):
+#         response = get_file_respnse(url)
+#         if response is None:
+#             print("下载失败！")
+#             return
+#
+#         total_size = int(response.headers.get('content-length', 0)) + file_path.stat().st_size
+#
+#         with open(file_path, "ab") as file:  # 以追加模式打开文件
+#             with tqdm(total=total_size, initial=file_path.stat().st_size, unit='B', unit_scale=True) as pbar:
+#                 for data in response.iter_content(chunk_size=1024):
+#                     if time.time() - start_time > max_duration:
+#                         print("下载超时！")
+#                         return
+#                     file.write(data)
+#                     pbar.update(len(data))
 
 
 def download_file(url, file_path, max_duration=1200):
@@ -214,5 +242,5 @@ if __name__ == '__main__':
     # download_file(url=url, file_path=file_path)
     while True:
         url = input('请输入需要下载的链接：')
-        file_dir = input('请输入文件保存路径：')
+        file_dir = input('请输入文件保存路径：') or r'C:\Users\e5\Desktop\小初资料\小学资料'
         run(url=url, file_dir=file_dir)
