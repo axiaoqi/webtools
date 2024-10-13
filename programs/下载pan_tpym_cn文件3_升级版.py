@@ -38,18 +38,13 @@ def get_file_respnse(url, timeout=60, retries=5):
                 return None  # 重试结束，返回 None
 
 
-def download_file(url, file_path, max_duration=1200, max_retries_1=3, max_retries=4):
+def download_file(url, file_path, max_duration=1200, max_retries=5):
     retries = 0
-    while retries < max_retries_1:
+    while retries < max_retries:
         try:
             start_time = time.time()
 
             response = get_file_respnse(url)
-
-            if response is None:
-                print("无法获取文件响应，下载失败。")
-                return
-
             total_size = int(response.headers.get('content-length', 0))
 
             with open(file_path, "wb") as file:
@@ -58,21 +53,11 @@ def download_file(url, file_path, max_duration=1200, max_retries_1=3, max_retrie
                         if time.time() - start_time > max_duration:
                             print("下载超时！")
                             break
-                        if not data:  # 如果没有数据返回，尝试重新下载
-                            print("网络波动，正在重新下载...")
-                            for retry in range(max_retries):
-                                response = get_file_respnse(url)
-                                if response is None:
-                                    print("重新下载失败，终止。")
-                                    return
-                                else:
-                                    print(f"重新下载尝试 {retry + 1} 成功。")
-                                    break
-                        else:
-                            file.write(data)
-                            pbar.update(len(data))
+                        file.write(data)
+                        pbar.update(len(data))
+            break
         except Exception as e:
-            print(f'发生错误: {e}')
+            print(f'下载中断，正在第{retries+1}次重试: {e}')
         retries += 1
         time.sleep(5)  # Wait for 5 seconds before retrying
     if retries == max_retries:

@@ -53,7 +53,7 @@ def run():
     图片文案
     """
 
-    img_txt_path = SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\01文案\图片内容'
+    img_txt_path = SynologyDrive / r'01新项目记录\AI学习机\01文案\图片内容'
     xianyuimg = XianyuImgTxt()
 
     # 打印所有的文件

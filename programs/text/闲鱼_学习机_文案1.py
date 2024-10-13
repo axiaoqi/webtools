@@ -35,7 +35,7 @@ def run():
     """
     咸鱼AI学习机
     """
-    data_dir = SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\01文案\文案素材1'
+    data_dir = SynologyDrive / r'01新项目记录\AI学习机\01文案\文案素材1'
     xianyu = XianyuTextGenerator(data_dir)
 
     xianyu.run()  # start=4, end=7
