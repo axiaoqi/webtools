@@ -43,7 +43,7 @@ class XianyuTextGenerator2(XianyuTextGenerator):
 
 def run():
     img_txt_path = SynologyDrive / r'01新项目记录\AI学习机\01文案\图片内容'
-    x = XianyuTextGenerator2(SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\01文案\文案素材2_抄王')
+    x = XianyuTextGenerator2(SynologyDrive / r'01新项目记录\AI学习机\01文案\文案素材2_抄王')
 
     all_str = []
 
