@@ -1,6 +1,6 @@
 import random
 from programs.text.xianyu_text import XianyuTextGenerator, XianyuImgTxt, generate_price
-from programs.settings import SynologyDrive
+from programs.settings import xuexiji_dir
 
 
 class XianyuTextGenerator2(XianyuTextGenerator):
@@ -42,8 +42,8 @@ class XianyuTextGenerator2(XianyuTextGenerator):
 
 
 def run():
-    img_txt_path = SynologyDrive / r'01新项目记录\AI学习机\01文案\图片内容'
-    x = XianyuTextGenerator2(SynologyDrive / r'01新项目记录\AI学习机\01文案\文案素材2_抄王')
+    img_txt_path = xuexiji_dir / r'01文案\图片内容'
+    x = XianyuTextGenerator2(xuexiji_dir / r'01文案\文案素材2_抄王')
 
     all_str = []
 
