@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from programs.text import 闲鱼_学习机_文案1, 闲鱼_学习机_文案2_王, 闲鱼学习机文案_好好学习
+from programs.text import 闲鱼_学习机_文案1, 闲鱼_学习机_文案2_王, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_娜娜子, 闲鱼学习机文案_花花
 from programs import 淘宝分享链接转真实URL
 
 app = Flask(__name__)
@@ -23,9 +23,14 @@ def run_program(program_name):
         result = 闲鱼_学习机_文案2_王.run()
     elif program_name == '闲鱼学习机文案_好好学习':
         result = 闲鱼学习机文案_好好学习.run()
+    elif program_name == '闲鱼学习机文案_娜娜子':
+        result = 闲鱼学习机文案_娜娜子.run()
+    elif program_name == '闲鱼学习机文案_花花':
+        result = 闲鱼学习机文案_花花.run()
 
     # 继续为其他程序添加分支
     return render_template('program.html', program_name=program_name, result=result)
+
 
 @app.route('/淘宝分享链接转真实URL', methods=['GET', 'POST'])
 def run_淘宝分享链接转真实URL_route():
