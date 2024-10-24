@@ -20,9 +20,7 @@ class BaseTextGenerator:
 class TextGenerator(BaseTextGenerator):
     """
     文案生成器基本功能的实现。
-
     实现的一些方法：
-
     """
     def __init__(self, data_dir: Path = None):
         self.data_dir = data_dir
