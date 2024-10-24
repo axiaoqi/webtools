@@ -7,21 +7,25 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <!-- 居中的返回首页菜单 -->
-    <nav>
-        <ul class="center-menu">
-            <li><a href="{{ url_for('home') }}" class="nav-btn">首页</a></li>
-        </ul>
-    </nav>
+    <div class="wrapper">
+        <div class="content">
+            <!-- 居中的返回首页菜单 -->
+            <nav>
+                <ul class="center-menu">
+                    <li><a href="{{ url_for('home') }}" class="nav-btn">首页</a></li>
+                </ul>
+            </nav>
 
-    <main>
-        {% block content %}
-        {% endblock %}
-    </main>
+            <main>
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
 
-    <!-- 页脚 -->
-    <footer>
-        <p>©2024 XiaoQi</p>
-    </footer>
+        <!-- 页脚 -->
+        <footer>
+            <p>©2024 XiaoQi. All rights reserved.</p>
+        </footer>
+    </div>
 </body>
 </html>

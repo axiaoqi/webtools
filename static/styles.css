@@ -7,6 +7,22 @@ body {
     overflow-x: hidden;  /* 避免水平滚动 */
 }
 
+/* 页脚样式 */
+html, body {
+    height: 100%; /* 使 html 和 body 高度为 100% */
+    margin: 0; /* 清除默认边距 */
+}
+
+.wrapper {
+    min-height: 100%; /* 确保内容至少填满整个页面 */
+    display: flex;
+    flex-direction: column; /* 纵向排列内容 */
+}
+
+.content {
+    flex: 1; /* 使内容区域填满剩余空间 */
+}
+
 /* 中心按钮容器，使用flexbox布局 */
 .center-button {
     display: flex;
@@ -126,7 +142,7 @@ footer {
     bottom: 0;
     width: 100%;
     text-align: center;
-    padding: 5px 0;
+    padding: 20px 0;
 }
 
 /* 确保页脚和按钮不会重叠 */
@@ -147,5 +163,3 @@ main {
     transform: translateX(-50%);
     z-index: 1000; /* 确保它在其他元素之上显示 */
 }
-
-
