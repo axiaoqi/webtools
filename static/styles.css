@@ -11,7 +11,7 @@ body {
 .center-button {
     display: flex;
     justify-content: center;
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 /* 设置按钮样式，调整适应移动设备的大小 */
@@ -123,13 +123,10 @@ nav {
 
 /* 页脚样式 */
 footer {
-    position: fixed;
     bottom: 0;
     width: 100%;
     text-align: center;
-    background-color: #f4f4f4;
-    padding: 10px 0;
-    border-top: 1px solid #ccc;
+    padding: 5px 0;
 }
 
 /* 确保页脚和按钮不会重叠 */
