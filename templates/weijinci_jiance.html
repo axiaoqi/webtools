@@ -77,9 +77,10 @@
         <form method="POST">
             <label for="platform">选择平台：</label>
             <select name="platform">
-                <option value="douyin_banned.txt" {% if selected_file == "douyin_banned.txt" %}selected{% endif %}>抖音</option>
-                <option value="xianyu_banned.txt" {% if selected_file == "xianyu_banned.txt" %}selected{% endif %}>闲鱼</option>
-                <option value="xiaohongshu_banned.txt" {% if selected_file == "xiaohongshu_banned.txt" %}selected{% endif %}>小红书</option>
+{#                下面是选择违禁词文件，添加时候需要更改#}
+                <option value="闲鱼_违禁词.txt" {% if selected_file == "闲鱼_违禁词.txt" %}selected{% endif %}>闲鱼</option>
+                <option value="抖音_违禁词.txt" {% if selected_file == "抖音_违禁词.txt" %}selected{% endif %}>抖音</option>
+                <option value="小红书_违禁词.txt" {% if selected_file == "小红书_违禁词.txt" %}selected{% endif %}>小红书</option>
             </select><br>
 
             <textarea name="input_text" placeholder="请输入文本进行检查...">{{ request.form['input_text'] }}</textarea><br>

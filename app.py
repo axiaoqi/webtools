@@ -47,7 +47,7 @@ def run_淘宝分享链接转真实URL_route():
 @app.route('/违禁词检测', methods=['GET', 'POST'])
 def run_违禁词检测_route():
     result_text = ""
-    selected_file = "xianyu_banned.txt"  # 默认选择抖音
+    selected_file = "闲鱼_违禁词.txt"  # 默认选择抖音
     if request.method == "POST":
         input_text = request.form['input_text']
         selected_file = request.form['platform']
