@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from programs.text import 闲鱼_学习机_文案1, 闲鱼_学习机_文案2_王, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_娜娜子, 闲鱼学习机文案_花花
+from programs.text.违禁词检测.违禁词检测 import load_banned_words, check_for_banned_words
 from programs import 淘宝分享链接转真实URL
 
 app = Flask(__name__)
@@ -41,6 +42,21 @@ def run_淘宝分享链接转真实URL_route():
         result = 淘宝分享链接转真实URL.run(input_data)
 
     return render_template('taobao_realurl.html', result=result)
+
+
+@app.route('/违禁词检测', methods=['GET', 'POST'])
+def run_违禁词检测_route():
+    result_text = ""
+    selected_file = "douyin_banned.txt"  # 默认选择抖音
+    if request.method == "POST":
+        input_text = request.form['input_text']
+        selected_file = request.form['platform']
+        banned_words = load_banned_words(selected_file)
+        result_text = check_for_banned_words(input_text, banned_words)
+
+        print(selected_file, banned_words, result_text)
+
+    return render_template("weijinci_jiance.html", result_text=result_text, selected_file=selected_file)
 
 
 if __name__ == '__main__':
