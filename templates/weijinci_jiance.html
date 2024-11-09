@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>违禁词检查</title>
-    <style>
+{% extends 'base.html' %}
+
+{% block title %}违禁词检测{% endblock %}
+
+{% block content %}
+        <style>
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -72,9 +71,8 @@
             border-radius: 5px;
         }
     </style>
-</head>
-<body>
-    <div class="container">
+
+        <div class="container">
         <h1>违禁词检查器</h1>
         <form method="POST">
             <label for="platform">选择平台：</label>
@@ -100,7 +98,7 @@
         {% endif %}
     </div>
 
-    <!-- 复制到剪贴板功能 -->
+        <!-- 复制到剪贴板功能 -->
     <script>
         // 复制到剪贴板功能
         function copyToClipboard() {
@@ -152,5 +150,4 @@
             }
         };
     </script>
-</body>
-</html>
+{% endblock %}
