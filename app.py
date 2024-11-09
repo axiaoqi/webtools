@@ -54,8 +54,6 @@ def run_违禁词检测_route():
         banned_words = load_banned_words(selected_file)
         result_text = check_for_banned_words(input_text, banned_words)
 
-        print(selected_file, banned_words, result_text)
-
     return render_template("weijinci_jiance.html", result_text=result_text, selected_file=selected_file)
 
 
