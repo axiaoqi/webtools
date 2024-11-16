@@ -51,9 +51,10 @@ result = [link for link in links if link.startswith('3.') and compare_versions(l
 
 # windows
 # download_urls = [url + link + '/' + 'python-' + link + '-amd64.exe' for link in result]
-# macOS
-download_urls = [url + link + '/' + 'python-' + link + '-macos11.pkg' for link in result]
-
+# macOS11
+# download_urls = [url + link + '/' + 'python-' + link + '-macos11.pkg' for link in result]
+# macOS10.9
+download_urls = [url + link + '/' + 'python-' + link + '-macosx10.9.pkg' for link in result]
 
 print(download_urls)
 
