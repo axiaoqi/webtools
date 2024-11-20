@@ -17,7 +17,8 @@ class HaoHaoXueXi(XianyuTextGenerator):
         # second_list = self._open_file(self.data_dir / r'好好学习_文案\02_标题.txt')
         # choice_item = random.choice(second_list)
         # self.choice_items.append(choice_item)
-        self.choice_items.append(xuexiji_name())
+        name_file = xuexiji_dir / r'01文案\好好学习_文案\02_多字段标题生成.txt'
+        self.choice_items.append(xuexiji_name(name_file))
 
         # 第3句，故事，售卖原因--通用文案
         third_list = self._open_file(self.data_dir / r'01通用文案\03_故事.txt')

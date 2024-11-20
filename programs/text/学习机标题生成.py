@@ -14,8 +14,7 @@ def _open_file(file_path: Path, sep: str):
     return data
 
 
-def xuexiji_name():
-    name_file = xuexiji_dir / r'01文案\好好学习_文案\02_多字段标题生成.txt'
+def xuexiji_name(name_file):
     data = _open_file(name_file, sep='——')
 
     # 构建学习机名称
