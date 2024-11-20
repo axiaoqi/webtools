@@ -6,7 +6,7 @@ from programs.settings import xuexiji_dir
 class HaoHaoXueXi(XianyuTextGenerator):
     def run(self, start=None, end=None):
 
-        # 第1句，卖点
+        # 第1句，卖点--通用文案
         first_list = self._open_file(self.data_dir / r'01通用文案\01_卖点.txt')
         choice_item = random.choice(first_list)
         self.choice_items.append(choice_item)
@@ -16,7 +16,7 @@ class HaoHaoXueXi(XianyuTextGenerator):
         # choice_item = random.choice(second_list)
         # self.choice_items.append(choice_item)
 
-        # 第3句，故事，售卖原因
+        # 第3句，故事，售卖原因--通用文案
         third_list = self._open_file(self.data_dir / r'01通用文案\03_故事.txt')
         choice_item = random.choice(third_list)
         self.choice_items.append(choice_item)

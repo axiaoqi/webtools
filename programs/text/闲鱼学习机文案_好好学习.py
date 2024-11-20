@@ -25,9 +25,9 @@ class HaoHaoXueXi(XianyuTextGenerator):
         self.choice_items.append('\n' + choice_item)
 
         # 第4句，卖点提炼，分割符分割
-        fourth_list = self._open_file_by_sep(self.data_dir / r'好好学习_文案\04_卖点提炼.txt', sep='|||')
-        choice_item = random.choice(fourth_list)
-        self.choice_items.append('\n' + choice_item)
+        # fourth_list = self._open_file_by_sep(self.data_dir / r'好好学习_文案\04_卖点提炼.txt', sep='|||')
+        # choice_item = random.choice(fourth_list)
+        # self.choice_items.append('\n' + choice_item)
 
         # 添加一个名言警句
         self.choice_items.append('\n每日名言：' + xue_xi_ming_yan())
