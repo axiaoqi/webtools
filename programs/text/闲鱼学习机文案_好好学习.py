@@ -1,5 +1,5 @@
 import random
-from programs.text.xianyu_text import XianyuTextGenerator, XianyuImgTxt, generate_price
+from programs.text.xianyu_text import XianyuTextGenerator
 from programs.settings import xuexiji_dir
 from programs.text.名言警句_百度 import xue_xi_ming_yan
 from programs.text.学习机标题生成 import xuexiji_name
