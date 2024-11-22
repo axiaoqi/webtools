@@ -1,4 +1,8 @@
+import time
+
 from flask import Flask, render_template, request
+
+from programs.quant.股票分红监控 import calculate_stock_dividends
 from programs.text import 闲鱼_学习机_文案1, 闲鱼_学习机_文案2_王, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_苏苏, 闲鱼学习机文案_花花
 from programs.text.违禁词检测.违禁词检测 import load_banned_words, check_for_banned_words
 from programs import 淘宝分享链接转真实URL
@@ -55,6 +59,37 @@ def run_违禁词检测_route():
         result_text = check_for_banned_words(input_text, banned_words)
 
     return render_template("weijinci_jiance.html", result_text=result_text, selected_file=selected_file)
+
+
+@app.route('/股票分红监测', methods=['GET', 'POST'])
+def run_股票分红监测_route():
+    stock_names = ""
+    year = 2023  # 默认值
+    investment_amount = 200000.0  # 默认值
+
+    if request.method == "POST":
+        # 获取表单数据
+        stock_names = request.form["stock_names"].splitlines()  # 将每行分开，成为股票名称列表
+        year = int(request.form["year"])
+        investment_amount = float(request.form["investment_amount"])
+
+        # 调用计算函数
+        df = calculate_stock_dividends(stock_names=stock_names, dividend_year=year, initial_cash=investment_amount)
+
+        # 检查 df 是否有效
+        if df is None or df.empty:
+            return render_template("fenhong_jiance.html", result=False, message="没有找到符合条件的数据。",
+                                   stock_names=stock_names, dividend_year=year, initial_cash=investment_amount)
+
+        # 将 DataFrame 转换为 HTML 表格，并传递给模板
+        df_html = df.to_html(classes='data', header=True, index=False)
+
+        # 返回结果
+        return render_template("fenhong_jiance.html", tables=df_html, result=True,
+                               stock_names=stock_names, dividend_year=year, initial_cash=investment_amount)
+
+    return render_template("fenhong_jiance.html", result=False, stock_names=stock_names, dividend_year=year,
+                           initial_cash=investment_amount)
 
 
 if __name__ == '__main__':
