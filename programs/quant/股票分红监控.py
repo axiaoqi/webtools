@@ -54,4 +54,5 @@ def calculate_stock_dividends(stock_names: list, dividend_year: int, initial_cas
 
     # 然后输出dataframe，按分红金额从大到小排序
     df.insert(2, '1y_dividend', df.pop('1y_dividend'))
+    df.insert(3, 'current', df.pop('current'))
     return df
