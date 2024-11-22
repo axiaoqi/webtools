@@ -53,4 +53,5 @@ def calculate_stock_dividends(stock_names: list, dividend_year: int, initial_cas
     df['1y_dividend'] = df['can_buy_num'] * df['per_ten_pre_tax_dividend_ratio_rmb'] / 10.0
 
     # 然后输出dataframe，按分红金额从大到小排序
+    df.insert(2, '1y_dividend', df.pop('1y_dividend'))
     return df

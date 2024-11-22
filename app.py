@@ -63,33 +63,26 @@ def run_违禁词检测_route():
 
 @app.route('/股票分红监测', methods=['GET', 'POST'])
 def run_股票分红监测_route():
-    stock_names = ""
-    year = 2023  # 默认值
-    investment_amount = 200000.0  # 默认值
-
+    stock_names = ''
+    dividend_year = 2023
+    initial_cash = 200000
     if request.method == "POST":
-        # 获取表单数据
-        stock_names = request.form["stock_names"].splitlines()  # 将每行分开，成为股票名称列表
-        year = int(request.form["year"])
-        investment_amount = float(request.form["investment_amount"])
+        # 获取用户输入的数据
+        stock_names = request.form['stock_names'].splitlines()  # 用户输入的股票名称按行分割
+        dividend_year = int(request.form['dividend_year'])
+        initial_cash = float(request.form['initial_cash'])
 
-        # 调用计算函数
-        df = calculate_stock_dividends(stock_names=stock_names, dividend_year=year, initial_cash=investment_amount)
+        # 调用分红计算函数
+        result_df = calculate_stock_dividends(stock_names, dividend_year, initial_cash)
 
-        # 检查 df 是否有效
-        if df is None or df.empty:
-            return render_template("fenhong_jiance.html", result=False, message="没有找到符合条件的数据。",
-                                   stock_names=stock_names, dividend_year=year, initial_cash=investment_amount)
+        # 将结果转换为 HTML 表格进行展示
+        result_html = result_df.to_html(classes='table table-bordered', index=False)
 
-        # 将 DataFrame 转换为 HTML 表格，并传递给模板
-        df_html = df.to_html(classes='data', header=True, index=False)
+        return render_template("fenhong_jiance.html", result_html=result_html, stock_names='\n'.join(stock_names),
+                               dividend_year=dividend_year, initial_cash=initial_cash)
 
-        # 返回结果
-        return render_template("fenhong_jiance.html", tables=df_html, result=True,
-                               stock_names=stock_names, dividend_year=year, initial_cash=investment_amount)
-
-    return render_template("fenhong_jiance.html", result=False, stock_names=stock_names, dividend_year=year,
-                           initial_cash=investment_amount)
+    return render_template("fenhong_jiance.html", stock_names=stock_names, dividend_year=dividend_year,
+                           initial_cash=initial_cash)
 
 
 if __name__ == '__main__':
