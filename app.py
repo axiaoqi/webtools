@@ -2,6 +2,8 @@ import time
 
 from flask import Flask, render_template, request
 
+from html import escape
+from programs.music.query_url_from_csv import query_musics
 from programs.quant.股票分红监控 import calculate_stock_dividends
 from programs.text import 闲鱼_学习机_文案1, 闲鱼_学习机_文案2_王, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_苏苏, 闲鱼学习机文案_花花
 from programs.text.违禁词检测.违禁词检测 import load_banned_words, check_for_banned_words
@@ -83,6 +85,41 @@ def run_股票分红监测_route():
 
     return render_template("fenhong_jiance.html", stock_names=stock_names, dividend_year=dividend_year,
                            initial_cash=initial_cash)
+
+
+@app.route('/音乐下载', methods=['GET', 'POST'])
+def run_音乐下载_route():
+    music_names = ''
+    if request.method == "POST":
+        # 获取用户输入的数据
+        music_names = request.form['music_names'].splitlines()  # 用户输入的音乐名称按行分割
+        print(music_names)
+        s = query_musics(music_names)
+        result_html = s.replace('\n', '<br>')
+        return render_template("music_download.html", result_html=result_html, music_names='\n'.join(music_names))
+
+    return render_template("music_download.html", music_names=music_names)
+
+
+# @app.route('/音乐添加', methods=['GET', 'POST'])
+# def run_音乐添加_route():
+#     if request.method == "POST":
+#         # 获取用户输入的数据
+#         stock_names = request.form['stock_names'].splitlines()  # 用户输入的股票名称按行分割
+#         dividend_year = int(request.form['dividend_year'])
+#         initial_cash = float(request.form['initial_cash'])
+#
+#         # 调用分红计算函数
+#         result_df = calculate_stock_dividends(stock_names, dividend_year, initial_cash)
+#
+#         # 将结果转换为 HTML 表格进行展示
+#         result_html = result_df.to_html(classes='table table-bordered', index=False)
+#
+#         return render_template("fenhong_jiance.html", result_html=result_html, stock_names='\n'.join(stock_names),
+#                                dividend_year=dividend_year, initial_cash=initial_cash)
+#
+#     return render_template("fenhong_jiance.html", stock_names=stock_names, dividend_year=dividend_year,
+#                            initial_cash=initial_cash)
 
 
 if __name__ == '__main__':
