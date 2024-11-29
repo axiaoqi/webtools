@@ -27,7 +27,6 @@ columns = ['music_name', 'music_url_baidu', 'music_url_kuake',
 
 
 def get_music_file_path(music_name):
-    music_name = '童话镇 - 陈一发儿.flac'
     music_format = os.path.splitext(music_name)[1][1:]  # 获取歌曲扩展名
     music_author = os.path.splitext(music_name)[0].split(' - ')[-1]  # 获取歌手名
     music_path = music_data_dir / music_format / music_author / music_name  # 获取歌曲的路径，可以用来发邮件
