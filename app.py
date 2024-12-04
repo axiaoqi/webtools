@@ -32,7 +32,7 @@ def run_program(program_name):
         result = 闲鱼_学习机_文案2_王.run()
     elif program_name == '闲鱼学习机文案_好好学习':
         result = 闲鱼学习机文案_好好学习.run()
-    elif program_name == '闲鱼学习机文案_娜娜子':
+    elif program_name == '闲鱼学习机文案_苏苏':
         result = 闲鱼学习机文案_苏苏.run()
     elif program_name == '闲鱼学习机文案_花花':
         result = 闲鱼学习机文案_花花.run()
