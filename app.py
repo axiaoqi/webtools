@@ -7,7 +7,7 @@ from html import escape
 from programs.music.music import add_music_url
 from programs.music.query_url_from_csv import query_musics
 from programs.quant.股票分红监控 import calculate_stock_dividends
-from programs.text import 闲鱼_学习机_文案1, 闲鱼_学习机_文案2_王, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_苏苏, 闲鱼学习机文案_花花
+from programs.text import 闲鱼学习机文案_通用, 闲鱼_学习机_文案2_王, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_苏苏, 闲鱼学习机文案_花花
 from programs.text.违禁词检测.违禁词检测 import load_banned_words, check_for_banned_words
 from programs import 淘宝分享链接转真实URL
 
@@ -26,8 +26,8 @@ def run_program(program_name):
     result = None
 
     # 根据传入的 program_name 动态调用不同的程序
-    if program_name == '闲鱼_学习机_文案1':
-        result = 闲鱼_学习机_文案1.run()
+    if program_name == '闲鱼学习机文案_通用':
+        result = 闲鱼学习机文案_通用.run()
     elif program_name == '闲鱼_学习机_文案2_王':
         result = 闲鱼_学习机_文案2_王.run()
     elif program_name == '闲鱼学习机文案_好好学习':
