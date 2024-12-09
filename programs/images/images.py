@@ -5,6 +5,7 @@
 import random
 from pathlib import Path
 import shutil
+from typing import List
 
 
 def copy_random_images(n, folder_paths, target_folder, image_name=None):
@@ -86,15 +87,44 @@ def copy_image_to_folders(folder_paths, target_folder, image_name=None):
     return dst_folders
 
 
-if __name__ == '__main__':
-    from programs.settings import SynologyDrive
+def copy_images_must_and_other(must_select_folders: List[Path], other_folders: List[Path], target_folder: Path, total_images=8):
+    # 存储选择的图片路径
+    selected_images = []
 
-    white_primary = SynologyDrive / r'01新项目记录\咸鱼项目\AI学习机\白色主图收集'
-    black_primary = SynologyDrive / r'01新项目记录\咸鱼项目\AI学习机\黑色主图收集'
-    destination = Path.home() / 'Desktop'  # 目的地路径
+    # 定义支持的图片扩展名
+    valid_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp'}
 
-    dst_folders = copy_image_to_folders(
-        folder_paths=[white_primary, black_primary],
-        target_folder=destination
-    )
-    print(dst_folders)
+    # 从必选文件夹中随机选择一个图片
+    for folder in must_select_folders:
+        folder_path = Path(folder)
+        image_files = [f for f in folder_path.glob('*') if f.suffix.lower() in valid_extensions]  # 过滤图片扩展名
+        if image_files:
+            selected_images.append(random.choice(image_files))
+
+    # 计算还需要从其他文件夹选择的图片数量
+    remaining_images_count = total_images - len(selected_images)
+
+    # 从其他文件夹中随机选择图片，直到补充到总共 8 张图片
+    other_selected_images = []
+
+    if remaining_images_count > 0:
+        # 如果其他文件夹数量不足，随机选取一些文件夹
+        random_other_folders = random.sample(other_folders, min(remaining_images_count, len(other_folders)))
+        for folder in random_other_folders:
+            folder_path = Path(folder)
+            image_files = [f for f in folder_path.glob('*') if f.suffix.lower() in valid_extensions]  # 过滤图片扩展名
+            if image_files:
+                other_selected_images.append(random.choice(image_files))
+
+    # 合并所有选择的图片
+    all_selected_images = selected_images + other_selected_images
+
+    # 如果图片总数不足 8 张，继续从已选的文件夹中补充
+    while len(all_selected_images) < total_images:
+        all_selected_images.append(random.choice(all_selected_images))  # 随机重复已有的图片
+
+    # 复制图片到目标文件夹
+    for img in all_selected_images:
+        shutil.copy(img, target_folder)
+
+    print(f"成功复制了 {len(all_selected_images)} 张图片到 {target_folder}")
