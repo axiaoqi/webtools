@@ -1,6 +1,4 @@
-from pathlib import Path
-
-from programs.images.images import copy_random_images, copy_image_to_folders, copy_images_must_and_other
+from programs.images.images import copy_image_to_folders, copy_images_must_and_other
 
 
 def run_web_images():
