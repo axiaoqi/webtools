@@ -49,8 +49,10 @@ if __name__ == "__main__":
 
     folders = [
         # SynologyDrive / r'01新项目记录\闲鱼项目\AI学习机\02图片\01主图'
-        r'C:\Users\e5\Desktop\新建文件夹',
-        r'C:\Users\e5\SynologyDrive\01新项目记录\闲鱼项目\AI学习机\00_学习机原图\源文件\闲鱼主图-花花'
+        # r'C:\Users\e5\Desktop\新建文件夹',
+        # r'C:\Users\e5\SynologyDrive\01新项目记录\闲鱼项目\AI学习机\00_学习机原图\源文件\闲鱼主图-花花'
+        r'D:\SynologyDrive\01新项目记录\02_AI学习机\02图片\09素材',
+        # r'D:\SynologyDrive\01新项目记录\02_AI学习机\02图片\09素材\01主图_无水印'
 
     ]
 
