@@ -96,35 +96,66 @@ def copy_images_must_and_other(must_select_folders: List[Path], other_folders: L
 
     # 从必选文件夹中随机选择一个图片
     for folder in must_select_folders:
-        folder_path = Path(folder)
-        image_files = [f for f in folder_path.glob('*') if f.suffix.lower() in valid_extensions]  # 过滤图片扩展名
+        image_files = [f for f in folder.glob('*') if f.suffix.lower() in valid_extensions]  # 过滤图片扩展名
         if image_files:
             selected_images.append(random.choice(image_files))
 
     # 计算还需要从其他文件夹选择的图片数量
     remaining_images_count = total_images - len(selected_images)
-
     # 从其他文件夹中随机选择图片，直到补充到总共 8 张图片
     other_selected_images = []
-
+    other_folder_one_images = []
+    # 选其他剩余的图片
     if remaining_images_count > 0:
-        # 如果其他文件夹数量不足，随机选取一些文件夹
-        random_other_folders = random.sample(other_folders, min(remaining_images_count, len(other_folders)))
-        for folder in random_other_folders:
-            folder_path = Path(folder)
-            image_files = [f for f in folder_path.glob('*') if f.suffix.lower() in valid_extensions]  # 过滤图片扩展名
+        # 其他文件夹每个文件夹选一个图片出来
+        for folder in other_folders:
+            image_files = [f for f in folder.glob('*') if f.suffix.lower() in valid_extensions]  # 过滤图片扩展名
             if image_files:
-                other_selected_images.append(random.choice(image_files))
+                other_folder_one_images.append(random.choice(image_files))
+
+        # 再从上面结果选（total_images - len(必选图片)）张
+        other_selected_images = random.sample(other_folder_one_images, remaining_images_count)
 
     # 合并所有选择的图片
     all_selected_images = selected_images + other_selected_images
-
-    # 如果图片总数不足 8 张，继续从已选的文件夹中补充
-    while len(all_selected_images) < total_images:
-        all_selected_images.append(random.choice(all_selected_images))  # 随机重复已有的图片
 
     # 复制图片到目标文件夹
     for img in all_selected_images:
         shutil.copy(img, target_folder)
 
     print(f"成功复制了 {len(all_selected_images)} 张图片到 {target_folder}")
+
+
+# ************************************
+# 主程序
+# ************************************
+def run_web_images(primary_images_dir, destination):
+    from programs.settings import SynologyDrive
+    image_materials_folder = SynologyDrive / r'01新项目记录\02_AI学习机\02图片\09素材'
+
+    # 主图
+    target_folders = copy_image_to_folders(primary_images_dir, destination, image_name='主图')
+    print(target_folders)
+
+    # 其他8张图
+    must_choose_folders = [
+        image_materials_folder / '02整体展示',
+        image_materials_folder / '03配件图',
+        image_materials_folder / '04小孩使用图',
+        image_materials_folder / '05同步课程图',
+        image_materials_folder / '06拍照搜题图',
+    ]
+
+    other_folders = [
+        image_materials_folder / '07AR智慧眼图',
+        image_materials_folder / '08选课图',
+        image_materials_folder / '09练习图',
+        image_materials_folder / '10幼儿园图',
+        image_materials_folder / '11护眼模式图',
+        image_materials_folder / '19其他细节图',
+        # ...更多文件夹
+    ]
+
+    # 循环掺入其他图片
+    for target_folder in target_folders:
+        copy_images_must_and_other(must_choose_folders, other_folders, target_folder)
