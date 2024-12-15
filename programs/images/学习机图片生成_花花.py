@@ -7,6 +7,6 @@ if __name__ == '__main__':
     # 主图文件夹
     primary_images_dir = [image_dir / '素材_花花家主图']
     # 目标文件夹
-    destination = SynologyDrive / '02花花家图片'
+    destination = image_dir / '02花花家图片'
 
     run_web_images(primary_images_dir, destination)

@@ -151,7 +151,7 @@ def run_web_images(primary_images_dir, destination):
         image_materials_folder / '08选课图',
         image_materials_folder / '09练习图',
         image_materials_folder / '10幼儿园图',
-        image_materials_folder / '11护眼模式图',
+        # image_materials_folder / '11护眼模式图',
         image_materials_folder / '19其他细节图',
         # ...更多文件夹
     ]
