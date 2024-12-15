@@ -4,18 +4,109 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}My Website{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <!--bootstrap-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <!--自定义的css文件-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <style>
+        /* 设置导航栏背景色为白色，并固定在顶部 */
+        .navbar {
+            background-color: #fff;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000; /* 保证导航栏在最上面 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 轻微阴影 */
+            padding: 0.5rem 2rem;
+        }
+
+        /* 菜单项默认颜色 */
+        .navbar-nav .nav-link {
+            color: #333; /* 黑色文本 */
+            font-family: 'San Francisco', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            text-transform: uppercase; /* 菜单项字母大写 */
+            padding: 0.5rem 1rem;
+        }
+
+        /* 菜单项悬停效果 */
+        .navbar-nav .nav-link:hover {
+            color: #666; /* 悬停时颜色变浅 */
+            text-decoration: none;
+        }
+
+        /* 下拉菜单样式 */
+        .dropdown-menu {
+            background-color: #fff; /* 白色背景 */
+            border: 1px solid #ddd; /* 边框颜色 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+        }
+
+        /* 下拉菜单项悬停效果 */
+        .dropdown-item:hover {
+            background-color: #f1f1f1; /* 悬停时变成浅灰色 */
+            color: #333; /* 文字颜色 */
+        }
+
+        /* 使用 Flexbox 让菜单项居中 */
+        .navbar-nav {
+            display: flex;
+            justify-content: center; /* 居中对齐菜单项 */
+            flex-grow: 1; /* 确保导航栏占满整个宽度 */
+        }
+
+        /* 响应式设计：菜单项居中 */
+        @media (max-width: 767px) {
+            .navbar-nav {
+                text-align: center; /* 手机端菜单项居中 */
+            }
+        }
+
+        /* 让页面内容避免被菜单遮挡，给页面内容加一个合适的顶部空隙 */
+        body {
+            padding-top: 70px; /* 根据导航栏的高度调整 */
+        }
+    </style>
 </head>
+
 <body>
     <div class="wrapper">
         <div class="content">
-            <!-- 居中的返回首页菜单 -->
-            <nav>
-                <ul class="center-menu">
-                    <li><a href="{{ url_for('home') }}" class="nav-btn">首页</a></li>
-                </ul>
+
+            <!-- 导航栏 -->
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container-fluid">
+                    <!-- 响应式按钮 -->
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <!-- 菜单项 -->
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav"> <!-- 默认对齐左边，无需 ms-auto -->
+
+                            <!-- 单独菜单, 首页 -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('home') }}">首页</a>
+                            </li>
+
+                            <!-- 下拉菜单, 股票 -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    股票
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{{ url_for('run_股票分红监测_route') }}">股票分红</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </nav>
 
+            <!-- 内容 -->
             <main>
                 {% block content %}
                 {% endblock %}
@@ -23,9 +114,13 @@
         </div>
 
         <!-- 页脚 -->
-        <footer>
-            <p>©2024 XiaoQi. All rights reserved.</p>
+        <footer class="bg-light text-center">
+            <p>©{{ current_year }} XiaoQi. All rights reserved.</p>
         </footer>
     </div>
+
+    <!-- 引入 Bootstrap 5 JS 和 Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

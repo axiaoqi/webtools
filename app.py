@@ -1,3 +1,4 @@
+import datetime
 import time
 
 from flask import Flask, render_template, request
@@ -13,6 +14,11 @@ from programs import 淘宝分享链接转真实URL
 
 app = Flask(__name__)
 
+
+# 添加自定义 Jinja2 宏
+@app.context_processor
+def inject_year():
+    return {'current_year': datetime.datetime.now().year}
 
 # 首页
 @app.route('/')
