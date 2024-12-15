@@ -3,31 +3,30 @@
 {% block title %}Python程序管理系统{% endblock %}
 
 {% block content %}
+    <!--网站网址-->
+    {% set base_url = "http://iuhui.com" %}
 
-<div class="button-container">
-    <!--mp3代下载-->
-    <a href="{{ url_for('run_音乐下载_route') }}" class="btn">音乐下载</a>
-    <a href="{{ url_for('run_音乐添加_route') }}" class="btn">音乐添加</a>
+    <div class="button-container">
+        <!--mp3代下载-->
+        <a href="{{ url_for('run_音乐下载_route') }}" class="btn">音乐下载</a>
+        <a href="{{ url_for('run_音乐添加_route') }}" class="btn">音乐添加</a>
 
-    <a href="http://iuhui.com:4004/01%E8%B5%84%E6%96%99%E9%A1%B9%E7%9B%AE/%E8%B5%84%E6%96%99%E9%93%BE%E6%8E%A5.html" class="btn" target="_blank">电子资料</a>
+        <a href="{{ base_url ~ ':4004/01%E8%B5%84%E6%96%99%E9%A1%B9%E7%9B%AE/%E8%B5%84%E6%96%99%E9%93%BE%E6%8E%A5.html' }}" class="btn" target="_blank">电子资料</a>
 
-{#    <a href="{{ url_for('run_program', program_name='闲鱼_学习机_文案1') }}" class="btn">运行_闲鱼_学习机_文案1</a>#}
-{#    <a href="{{ url_for('run_program', program_name='闲鱼_学习机_文案2_王') }}" class="btn">运行_闲鱼_学习机_文案2_王</a>#}
+        <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_好好学习') }}" class="btn">闲鱼学习机文案_好好学习</a>
+        <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_花花') }}" class="btn">闲鱼学习机文案_花花</a>
+        <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_苏苏') }}" class="btn">闲鱼学习机文案_苏苏</a>
+        <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_通用') }}" class="btn">闲鱼学习机文案_通用</a>
 
-    <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_好好学习') }}" class="btn">闲鱼学习机文案_好好学习</a>
-    <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_花花') }}" class="btn">闲鱼学习机文案_花花</a>
-    <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_苏苏') }}" class="btn">闲鱼学习机文案_苏苏</a>
-    <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_通用') }}" class="btn">闲鱼学习机文案_通用</a>
+        <a href="{{ url_for('run_program', program_name='闲鱼点读笔文案') }}" class="btn">闲鱼点读笔文案</a>
 
-    <a href="{{ url_for('run_program', program_name='闲鱼点读笔文案') }}" class="btn">闲鱼点读笔文案</a>
-
-    <a href="{{ url_for('run_违禁词检测_route') }}" class="btn">违禁词检测</a>
-    <a href="{{ url_for('run_淘宝分享链接转真实URL_route') }}" class="btn">淘宝分享链接转真实URL</a>
-    <a href="{{ url_for('run_股票分红监测_route') }}" class="btn">股票分红监测</a>
-
+        <a href="{{ url_for('run_违禁词检测_route') }}" class="btn">违禁词检测</a>
+        <a href="{{ url_for('run_淘宝分享链接转真实URL_route') }}" class="btn">淘宝分享链接转真实URL</a>
+        <a href="{{ url_for('run_股票分红监测_route') }}" class="btn">股票分红监测</a>
 
 
-    <a href="https://www.eteste.com/" class="btn" target="_blank">字符数统计</a>
-    <!-- 添加更多按钮 -->
-</div>
+
+        <a href="https://www.eteste.com/" class="btn" target="_blank">字符数统计</a>
+        <!-- 添加更多按钮 -->
+    </div>
 {% endblock %}
