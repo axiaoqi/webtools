@@ -33,10 +33,10 @@ class TongYongXueXiJi(XianyuTextGenerator):
         choice_item = random.choice(fifth_list)
         self.choice_items.append(choice_item)
 
-        # 第8句，英语名言
-        eighth_list = self._open_file(self.data_dir / r'01通用文案\152个名言警句-英文.txt')
-        choice_item = '一天一句【英语写作素材】：' + random.choice(eighth_list) + '\n咨询客服，可免费赠送150多句英语名言警句txt文档，后期还可免费更新，小学初中高中英语作文神器！！'
-        self.choice_items.append(choice_item)
+        # # 第8句，英语名言
+        # eighth_list = self._open_file(self.data_dir / r'01通用文案\152个名言警句-英文.txt')
+        # choice_item = '一天一句【英语写作素材】：' + random.choice(eighth_list) + '\n咨询客服，可免费赠送150多句英语名言警句txt文档，后期还可免费更新，小学初中高中英语作文神器！！'
+        # self.choice_items.append(choice_item)
 
         return self.choice_items
 

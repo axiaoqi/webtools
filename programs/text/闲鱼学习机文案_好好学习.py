@@ -30,8 +30,8 @@ class HaoHaoXueXi(XianyuTextGenerator):
         # choice_item = random.choice(fourth_list)
         # self.choice_items.append('\n' + choice_item)
 
-        # 添加一个名言警句
-        self.choice_items.append('\n每日名言：' + xue_xi_ming_yan())
+        # # 添加一个名言警句
+        # self.choice_items.append('\n每日名言：' + xue_xi_ming_yan())
 
         # 第5句，硬件参数，分割符分割
         fourth_list = self._open_file_by_sep(self.data_dir / r'好好学习_文案\05_参数_硬件.txt', sep='|||')
