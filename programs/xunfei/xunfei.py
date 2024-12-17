@@ -1,12 +1,20 @@
+import json
+
 from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
 from sparkai.core.messages import ChatMessage
+from programs.settings import SynologyDrive
+
+# api秘钥存到自己电脑
+config_file_path = SynologyDrive / r'Quant\config_file\xunfei_config_file.json'
+with open(config_file_path, 'r') as f:
+    data = json.load(f)
 
 #星火认知大模型Spark Max的URL值，其他版本大模型URL值请前往文档（https://www.xfyun.cn/doc/spark/Web.html）查看
 SPARKAI_URL = 'wss://spark-api.xf-yun.com/v1.1/chat'
 #星火认知大模型调用秘钥信息，请前往讯飞开放平台控制台（https://console.xfyun.cn/services/bm35）查看
-SPARKAI_APP_ID = '0a9c65e1'
-SPARKAI_API_SECRET = 'NDcyMGYyY2M3NmNmYzEyNWVkMTJiODcw'
-SPARKAI_API_KEY = 'c929a300a9a06d167824afccf9f107e3'
+SPARKAI_APP_ID = data.get('SPARKAI_APP_ID')
+SPARKAI_API_SECRET = data.get('SPARKAI_API_SECRET')
+SPARKAI_API_KEY = data.get('SPARKAI_API_KEY')
 #星火认知大模型Spark Max的domain值，其他版本大模型domain值请前往文档（https://www.xfyun.cn/doc/spark/Web.html）查看
 SPARKAI_DOMAIN = 'lite'
 
