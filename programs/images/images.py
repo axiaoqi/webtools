@@ -158,4 +158,31 @@ def run_web_images(primary_images_dir, destination):
 
     # 循环掺入其他图片
     for target_folder in target_folders:
-        copy_images_must_and_other(must_choose_folders, other_folders, target_folder)
+        copy_images_must_and_other(must_choose_folders, other_folders, target_folder, total_images=8)
+
+
+def run_web_images_susu(primary_images_dir, destination):
+    from programs.settings import SynologyDrive
+    image_materials_folder = SynologyDrive / r'01新项目记录\02_AI学习机\02图片\09素材'
+
+    # 主图
+    target_folders = copy_image_to_folders(primary_images_dir, destination, image_name='主图')
+    print(target_folders)
+
+    # 其他8张图
+    must_choose_folders = [
+        image_materials_folder / '03配件图',
+        image_materials_folder / '04小孩使用图',
+        image_materials_folder / '05同步课程图',
+    ]
+
+    other_folders = [
+        image_materials_folder / '08选课图',
+        image_materials_folder / '09练习图',
+        # image_materials_folder / '19其他细节图',
+        # ...更多文件夹
+    ]
+
+    # 循环掺入其他图片
+    for target_folder in target_folders:
+        copy_images_must_and_other(must_choose_folders, other_folders, target_folder, total_images=5)
