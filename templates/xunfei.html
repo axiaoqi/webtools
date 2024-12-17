@@ -5,14 +5,20 @@
         <h1>闲鱼AI原创文案修改器</h1>
         <form id="calculatorForm" method="post">
             <div class="mb-3">
-                <label for="content" class="form-label">要求：</label>
-                <textarea class="form-control" id="content" name="content" rows="5">{{ content if content else '' }}</textarea>
+                <label for="master" class="form-label">专家领域：</label>
+                <textarea class="form-control" id="master" name="master" rows="3">{{ master if master else '' }}</textarea>
+                <small class="form-text text-muted">具体要求</small>
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">原文案：</label>
+                <textarea class="form-control" id="content" name="content" rows="7">{{ content if content else '' }}</textarea>
                 <small class="form-text text-muted">具体要求</small>
             </div>
 
             <button type="submit" class="btn btn-primary">生成</button>
-            <!-- Clear Stock Names Button -->
-            <button type="button" class="btn btn-warning" onclick="clearStockNames()">清除要求</button>
+            <!-- 清除文案 -->
+            <button type="button" class="btn btn-warning" onclick="clearContent()">清除文案</button>
+            <button type="button" class="btn btn-warning" onclick="clearMaster()">清除专家</button>
             <!-- 一键复制结果 -->
             <button type="button" class="btn btn-warning" onclick="copyToClipboard()">复制结果</button>
         </form>
@@ -27,9 +33,14 @@
     </div>
 
     <script>
-        // 清空股票名称
-        function clearStockNames() {
+        // 清空文案
+        function clearContent() {
             document.getElementById("content").value = '';
+        }
+
+        // 清空文案
+        function clearMaster() {
+            document.getElementById("master").value = '';
         }
     </script>
 {% endblock %}

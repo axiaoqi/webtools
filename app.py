@@ -135,18 +135,19 @@ def run_音乐添加_route():
 @app.route('/xunfei', methods=['GET', 'POST'])
 def run_xunfei_route():
     s = ''
-    start = '你是一个闲鱼资深卖家，帮我修改成原创文案。文案如下：\n'
+    master = '你是一个闲鱼卖家专家，帮我修改成原创文案。我是卖小品牌学习机的卖家，想蹭大品牌的流量，开发的同款学习机。文案修改后的格式跟原来差不多'
     if request.method == "POST":
 
         # 获取用户输入的数据
         content = request.form['content']
-        new_content = start + content  # 用户输入音乐的名称
+        master = request.form['master']
+        new_content = master + '文案如下：' + content  # 用户输入音乐的名称
 
         s = xunfei_lite(new_content)
 
-        return render_template("xunfei.html", result_html=s, content=content)
+        return render_template("xunfei.html", result_html=s, content=content, master=master)
 
-    return render_template("xunfei.html", content=s)
+    return render_template("xunfei.html", content=s, master=master)
 
 
 if __name__ == '__main__':
