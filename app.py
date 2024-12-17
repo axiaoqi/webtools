@@ -11,6 +11,7 @@ from programs.quant.股票分红监控 import calculate_stock_dividends
 from programs.text import 闲鱼学习机文案_通用, 闲鱼_学习机_文案2_王, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_苏苏, 闲鱼学习机文案_花花
 from programs.text.违禁词检测.违禁词检测 import load_banned_words, check_for_banned_words
 from programs import 淘宝分享链接转真实URL
+from programs.xunfei.xunfei import xunfei_lite
 
 app = Flask(__name__)
 
@@ -130,6 +131,20 @@ def run_音乐添加_route():
         return render_template("music_add.html", result_html=s, music_name=music_name, music_url_baidu=music_url_baidu, music_url_kuake=music_url_kuake)
 
     return render_template("music_add.html", music_names=s)
+
+@app.route('/xunfei', methods=['GET', 'POST'])
+def run_xunfei_route():
+    s = ''
+    if request.method == "POST":
+        # 获取用户输入的数据
+        content = request.form['content']  # 用户输入音乐的名称
+
+        s = xunfei_lite(content)
+        print(s)
+
+        return render_template("xunfei.html", result_html=s, content=content)
+
+    return render_template("xunfei.html", content=s)
 
 
 if __name__ == '__main__':

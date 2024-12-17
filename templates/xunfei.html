@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}科大讯飞AI文案生成器{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <h1>科大讯飞AI文案生成器</h1>
+        <form id="calculatorForm" method="post">
+            <div class="mb-3">
+                <label for="content" class="form-label">要求：</label>
+                <textarea class="form-control" id="content" name="content" rows="5">{{ content if content else '' }}</textarea>
+                <small class="form-text text-muted">具体要求</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary">生成</button>
+            <!-- Clear Stock Names Button -->
+            <button type="button" class="btn btn-warning" onclick="clearStockNames()">清除要求</button>
+            <!-- 一键复制结果 -->
+            <button type="button" class="btn btn-warning" onclick="copyToClipboard()">复制结果</button>
+        </form>
+
+        {% if result_html %}
+        <h2 class="mt-4">生成结果：</h2>
+        <div id="result-text">{{ result_html | safe }}</div>
+        <div id="copy-alert" style="display: none; background-color: #4CAF50; color: white; padding: 10px; border-radius: 4px; margin-top: 10px;">
+            已复制！
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // 清空股票名称
+        function clearStockNames() {
+            document.getElementById("content").value = '';
+        }
+    </script>
+{% endblock %}

@@ -24,40 +24,4 @@
     </form>
 </div>
 
-<!-- 复制到剪贴板功能 -->
-<script>
-    function copyToClipboard() {
-        var resultText = document.getElementById("result-text").innerText;
-
-        // 使用现代 API 进行复制
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(resultText).then(function() {
-                showCopyAlert();  // 显示提示
-            }).catch(function(error) {
-                console.error("Failed to copy: ", error);  // 仅记录错误
-            });
-        } else {
-            // 备用方法
-            var tempInput = document.createElement("textarea");
-            tempInput.value = resultText;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            try {
-                document.execCommand("copy");
-                showCopyAlert();  // 显示提示
-            } catch (err) {
-                console.error("Failed to copy: ", err);  // 仅记录错误
-            }
-            document.body.removeChild(tempInput);
-        }
-    }
-
-    function showCopyAlert() {
-        var alertBox = document.getElementById("copy-alert");
-        alertBox.style.display = "block";
-        setTimeout(function() {
-            alertBox.style.display = "none";
-        }, 2000);  // 2秒后自动消失
-    }
-</script>
 {% endblock %}
