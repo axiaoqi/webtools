@@ -6,12 +6,12 @@
         <form id="calculatorForm" method="post">
             <div class="mb-3">
                 <label for="master" class="form-label">专家领域：</label>
-                <textarea class="form-control" id="master" name="master" rows="3">{{ master if master else '' }}</textarea>
+                <textarea class="form-control" id="master" name="master" rows="3" oninput="autoResize(this)">{{ master if master else '' }}</textarea>
                 <small class="form-text text-muted">具体要求</small>
             </div>
             <div class="mb-3">
                 <label for="content" class="form-label">原文案：</label>
-                <textarea class="form-control" id="content" name="content" rows="7">{{ content if content else '' }}</textarea>
+                <textarea class="form-control" id="content" name="content" rows="5" oninput="autoResize(this)">{{ content if content else '' }}</textarea>
                 <small class="form-text text-muted">具体要求</small>
             </div>
 

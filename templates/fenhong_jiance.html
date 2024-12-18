@@ -6,7 +6,7 @@
         <form id="calculatorForm" method="post">
             <div class="mb-3">
                 <label for="stock_names" class="form-label">股票名称(一行一个)</label>
-                <textarea class="form-control" id="stock_names" name="stock_names" rows="5">{{ stock_names if stock_names else '' }}</textarea>
+                <textarea class="form-control" id="stock_names" name="stock_names" rows="5" oninput="autoResize(this)">{{ stock_names if stock_names else '' }}</textarea>
                 <small class="form-text text-muted">每行一个股票名称</small>
             </div>
             <div class="mb-3">

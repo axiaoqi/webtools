@@ -160,6 +160,20 @@
                 alertBox.style.display = "none";
             }, 2000);  // 2秒后自动消失
         }
+
+        // 动态调整文本框高度
+        function autoResize(textarea) {
+            // 重置高度
+            textarea.style.height = 'auto';
+            // 设置新高度
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
+
+        // 初始化文本框
+        document.addEventListener('DOMContentLoaded', function() {
+            var textarea = document.getElementById('stock_names');
+            autoResize(textarea);  // 初始化时自动调整文本框高度
+        });
     </script>
 
     <!-- 引入 Bootstrap 5 JS 和 Popper.js -->
