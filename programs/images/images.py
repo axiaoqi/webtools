@@ -102,19 +102,29 @@ def copy_images_must_and_other(must_select_folders: List[Path], other_folders: L
 
     # 计算还需要从其他文件夹选择的图片数量
     remaining_images_count = total_images - len(selected_images)
+
     # 从其他文件夹中随机选择图片，直到补充到总共 8 张图片
     other_selected_images = []
     other_folder_one_images = []
     # 选其他剩余的图片
     if remaining_images_count > 0:
-        # 其他文件夹每个文件夹选一个图片出来
-        for folder in other_folders:
-            image_files = [f for f in folder.glob('*') if f.suffix.lower() in valid_extensions]  # 过滤图片扩展名
+        if len(other_folders) == 1:  # 其他文件夹只有一个
+            # 只有其他文件夹一个文件夹时候，选取remaining_images_count张图片就行了
+            image_files = [f for f in other_folders[0].glob('*') if f.suffix.lower() in valid_extensions]  # 过滤图片扩展名
             if image_files:
-                other_folder_one_images.append(random.choice(image_files))
+                other_selected_images.extend(random.sample(image_files, remaining_images_count))
 
-        # 再从上面结果选（total_images - len(必选图片)）张
-        other_selected_images = random.sample(other_folder_one_images, remaining_images_count)
+        elif len(other_folders) > 1 and len(other_folders) >= remaining_images_count:  # 文件夹数量大于等于随机选取的图像数量
+            # 其他文件夹每个文件夹选一个图片出来
+            for folder in other_folders:
+                image_files = [f for f in folder.glob('*') if f.suffix.lower() in valid_extensions]  # 过滤图片扩展名
+                if image_files:
+                    other_folder_one_images.append(random.choice(image_files))
+
+            # 再从上面结果选（total_images - len(必选图片)）张
+            other_selected_images = random.sample(other_folder_one_images, remaining_images_count)
+        else:
+            print('其他文件夹数量不足！')
 
     # 合并所有选择的图片
     all_selected_images = selected_images + other_selected_images
@@ -139,18 +149,19 @@ def run_web_images(primary_images_dir, destination):
 
     # 其他8张图
     must_choose_folders = [
-        image_materials_folder / '02整体展示',
+        # image_materials_folder / '02整体展示',
         image_materials_folder / '03配件图',
         image_materials_folder / '04小孩使用图',
         image_materials_folder / '05同步课程图',
-        image_materials_folder / '06拍照搜题图',
+        # image_materials_folder / '06拍照搜题图',
+        image_materials_folder / '08选课图',
+        image_materials_folder / '09练习图',
+        image_materials_folder / '07AR智慧眼图',
+
     ]
 
     other_folders = [
-        image_materials_folder / '07AR智慧眼图',
-        image_materials_folder / '08选课图',
-        image_materials_folder / '09练习图',
-        image_materials_folder / '10幼儿园图',
+        # image_materials_folder / '10幼儿园图',
         # image_materials_folder / '11护眼模式图',
         image_materials_folder / '19其他细节图',
         # ...更多文件夹
