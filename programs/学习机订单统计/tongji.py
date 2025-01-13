@@ -35,12 +35,13 @@ def run(laiyuan, start, end, file_csv):
     fukuan_count = fukuan_df['数量'].sum()
 
     ########## 计算本期已经填单号的退款数量 ##########################
-    tuikuan_df = fukuan_df[fukuan_df['退货日期'].notnull()]
+    tuikuan_df = fukuan_df[fukuan_df['退货日期'].notnull()]  # 因为结款日期会晚几天，得算退货日期在结款日期之间的单子
+    tuikuan_df = tuikuan_df[(tuikuan_df['退货日期'] >= start) & (tuikuan_df['退货日期'] <= end)]  # 退货日期在结款日期中间的
     tuikuan_count = tuikuan_df['数量'].sum()
 
     ########### 计算上一期退款的，还没有减掉的 ##################
-    _forward_all_df = my_all_df[my_all_df['发货日期'] < start]
-    forward_all_df = _forward_all_df[_forward_all_df['退货日期'] >= start]
+    _forward_all_df = my_all_df[my_all_df['发货日期'] < start]  # 取出这一期开始时间之前的订单
+    forward_all_df = _forward_all_df[(_forward_all_df['退货日期'] >= start) & (_forward_all_df['退货日期'] <= end)]  # 退货日期是这一期的订单
     forward_tuikuan_count = forward_all_df['数量'].sum()
 
 
@@ -64,7 +65,7 @@ def run(laiyuan, start, end, file_csv):
 
 if __name__ == '__main__':
     # 订单日期
-    start = '2024-12-20'
+    start = '2024-12-30'
     end = '2025-1-9'
 
     file_csv = Path(r'C:\Users\dell\Desktop\工作簿1.xlsx')
