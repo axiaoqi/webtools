@@ -1,6 +1,6 @@
 import json
 
-from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
+from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler  # pip install spark_ai_python
 from sparkai.core.messages import ChatMessage
 from programs.settings import SynologyDrive
 
