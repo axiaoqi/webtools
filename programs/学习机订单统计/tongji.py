@@ -65,13 +65,13 @@ def run(laiyuan, start, end, file_csv):
 
 if __name__ == '__main__':
     # 订单日期
-    start = '2024-12-30'
-    end = '2025-1-9'
+    start = '2025-1-10'
+    end = '2025-1-23'
 
     file_csv = Path(r'C:\Users\dell\Desktop\工作簿1.xlsx')
 
-    laiyuans = ['阮总', '王总', '曹总']
-    # laiyuans = ['阮总']
+    # laiyuans = ['阮总', '王总', '曹总']
+    laiyuans = ['阮总']
     for laiyuan in laiyuans:
         run(laiyuan, start, end, file_csv)
 
