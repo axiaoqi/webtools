@@ -11,7 +11,7 @@ class FlaskDesktopApp(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle("Flask Desktop App")
+        self.setWindowTitle("XQ桌面程序")
         self.setGeometry(100, 100, 1024, 768)
 
         # 创建 WebEngineView
