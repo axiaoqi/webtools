@@ -51,7 +51,8 @@ def update_python(computer_system, file_dir):
         # download_urls = [url + link + '/' + 'python-' + link + '-macosx10.6.pkg' for link in result]
 
     # 设置下载保存的文件夹路径
-    download_folder = file_dir / 'Python安装包【windows版】'
+    # download_folder = file_dir / 'Python安装包【windows版】'
+    download_folder = file_dir
     # 设置记录404错误链接的文件路径
     error_log_file = file_dir / "404_links.txt"
 
