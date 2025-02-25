@@ -44,7 +44,7 @@ def run(laiyuan, start, end, file_csv):
     forward_all_df = _forward_all_df[(_forward_all_df['退货日期'] >= start) & (_forward_all_df['退货日期'] <= end)]  # 退货日期是这一期的订单
     forward_tuikuan_count = forward_all_df['数量'].sum()
 
-
+    fukuan_df = fukuan_df.reset_index()
     print(fukuan_df)
 
     print('本期退款的：')
@@ -65,13 +65,13 @@ def run(laiyuan, start, end, file_csv):
 
 if __name__ == '__main__':
     # 订单日期
-    start = '2025-1-10'
-    end = '2025-1-23'
+    start = '2025-2-1'
+    end = '2025-2-20'
 
     file_csv = Path(r'C:\Users\dell\Desktop\工作簿1.xlsx')
 
-    # laiyuans = ['阮总', '王总', '曹总']
-    laiyuans = ['阮总']
+    laiyuans = ['阮总', '王总', '曹总']
+    # laiyuans = ['阮总']
     for laiyuan in laiyuans:
         run(laiyuan, start, end, file_csv)
 
