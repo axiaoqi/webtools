@@ -5,7 +5,7 @@ from sparkai.core.messages import ChatMessage
 from programs.settings import SynologyDrive
 
 # api秘钥存到自己电脑
-config_file_path = SynologyDrive / r'Quant\config_file\xunfei_config_file.json'
+config_file_path = SynologyDrive / r'Gitbooks\Quant\config_file\xunfei_config_file.json'
 with open(config_file_path, 'r') as f:
     data = json.load(f)
 
