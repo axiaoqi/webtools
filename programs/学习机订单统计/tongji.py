@@ -65,8 +65,8 @@ def run(laiyuan, start, end, file_csv):
 
 if __name__ == '__main__':
     # 订单日期
-    start = '2025-2-1'
-    end = '2025-2-20'
+    start = '2025-2-21'
+    end = '2025-3-2'
 
     file_csv = Path(r'C:\Users\dell\Desktop\工作簿1.xlsx')
 
