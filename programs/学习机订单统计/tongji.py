@@ -66,9 +66,9 @@ def run(laiyuan, start, end, file_csv):
 if __name__ == '__main__':
     # 订单日期
     start = '2025-2-21'
-    end = '2025-3-2'
+    end = '2025-3-20'
 
-    file_csv = Path(r'C:\Users\dell\Desktop\工作簿1.xlsx')
+    file_csv = Path.home().joinpath("Desktop", "工作簿1.xlsx")
 
     laiyuans = ['阮总', '王总', '曹总']
     # laiyuans = ['阮总']
