@@ -5,7 +5,11 @@
 
 
 ## requirments
+python=3.9
 
 ```bash
-pip install flask requests
+pip install flask requests spark_ai_python
+
+cd cnquant
+pip install -e .
 ```

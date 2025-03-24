@@ -52,6 +52,10 @@ def run(laiyuan, start, end, file_csv):
     print("上期退款的还没有减去的：")
     print(forward_all_df)
 
+    # 导出到桌面
+    tuikuan_df.to_csv(Path.home().joinpath("Desktop", f"{laiyuan}_本期退款的.csv"), encoding='utf-8-sig')
+    forward_all_df.to_csv(Path.home().joinpath("Desktop", f"{laiyuan}_上期退款的还没有减去的.csv"), encoding='utf-8-sig')
+
     print('\n')
     print(f'{laiyuan}: {start} - {end}：本期付款订单数量：{fukuan_count}')
     print(f'本期已经填了快递单号退款的数量：{tuikuan_count}')
@@ -65,13 +69,13 @@ def run(laiyuan, start, end, file_csv):
 
 if __name__ == '__main__':
     # 订单日期
-    start = '2025-2-1'
-    end = '2025-2-20'
+    start = '2025-2-21'
+    end = '2025-3-20'
 
-    file_csv = Path(r'C:\Users\dell\Desktop\工作簿1.xlsx')
+    file_csv = Path.home().joinpath("Desktop", "工作簿1.xlsx")
 
-    laiyuans = ['阮总', '王总', '曹总']
-    # laiyuans = ['阮总']
+    # laiyuans = ['阮总', '王总', '曹总']
+    laiyuans = ['阮总']
     for laiyuan in laiyuans:
         run(laiyuan, start, end, file_csv)
 
