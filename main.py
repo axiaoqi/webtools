@@ -1,4 +1,6 @@
 import sys
+
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PySide6.QtWebEngineWidgets import QWebEngineView
 from PySide6.QtCore import QProcess, QUrl
@@ -13,6 +15,9 @@ class FlaskDesktopApp(QMainWindow):
     def init_ui(self):
         self.setWindowTitle("XQ桌面程序")
         self.setGeometry(100, 100, 1024, 768)
+
+        # 设置窗口图标
+        self.setWindowIcon(QIcon('favicon.ico'))
 
         # 创建 WebEngineView
         self.web_view = QWebEngineView()

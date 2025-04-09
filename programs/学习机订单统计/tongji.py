@@ -74,8 +74,8 @@ if __name__ == '__main__':
 
     file_csv = Path.home().joinpath("Desktop", "工作簿1.xlsx")
 
-    # laiyuans = ['阮总', '王总', '曹总']
-    laiyuans = ['阮总']
+    laiyuans = ['阮总', '王总', '曹总']
+    # laiyuans = ['阮总']
     for laiyuan in laiyuans:
         run(laiyuan, start, end, file_csv)
 
