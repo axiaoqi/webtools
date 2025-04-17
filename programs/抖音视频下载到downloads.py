@@ -1,9 +1,27 @@
 import pathlib
 import re
-
 import requests
 
-file_fir = pathlib.Path.home() / 'Desktop'
+from programs.utils.download_file import download_file
+
+
+file_fir = pathlib.Path.home() / 'Downloads'
+
+
+def extract_name(koulin):
+    """
+    取出视频名称
+    """
+    # 分割出https之前的部分
+    first_part = koulin.split('https')[0].strip()
+
+    pattern = r"[#\u4e00-\u9fa5].*"  # 匹配第一个 `#` 或中文字符及其后的所有内容
+    match = re.search(pattern, first_part)
+    name = match.group()
+
+    # 名字特殊字符用空格替换
+    name = name.replace('|', ' ') if name else None
+    return name
 
 
 def dy_downloader(koulin):
@@ -12,10 +30,9 @@ def dy_downloader(koulin):
     pattern = r'https://v\.douyin\.com/[\w\/-]+/?'
     url = re.findall(pattern, koulin)[0]
     base_url = f'https://dlpanda.com/zh-CN?url={url}&token=G7eRpMaa'
+
     # 正则表达式（包含话题标签）
-    pattern = r'\d{2}/\d{2}\s+((?:.(?!\s+https?://))+)'
-    match = re.search(pattern, koulin, re.DOTALL)
-    video_name = match.group(1).strip() if match else None
+    video_name = extract_name(koulin)
 
     # 获取下载地址
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36'}
@@ -25,14 +42,17 @@ def dy_downloader(koulin):
     if match:
         video_download_url = "http:" + match.group(1)
         print(video_download_url)  # 输出提取的URL
+
+        # 下载文件
+        file_path = file_fir / (video_name+'.mp4')
+        print(file_path)
+        download_file(url=video_download_url, file_path=file_path)
     else:
         print("未找到匹配的URL")
 
 
-    # 下载文件
-
-
-
 if __name__ == '__main__':
-    kl = '5.61 z@g.Bt reo:/ 02/28 延时摄影25分钟，带你欣赏流动的云彩# 蓝蓝的天空白云飘# 蓝天白云绿草地  https://v.douyin.com/zyp2peR0Ju0/ 复制此链接，打开Dou音搜索，直接观看视频！'
+    kl = input("输入抖音分享口令：")
+    # name = extract_name(kl)
+    # print(name)
     dy_downloader(kl)
