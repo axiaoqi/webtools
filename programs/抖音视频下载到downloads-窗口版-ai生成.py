@@ -12,7 +12,6 @@ headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'}
 
 
-
 def get_file_respnse(url, timeout=60, retries=5):
     for attempt in range(retries):
         try:
@@ -95,11 +94,24 @@ def dy_downloader(koulin):
     else:
         print("未找到匹配的URL")
 
+
 if __name__ == '__main__':
     # 创建GUI窗口
     root = tk.Tk()
     root.title("抖音视频下载器")
-    root.geometry("500x100")
+
+    # 设置窗口尺寸
+    window_width = 500
+    window_height = 100
+
+    # 计算窗口居中的坐标
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width - window_width) // 2
+    y = (screen_height - window_height) // 3
+
+    # 设置窗口位置和大小
+    root.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
     # URL输入框
     lbl = tk.Label(root, text="请输入抖音分享口令:")
@@ -108,6 +120,7 @@ if __name__ == '__main__':
     entry = tk.Entry(root, width=60)
     entry.pack(pady=5)
 
+    root.mainloop()
     def on_download():
         """ 下载按钮点击事件 """
         koulin = entry.get().strip()  # 获取输入内容
