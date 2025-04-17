@@ -96,13 +96,26 @@ def dy_downloader(koulin):
 
 
 if __name__ == '__main__':
+    def on_download():
+        """ 下载按钮点击事件 """
+        koulin = entry.get().strip()  # 获取输入内容
+        if not koulin:
+            messagebox.showerror("错误", "请输入抖音分享口令！")
+            return
+        try:
+            dy_downloader(koulin)  # 请确保已实现这个下载函数
+            messagebox.showinfo("成功", "视频下载完成！")
+        except Exception as e:
+            messagebox.showerror("错误", f"下载失败：{str(e)}")
+
+
     # 创建GUI窗口
     root = tk.Tk()
     root.title("抖音视频下载器")
 
     # 设置窗口尺寸
     window_width = 500
-    window_height = 100
+    window_height = 150  # 需要增加高度以适应按钮
 
     # 计算窗口居中的坐标
     screen_width = root.winfo_screenwidth()
@@ -120,21 +133,8 @@ if __name__ == '__main__':
     entry = tk.Entry(root, width=60)
     entry.pack(pady=5)
 
-    root.mainloop()
-    def on_download():
-        """ 下载按钮点击事件 """
-        koulin = entry.get().strip()  # 获取输入内容
-        if not koulin:
-            messagebox.showerror("错误", "请输入抖音分享口令！")
-            return
-        try:
-            dy_downloader(koulin)
-            messagebox.showinfo("成功", "视频下载完成！")
-        except Exception as e:
-            messagebox.showerror("错误", f"下载失败：{str(e)}")
-
     # 下载按钮
     download_btn = tk.Button(root, text="下载", command=on_download)
-    download_btn.pack(pady=5)
+    download_btn.pack(pady=10)
 
     root.mainloop()
