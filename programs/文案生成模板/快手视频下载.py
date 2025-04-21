@@ -1,5 +1,50 @@
+import pathlib
+import time
+
 import requests
 from lxml import etree
+from tqdm import tqdm
+
+
+def get_file_respnse(url, timeout=60, retries=5):
+    for attempt in range(retries):
+        try:
+            response = requests.get(url, headers=headers, stream=True, timeout=timeout)
+            response.raise_for_status()  # 检查请求是否成功
+            return response
+        except requests.exceptions.RequestException as e:
+            print(f"尝试 {attempt + 1} 失败: {e}")
+            if attempt == retries - 1:
+                return None  # 重试结束，返回 None
+
+
+def download_file(url, file_path, max_duration=1200, max_retries=5):
+    retries = 0
+    while retries < max_retries:
+        try:
+            start_time = time.time()
+
+            response = get_file_respnse(url)
+            total_size = int(response.headers.get('content-length', 0))
+
+            with open(file_path, "wb") as file:
+                with tqdm(total=total_size, unit='B', unit_scale=True) as pbar:
+                    for data in response.iter_content(chunk_size=1024):
+                        if time.time() - start_time > max_duration:
+                            print("下载超时！")
+                            break
+                        file.write(data)
+                        pbar.update(len(data))
+            break
+        except Exception as e:
+            print(f'下载中断，正在第{retries+1}次重试: {e}')
+        retries += 1
+        time.sleep(5)  # Wait for 5 seconds before retrying
+    if retries == max_retries:
+        print('重试次数过多，下载失败')
+
+
+file_fir = pathlib.Path.home() / 'Downloads'
 
 
 headers = {
@@ -11,8 +56,8 @@ base_url = 'https://douyinxz.com/kuaishou/'
 
 
 if __name__ == '__main__':
-    url = 'https://www.kuaishou.com/short-video/3x3sf46sh54qtrc?authorId=3xyxdkksqu36yr6&streamSource=search&searchKey=%E8%BE%A3%E6%A4%92&area=searchxxnull'
-    # url = 'https://www.kuaishou.com/short-video/3x8g8u68jbhj89m?authorId=3xciavcy82p2bru&streamSource=search&area=searchxxnull&searchKey=%E8%BE%A3%E6%A4%92'
+    url = input('输入快手视频链接：')
+    # url = 'https://www.kuaishou.com/short-video/3x3sf46sh54qtrc?authorId=3xyxdkksqu36yr6&streamSource=search&searchKey=%E8%BE%A3%E6%A4%92&area=searchxxnull'
     data = {
         '_token': '9hL3iIB1lDy4l8mHo77AlZXlchnhQLEKdpb1s2Px',
         'url': url
@@ -21,13 +66,16 @@ if __name__ == '__main__':
 
     print(resp.text)
 
+    # 获取名称\获取下载地址
+
     tree = etree.HTML(resp.text)
     download_url = tree.xpath('//video/@src')[0]
     file_name = tree.xpath('//h2/text()')[0]
     print(download_url)
     print(file_name)
-    # 获取名称
 
-    # 获取下载地址
+    file_path = file_fir / (file_name + '.mp4')
+
 
     # 下载文件
+    download_file(url=download_url, file_path=file_path)
