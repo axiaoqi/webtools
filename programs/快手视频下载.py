@@ -57,17 +57,13 @@ base_url = 'https://douyinxz.com/kuaishou/'
 
 if __name__ == '__main__':
     url = input('输入快手视频链接：')
-    # url = 'https://www.kuaishou.com/short-video/3x3sf46sh54qtrc?authorId=3xyxdkksqu36yr6&streamSource=search&searchKey=%E8%BE%A3%E6%A4%92&area=searchxxnull'
     data = {
         '_token': '9hL3iIB1lDy4l8mHo77AlZXlchnhQLEKdpb1s2Px',
         'url': url
     }
     resp = requests.post(url=base_url, headers=headers, json=data)
 
-    # print(resp.text)
-
     # 获取名称\获取下载地址
-
     tree = etree.HTML(resp.text)
     download_url = tree.xpath('//video/@src')[0]
     file_name = tree.xpath('//h2/text()')[0]
@@ -75,8 +71,7 @@ if __name__ == '__main__':
     # print(file_name)
 
     file_path = file_fir / (file_name + '.mp4')
-    print(file_name)
-
+    print(file_path)
 
     # 下载文件
     download_file(url=download_url, file_path=file_path)
