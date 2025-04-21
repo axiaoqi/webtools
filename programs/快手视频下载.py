@@ -64,7 +64,7 @@ if __name__ == '__main__':
     }
     resp = requests.post(url=base_url, headers=headers, json=data)
 
-    print(resp.text)
+    # print(resp.text)
 
     # 获取名称\获取下载地址
 
@@ -72,9 +72,10 @@ if __name__ == '__main__':
     download_url = tree.xpath('//video/@src')[0]
     file_name = tree.xpath('//h2/text()')[0]
     print(download_url)
-    print(file_name)
+    # print(file_name)
 
     file_path = file_fir / (file_name + '.mp4')
+    print(file_name)
 
 
     # 下载文件
