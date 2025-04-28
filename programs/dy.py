@@ -74,6 +74,7 @@ def extract_name(koulin):
 
     # 名字特殊字符用空格替换
     name = name.replace('|', ' ') if name else None
+    name = name.replace('?', ' ') if name else None
     return name
 
 
