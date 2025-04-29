@@ -150,5 +150,10 @@ def run_xunfei_route():
     return render_template("xunfei.html", content=s, master=master)
 
 
+@app.route('/字数统计')
+def run_字数统计_route():
+    return render_template('字数统计工具.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=7000)
