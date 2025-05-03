@@ -3,268 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>动态文章生成工具 (智能命名/插入/显示标签/复制纯文本)</title>
+    <title>动态文章生成工具 (字数统计/双击修改口播速率/复制纯文本)</title>
     <style>
-        /* --- Styles remain the same as the previous version --- */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Common system fonts */
-            line-height: 1.6;
-            padding: 20px;
-            background-color: #f8f9fa;
-            color: #212529; /* Default text color */
-        }
-        .container {
-            max-width: 750px; /* Slightly wider */
-            margin: 20px auto; /* Add top/bottom margin */
-            background: #fff;
-            padding: 25px 35px; /* Adjust padding */
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Softer shadow */
-            border: 1px solid #dee2e6; /* Subtle border */
-        }
-        h1 {
-            color: #343a40;
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: 600; /* Slightly bolder */
-        }
-        .description {
-             text-align: center;
-             color: #6c757d;
-             margin-bottom: 30px; /* More space */
-             font-size: 0.95em;
-         }
-        .input-fields {
-             margin-bottom: 25px;
-             padding-bottom: 10px;
-        }
-        .input-group {
-            margin-bottom: 18px; /* More space between groups */
-            padding: 15px; /* More padding inside group */
-            border: 1px solid #e9ecef; /* Lighter border */
-            border-radius: 6px; /* Slightly larger radius */
-            background-color: #fff;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            transition: box-shadow 0.2s ease-in-out;
-        }
-         .input-group:hover {
-              box-shadow: 0 2px 8px rgba(0,0,0,0.06); /* Hover effect */
-         }
-        .input-group-header {
-             display: flex;
-             justify-content: space-between;
-             align-items: center;
-             margin-bottom: 8px; /* Slightly more space */
-             gap: 10px; /* Add gap between label and button container */
-        }
-
-        label.editable-label {
-            font-weight: 600; /* Bolder label */
-            color: #495057;
-            font-size: 0.95em; /* Slightly larger font */
-            cursor: text;
-            padding: 3px 6px; /* Adjust padding */
-            border-radius: 4px; /* Match input radius */
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
-            flex-grow: 1; /* Label takes available space */
-            /* Prevent long labels from breaking layout */
-            word-break: break-word;
-            line-height: 1.4; /* Ensure multi-line labels look okay */
-            /* Crucial: Allow browser to handle selection/caret */
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
-            min-width: 50px; /* Prevent label from becoming too small */
-        }
-        label.editable-label:hover {
-             background-color: #f1f3f5; /* Lighter hover */
-        }
-        label.editable-label:focus {
-            background-color: #e7f5ff; /* Light blue focus */
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); /* Softer focus ring */
-        }
-
-        textarea.input-box {
-            padding: 12px; /* More padding */
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-size: 1em;
-            min-height: 55px; /* Adjust height */
-            resize: vertical;
-            box-sizing: border-box;
-            width: 100%;
-            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-         textarea.input-box:focus {
-             border-color: #86b7fe; /* Bootstrap focus color */
-             outline: 0;
-             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Bootstrap focus shadow */
-         }
-
-        /* --- Button Container --- */
-        .input-group-buttons {
-             display: flex;
-             align-items: center;
-             gap: 6px; /* Space between insert and delete buttons */
-             flex-shrink: 0; /* Prevent buttons container from shrinking */
-        }
-
-        /* --- Shared Button Styles --- */
-        button.action-icon-btn {
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 26px; /* Slightly larger */
-            height: 26px;
-            font-size: 18px; /* Adjust sign size */
-            font-weight: bold;
-            line-height: 26px; /* Center vertically */
-            text-align: center;
-            cursor: pointer;
-            padding: 0;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            display: flex; /* Center symbol better */
-            align-items: center;
-            justify-content: center;
-        }
-        button.action-icon-btn:hover {
-             transform: scale(1.1); /* Slight scale effect */
-         }
-        button.action-icon-btn:active {
-             transform: scale(1); /* Reset scale on click */
-         }
-
-        /* --- Insert Button (+) --- */
-        button.insert-btn {
-            background-color: #198754; /* Bootstrap Success Green */
-        }
-        button.insert-btn:hover {
-            background-color: #157347; /* Darker green */
-        }
-
-        /* --- Delete Button (-) --- */
-        button.delete-btn {
-            background-color: #e63946; /* A different red */
-        }
-        button.delete-btn:hover {
-            background-color: #d62828; /* Darker red */
-        }
-
-        /* --- Add Button (at the bottom) --- */
-        #add-field-btn {
-            display: flex; /* Use flex to center icon/text */
-            align-items: center;
-            justify-content: center;
-            gap: 8px; /* Space between icon and text */
-            width: 100%;
-            padding: 10px 15px;
-            background-color: #007bff; /* Standard Blue */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            font-weight: 500;
-            margin-top: 20px; /* More space */
-            transition: background-color 0.3s ease;
-        }
-        #add-field-btn::before { /* Plus icon using content */
-             content: '+';
-             font-size: 1.2em;
-             line-height: 1;
-        }
-        #add-field-btn:hover {
-            background-color: #0056b3; /* Darker blue */
-        }
-
-        /* --- Action Buttons (Copy) --- */
-        .action-button-group {
-            display: flex;
-            justify-content: center;
-            margin-top: 25px; /* More space */
-            margin-bottom: 30px;
-        }
-        #copy-btn {
-             padding: 12px 25px;
-             background-color: #28a745; /* Green */
-             color: white;
-             border: none;
-             border-radius: 5px;
-             cursor: pointer;
-             font-size: 1.05em;
-             font-weight: 500;
-             transition: background-color 0.3s ease, opacity 0.3s ease;
-             display: flex;
-             align-items: center;
-             gap: 8px;
-        }
-         #copy-btn::before { /* Copy icon simulation */
-             content: '📋'; /* Or use an SVG/Font Awesome icon */
-             font-size: 1.1em;
-         }
+        /* --- Styles mostly unchanged --- */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f8f9fa; color: #212529; }
+        .container { max-width: 750px; margin: 20px auto; background: #fff; padding: 25px 35px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #dee2e6; }
+        h1 { color: #343a40; text-align: center; margin-bottom: 15px; font-weight: 600; }
+        .description { text-align: center; color: #6c757d; margin-bottom: 30px; font-size: 0.95em; }
+        .input-fields { margin-bottom: 25px; padding-bottom: 10px; }
+        .input-group { margin-bottom: 18px; padding: 15px; border: 1px solid #e9ecef; border-radius: 6px; background-color: #fff; position: relative; display: flex; flex-direction: column; transition: box-shadow 0.2s ease-in-out; }
+        .input-group:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .input-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; }
+        label.editable-label { font-weight: 600; color: #495057; font-size: 0.95em; cursor: text; padding: 3px 6px; border-radius: 4px; transition: background-color 0.2s ease, box-shadow 0.2s ease; flex-grow: 1; word-break: break-word; line-height: 1.4; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; min-width: 50px; }
+        label.editable-label:hover { background-color: #f1f3f5; }
+        label.editable-label:focus { background-color: #e7f5ff; outline: none; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); }
+        textarea.input-box { padding: 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em; min-height: 55px; resize: vertical; box-sizing: border-box; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        textarea.input-box:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
+        .input-group-buttons { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        button.action-icon-btn { color: white; border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 18px; font-weight: bold; line-height: 26px; text-align: center; cursor: pointer; padding: 0; transition: background-color 0.2s ease, transform 0.1s ease; display: flex; align-items: center; justify-content: center; }
+        button.action-icon-btn:hover { transform: scale(1.1); }
+        button.action-icon-btn:active { transform: scale(1); }
+        button.insert-btn { background-color: #198754; }
+        button.insert-btn:hover { background-color: #157347; }
+        button.delete-btn { background-color: #e63946; }
+        button.delete-btn:hover { background-color: #d62828; }
+        #add-field-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: 500; margin-top: 20px; transition: background-color 0.3s ease; }
+        #add-field-btn::before { content: '+'; font-size: 1.2em; line-height: 1; }
+        #add-field-btn:hover { background-color: #0056b3; }
+        .action-button-group { display: flex; justify-content: center; margin-top: 25px; margin-bottom: 30px; }
+        #copy-btn { padding: 12px 25px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.05em; font-weight: 500; transition: background-color 0.3s ease, opacity 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        #copy-btn::before { content: '📋'; font-size: 1.1em; }
         #copy-btn:hover { background-color: #218838; }
         #copy-btn:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.65; }
-        #copy-btn.copied { background-color: #198754; } /* Success green */
+        #copy-btn.copied { background-color: #198754; }
         #copy-btn.copied::before { content: '✅'; }
+        .output-section { margin-top: 20px; }
+        #output-label { font-weight: 600; color: #343a40; display: block; margin-bottom: 8px; font-size: 1.1em; }
+        #output-stats { font-size: 0.88em; color: #6c757d; margin-bottom: 10px; line-height: 1.8; padding-left: 5px; }
+        .stat-item { display: inline-block; margin-right: 15px; white-space: nowrap; margin-bottom: 5px; }
+        .stat-item:last-child { margin-right: 0; }
+        .stat-value { font-weight: bold; color: #495057; }
+        .stat-item-hanzi .stat-value { color: #dc3545; }
+        .stat-item-punct .stat-value { color: #0dcaf0; }
+        .stat-item-letter .stat-value { color: #198754; }
+        .stat-item-digit .stat-value { color: #ffc107; }
+        .stat-item-time .stat-value { color: #6f42c1; }
 
-        #output-label { font-weight: 600; color: #343a40; margin-bottom: 10px; display: block; font-size: 1.1em; }
-        #output-area {
-            width: 100%;
-            min-height: 200px; /* Even taller */
-            padding: 15px;
-            border: 1px solid #ced4da;
-            background-color: #f8f9fa; /* Match body bg for readonly */
-            border-radius: 6px;
-            font-size: 1em;
-            line-height: 1.7; /* More line spacing */
-            box-sizing: border-box;
-            white-space: pre-wrap;
-            overflow-wrap: break-word;
-            transition: background-color 0.3s ease;
-            color: #495057; /* Slightly darker text for output */
+        /* --- NEW: Editable Rate Span Styling --- */
+        #stats-rate-value {
+            display: inline-block; /* Needed for padding/background */
+            font-weight: bold;
+            color: #6f42c1; /* Match time value color */
+            cursor: text;
+            padding: 1px 4px; /* Minimal padding */
+            border-radius: 3px;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            min-width: 25px; /* Ensure it doesn't collapse if empty */
+            text-align: center;
         }
-         #output-area:focus { /* Style when focused (e.g., for manual selection) */
-              border-color: #86b7fe;
-              outline: 0;
-              box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-              background-color: #fff; /* White background when focused */
-         }
+        #stats-rate-value:hover {
+            background-color: #f1f3f5; /* Similar to label hover */
+        }
+        #stats-rate-value:focus {
+            background-color: #e7f5ff; /* Similar to label focus */
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+        }
+        /* --- End New Styles --- */
 
-        /* Message styling for empty input fields */
-        .empty-message {
-             text-align:center;
-             color:#6c757d;
-             padding: 20px;
-             font-style: italic;
-        }
+        #output-area { width: 100%; min-height: 200px; padding: 15px; border: 1px solid #ced4da; background-color: #f8f9fa; border-radius: 6px; font-size: 1em; line-height: 1.7; box-sizing: border-box; white-space: pre-wrap; overflow-wrap: break-word; transition: background-color 0.3s ease; color: #495057; display: block; margin-top: 0; }
+        #output-area:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); background-color: #fff; }
+        .empty-message { text-align:center; color:#6c757d; padding: 20px; font-style: italic; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>动态文章生成工具</h1>
-    <p class="description">在下方输入内容，文章将实时生成并带标签显示。点击标签文字可修改。使用 <span style="color: #198754; font-weight:bold;">+</span> 按钮在下方插入新条目，<span style="color:#e63946; font-weight:bold;">−</span> 按钮删除条目。底部的 <span style="color: #007bff; font-weight:bold;">+</span> 添加到末尾。<strong>复制按钮仅复制纯文本内容。</strong> 新增条目会自动查找当前最大的 "新条目 X" 编号并加一。</p>
+    <p class="description">输入内容实时生成带标签预览。可修改标签、插入/删除条目。<strong>复制按钮仅复制纯文本。</strong> 实时字数统计、口播时长估算（<strong title="双击下方括号里的数字即可修改">速率可调</strong>）显示在预览区上方。</p>
 
-    <!-- Container for dynamically generated fields -->
     <div id="input-fields" class="input-fields">
         <!-- Input fields will be rendered here by JS -->
     </div>
 
-    <!-- Add new field button (at the end) -->
     <button id="add-field-btn">添加新条目到末尾</button>
 
-    <!-- Action buttons (currently only Copy) -->
     <div class="action-button-group">
         <button id="copy-btn" disabled>复制文章</button>
     </div>
 
-    <!-- Output Area -->
-    <label for="output-area" id="output-label">生成的文章 (带标签预览):</label>
-    <textarea id="output-area" readonly placeholder="在此实时显示生成的文章..."></textarea>
+    <div class="output-section">
+        <label for="output-area" id="output-label">生成的文章 (带标签预览):</label>
+        <div id="output-stats">
+             <span class="stat-item stat-item-total">总字数: <span class="stat-value" id="stats-total">0</span></span>
+             <span class="stat-item stat-item-hanzi">汉字: <span class="stat-value" id="stats-hanzi">0</span></span>
+             <span class="stat-item stat-item-punct">标点(全角): <span class="stat-value" id="stats-biaodian">0</span></span>
+             <span class="stat-item stat-item-letter">字母/符(半角): <span class="stat-value" id="stats-zimu">0</span></span>
+             <span class="stat-item stat-item-digit">数字: <span class="stat-value" id="stats-shuzi">0</span></span>
+             <br>
+             <span class="stat-item stat-item-time">
+                 口播时长(<span id="stats-rate-value" contenteditable="false" title="双击修改速率 (50-1000)">300</span>字/分钟): <!-- Editable rate span -->
+                 <span class="stat-value" id="stats-time">0分0秒</span>
+             </span>
+             <!-- Rate input is removed -->
+        </div>
+        <textarea id="output-area" readonly placeholder="在此实时显示生成的文章..."></textarea>
+    </div>
 
 </div>
 
@@ -274,342 +118,214 @@
     const addFieldBtn = document.getElementById('add-field-btn');
     const copyBtn = document.getElementById('copy-btn');
     const outputArea = document.getElementById('output-area');
+    const statsTotalEl = document.getElementById('stats-total');
+    const statsHanziEl = document.getElementById('stats-hanzi');
+    const statsBiaodianEl = document.getElementById('stats-biaodian');
+    const statsZimuEl = document.getElementById('stats-zimu');
+    const statsShuziEl = document.getElementById('stats-shuzi');
+    // const statsTimeLabelEl = document.getElementById('stats-time-label'); // No longer need separate label element
+    const statsRateValueEl = document.getElementById('stats-rate-value'); // NEW: Editable rate span
+    const statsTimeEl = document.getElementById('stats-time'); // Value for time
 
     // Constants and State
-    const localStorageDataKey = 'dynamicArticleGeneratorData_v3'; // Increment version if needed
-    const defaultItemLabelPrefix = "新条目 "; // Base prefix for default labels
+    const localStorageDataKey = 'dynamicArticleGeneratorData_v4'; // Keep v4, structure is compatible
+    const defaultItemLabelPrefix = "新条目 ";
+    const DEFAULT_SPEAKING_RATE = 300;
+    const MIN_SPEAKING_RATE = 50;
+    const MAX_SPEAKING_RATE = 1000;
     let inputFieldsData = [];
-    let nextId = 1; // Still used for UNIQUE internal ID
+    let nextId = 1;
+    let speakingRate = DEFAULT_SPEAKING_RATE;
 
-    // --- Helper Function: Get Next Default Item Number ---
-    /**
-     * Finds the highest number used in labels matching "新条目 N:" and returns N+1.
-     * @param {Array} currentFieldsData - The current array of field data objects.
-     * @returns {number} The next number to use for a default "新条目" label.
-     */
-    function getNextDefaultItemNumber(currentFieldsData) {
-        let maxNum = 0;
-        // Regex to match "新条目" followed by optional space(s) and one or more digits, optional colon at the end.
-        // Case-insensitive just in case, though unlikely needed for Chinese.
-        const regex = new RegExp(`^${defaultItemLabelPrefix.trim()}\\s*(\\d+):?$`, 'i');
-
-        currentFieldsData.forEach(field => {
-            const match = field.label.match(regex);
-            if (match && match[1]) { // Check if match and capture group exist
-                const num = parseInt(match[1], 10);
-                if (!isNaN(num)) {
-                    maxNum = Math.max(maxNum, num);
-                }
-            }
-        });
-        return maxNum + 1; // Return the next available number
+    // --- Helper Functions (getNextDefaultItemNumber - unchanged) ---
+    function getNextDefaultItemNumber(currentFieldsData) { /* ...unchanged... */
+        let maxNum = 0; const regex = new RegExp(`^${defaultItemLabelPrefix.trim()}\\s*(\\d+):?$`, 'i');
+        currentFieldsData.forEach(field => { const match = field.label.match(regex); if (match && match[1]) { const num = parseInt(match[1], 10); if (!isNaN(num)) { maxNum = Math.max(maxNum, num); } } });
+        return maxNum + 1;
     }
 
-
-    // --- Data Persistence Functions ---
+    // --- Data Persistence Functions (Unchanged logic for saving/loading rate) ---
     function saveData() {
         inputFieldsData.forEach(field => {
-            const textarea = document.getElementById(`input-${field.id}`);
-            if (textarea) field.value = textarea.value;
-            const label = document.getElementById(`label-${field.id}`);
-            if (label && label.textContent !== field.label) {
-                 field.label = label.textContent.trim() || `未命名 ${field.id}:`;
-            }
+            const textarea = document.getElementById(`input-${field.id}`); if (textarea) field.value = textarea.value;
+            const label = document.getElementById(`label-${field.id}`); if (label && label.textContent !== field.label) { field.label = label.textContent.trim() || `未命名 ${field.id}:`; }
         });
-        try {
-            localStorage.setItem(localStorageDataKey, JSON.stringify({ fields: inputFieldsData, nextId: nextId }));
-        } catch (e) {
-            console.error("Error saving data to localStorage:", e);
-            alert("无法保存数据，可能是本地存储已满或被禁用。");
-        }
+        const dataToSave = { fields: inputFieldsData, nextId: nextId, rate: speakingRate };
+        try { localStorage.setItem(localStorageDataKey, JSON.stringify(dataToSave)); }
+        catch (e) { console.error("Error saving data to localStorage:", e); alert("无法保存数据，可能是本地存储已满或被禁用。"); }
     }
 
     function loadData() {
         const savedData = localStorage.getItem(localStorageDataKey);
+        let loadedRate = DEFAULT_SPEAKING_RATE;
         if (savedData) {
             try {
                 const parsedData = JSON.parse(savedData);
                 if (parsedData && Array.isArray(parsedData.fields)) {
                     inputFieldsData = parsedData.fields;
-                    inputFieldsData.forEach(f => {
-                        f.id = parseInt(f.id, 10);
-                        f.value = String(f.value || "");
-                        f.label = String(f.label || `未命名 ${f.id}:`).trim();
-                         if (!f.label) f.label = `未命名 ${f.id}:`;
-                    });
-                    // nextId ensures UNIQUE IDs. It should be higher than any existing ID.
-                    nextId = parsedData.nextId && typeof parsedData.nextId === 'number'
-                             ? parsedData.nextId
-                             : 1; // Default to 1 if missing
-                    if (inputFieldsData.length > 0) {
-                        nextId = Math.max(nextId, Math.max(...inputFieldsData.map(f => f.id)) + 1);
-                    } else {
-                        nextId = 1; // Reset if no fields loaded
-                    }
-                    return;
+                    inputFieldsData.forEach(f => { f.id = parseInt(f.id, 10); f.value = String(f.value || ""); f.label = String(f.label || `未命名 ${f.id}:`).trim(); if (!f.label) f.label = `未命名 ${f.id}:`; });
+                    nextId = parsedData.nextId && typeof parsedData.nextId === 'number' ? parsedData.nextId : 1;
+                    if (inputFieldsData.length > 0) { nextId = Math.max(nextId, Math.max(...inputFieldsData.map(f => f.id)) + 1); } else { nextId = 1; }
+                }
+                if (parsedData && typeof parsedData.rate === 'number' && parsedData.rate >= MIN_SPEAKING_RATE && parsedData.rate <= MAX_SPEAKING_RATE) {
+                    loadedRate = parsedData.rate;
                 }
             } catch (e) {
-                console.error("Error parsing saved data:", e);
-                localStorage.removeItem(localStorageDataKey); // Remove corrupted data
+                console.error("Error parsing saved data:", e); localStorage.removeItem(localStorageDataKey);
+                inputFieldsData = [ { id: 1, label: "引言:", value: "" }, { id: 2, label: "核心观点 1:", value: "" }, { id: 3, label: "核心观点 2:", value: "" }, { id: 4, label: "支撑细节:", value: "" }, { id: 5, label: "结论:", value: "" } ];
+                nextId = inputFieldsData.length > 0 ? Math.max(...inputFieldsData.map(f => f.id)) + 1 : 1;
             }
+        } else {
+            inputFieldsData = [ { id: 1, label: "引言:", value: "" }, { id: 2, label: "核心观点 1:", value: "" }, { id: 3, label: "核心观点 2:", value: "" }, { id: 4, label: "支撑细节:", value: "" }, { id: 5, label: "结论:", value: "" } ];
+            nextId = inputFieldsData.length > 0 ? Math.max(...inputFieldsData.map(f => f.id)) + 1 : 1;
         }
-        // Default fields if no saved data or data is corrupted
-        inputFieldsData = [
-            { id: 1, label: "引言:", value: "" },
-            { id: 2, label: "核心观点 1:", value: "" },
-            { id: 3, label: "核心观点 2:", value: "" },
-            { id: 4, label: "支撑细节:", value: "" },
-            { id: 5, label: "结论:", value: "" }
-        ];
-        // Calculate the correct nextId based on default data
-        nextId = inputFieldsData.length > 0 ? Math.max(...inputFieldsData.map(f => f.id)) + 1 : 1;
-        saveData(); // Save the default state
+
+        // Apply loaded/default rate AND update the display span
+        speakingRate = loadedRate;
+        statsRateValueEl.textContent = speakingRate; // Set the editable span's text
+
+        if (!savedData) { saveData(); }
     }
 
-    // --- UI Rendering Function (Mostly Unchanged) ---
-    function renderInputFields() {
-        inputFieldsContainer.innerHTML = ''; // Clear previous fields
-        if (inputFieldsData.length === 0) {
-             inputFieldsContainer.innerHTML = `<p class="empty-message">点击下方的 "${addFieldBtn.textContent}" 按钮来创建第一个输入框。</p>`;
-        } else {
-            inputFieldsData.forEach(fieldData => {
-                const inputGroup = document.createElement('div');
-                inputGroup.classList.add('input-group');
-                inputGroup.dataset.fieldId = fieldData.id;
-
-                const header = document.createElement('div');
-                header.classList.add('input-group-header');
-
-                // Editable Label (No changes needed here)
-                const label = document.createElement('label');
-                label.setAttribute('for', `input-${fieldData.id}`);
-                label.classList.add('editable-label');
-                label.setAttribute('contenteditable', 'true');
-                label.dataset.labelId = fieldData.id;
-                label.textContent = fieldData.label;
-                label.setAttribute('id', `label-${fieldData.id}`);
-                let clickTimeout = null;
-                const clickDelay = 250;
-                label.addEventListener('mousedown', (event) => { if (event.target === label && document.activeElement !== label) event.preventDefault(); });
-                label.addEventListener('click', (event) => { if (event.detail === 1) { clearTimeout(clickTimeout); clickTimeout = setTimeout(() => { if (document.body.contains(label) && document.activeElement !== label) label.focus(); }, clickDelay); } });
-                label.addEventListener('dblclick', (event) => { if (event.target === label) { clearTimeout(clickTimeout); label.focus(); try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(label); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { console.error("Error selecting text:", e); } } });
-                label.addEventListener('blur', handleLabelBlur);
-                label.addEventListener('keydown', handleLabelKeydown);
-
-                // Button Container (No changes needed here)
-                const buttonContainer = document.createElement('div');
-                buttonContainer.classList.add('input-group-buttons');
-
-                // Insert Below Button (+)
-                const insertBtn = document.createElement('button');
-                insertBtn.classList.add('action-icon-btn', 'insert-btn');
-                insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${fieldData.label})`);
-                insertBtn.title = '在此下方插入新条目';
-                insertBtn.textContent = '+';
-                insertBtn.dataset.fieldId = fieldData.id;
-                insertBtn.addEventListener('click', handleInsertFieldBelow);
-
-                // Delete Button (-)
-                const deleteBtn = document.createElement('button');
-                deleteBtn.classList.add('action-icon-btn', 'delete-btn');
-                deleteBtn.setAttribute('aria-label', `删除条目 ${fieldData.label}`);
-                deleteBtn.title = '删除此项';
-                deleteBtn.textContent = '−';
-                deleteBtn.dataset.fieldId = fieldData.id;
-                deleteBtn.addEventListener('click', handleDeleteField);
-
-                buttonContainer.appendChild(insertBtn);
-                buttonContainer.appendChild(deleteBtn);
-
-                header.appendChild(label);
-                header.appendChild(buttonContainer);
-
-                // Textarea (No changes needed here)
-                const textarea = document.createElement('textarea');
-                textarea.setAttribute('id', `input-${fieldData.id}`);
-                textarea.setAttribute('aria-describedby', `label-${fieldData.id}`);
-                textarea.classList.add('input-box');
-                textarea.setAttribute('rows', '3');
-                textarea.setAttribute('placeholder', `关于 "${fieldData.label.replace(':', '')}" 的内容...`);
-                textarea.value = fieldData.value || "";
-                textarea.addEventListener('input', handleTextareaInput);
-
-                inputGroup.appendChild(header);
-                inputGroup.appendChild(textarea);
-                inputFieldsContainer.appendChild(inputGroup);
-            });
-        }
+    // --- UI Rendering Function (Unchanged) ---
+    function renderInputFields() { /* ...unchanged... */
+        inputFieldsContainer.innerHTML = '';
+        if (inputFieldsData.length === 0) { inputFieldsContainer.innerHTML = `<p class="empty-message">点击下方的 "${addFieldBtn.textContent}" 按钮来创建第一个输入框。</p>`; }
+        else { inputFieldsData.forEach(fieldData => { const inputGroup = document.createElement('div'); inputGroup.classList.add('input-group'); inputGroup.dataset.fieldId = fieldData.id; const header = document.createElement('div'); header.classList.add('input-group-header'); const label = document.createElement('label'); label.setAttribute('for', `input-${fieldData.id}`); label.classList.add('editable-label'); label.setAttribute('contenteditable', 'true'); label.dataset.labelId = fieldData.id; label.textContent = fieldData.label; label.setAttribute('id', `label-${fieldData.id}`); let clickTimeout = null; const clickDelay = 250; label.addEventListener('mousedown', (event) => { if (event.target === label && document.activeElement !== label) event.preventDefault(); }); label.addEventListener('click', (event) => { if (event.detail === 1) { clearTimeout(clickTimeout); clickTimeout = setTimeout(() => { if (document.body.contains(label) && document.activeElement !== label) label.focus(); }, clickDelay); } }); label.addEventListener('dblclick', (event) => { if (event.target === label) { clearTimeout(clickTimeout); label.focus(); try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(label); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { console.error("Error selecting text:", e); } } }); label.addEventListener('blur', handleLabelBlur); label.addEventListener('keydown', handleLabelKeydown); const buttonContainer = document.createElement('div'); buttonContainer.classList.add('input-group-buttons'); const insertBtn = document.createElement('button'); insertBtn.classList.add('action-icon-btn', 'insert-btn'); insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${fieldData.label})`); insertBtn.title = '在此下方插入新条目'; insertBtn.textContent = '+'; insertBtn.dataset.fieldId = fieldData.id; insertBtn.addEventListener('click', handleInsertFieldBelow); const deleteBtn = document.createElement('button'); deleteBtn.classList.add('action-icon-btn', 'delete-btn'); deleteBtn.setAttribute('aria-label', `删除条目 ${fieldData.label}`); deleteBtn.title = '删除此项'; deleteBtn.textContent = '−'; deleteBtn.dataset.fieldId = fieldData.id; deleteBtn.addEventListener('click', handleDeleteField); buttonContainer.appendChild(insertBtn); buttonContainer.appendChild(deleteBtn); header.appendChild(label); header.appendChild(buttonContainer); const textarea = document.createElement('textarea'); textarea.setAttribute('id', `input-${fieldData.id}`); textarea.setAttribute('aria-describedby', `label-${fieldData.id}`); textarea.classList.add('input-box'); textarea.setAttribute('rows', '3'); textarea.setAttribute('placeholder', `关于 "${fieldData.label.replace(':', '')}" 的内容...`); textarea.value = fieldData.value || ""; textarea.addEventListener('input', handleTextareaInput); inputGroup.appendChild(header); inputGroup.appendChild(textarea); inputFieldsContainer.appendChild(inputGroup); }); }
         updateArticle();
     }
 
-    // --- Event Handlers ---
+    // --- Event Handlers (Label, Delete, Insert, Add - unchanged) ---
+    function handleLabelBlur(event) { /* ...unchanged... */
+        const label = event.target; const fieldId = parseInt(label.dataset.labelId, 10); let newText = label.textContent.trim(); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { const originalLabel = field.label; if (!newText) { newText = `未命名 ${fieldId}:`; label.textContent = newText; } if (newText !== originalLabel) { field.label = newText; const textarea = document.getElementById(`input-${fieldId}`); const group = label.closest('.input-group'); const insertBtn = group?.querySelector('.insert-btn'); const deleteBtn = group?.querySelector('.delete-btn'); if (textarea) textarea.placeholder = `关于 "${newText.replace(':', '')}" 的内容...`; if (insertBtn) insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${newText})`); if (deleteBtn) deleteBtn.setAttribute('aria-label', `删除条目 ${newText}`); saveData(); updateArticle(); } }
+    }
+    function handleLabelKeydown(event) { /* ...unchanged... */
+        if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); } else if (event.key === 'Escape') { const field = inputFieldsData.find(f => f.id === parseInt(event.target.dataset.labelId, 10)); if (field) event.target.textContent = field.label; event.target.blur(); }
+    }
+    function handleDeleteField(event) { /* ...unchanged... */
+        const button = event.target.closest('button.delete-btn'); if (!button) return; const fieldIdToDelete = parseInt(button.dataset.fieldId, 10); const field = inputFieldsData.find(f => f.id === fieldIdToDelete); const labelToDelete = field ? field.label : `条目 ${fieldIdToDelete}`; if (confirm(`确定要删除 "${labelToDelete}" 及其内容吗？`)) { inputFieldsData = inputFieldsData.filter(f => f.id !== fieldIdToDelete); saveData(); renderInputFields(); }
+    }
+    function handleInsertFieldBelow(event) { /* ...unchanged... */
+        const button = event.target.closest('button.insert-btn'); if (!button) return; const fieldIdToInsertBelow = parseInt(button.dataset.fieldId, 10); const index = inputFieldsData.findIndex(f => f.id === fieldIdToInsertBelow); if (index === -1) return; const newFieldId = nextId++; const nextItemNumber = getNextDefaultItemNumber(inputFieldsData); const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "" }; inputFieldsData.splice(index + 1, 0, newField); saveData(); renderInputFields(); focusAndScrollToField(newFieldId);
+    }
+    function handleAddField() { /* ...unchanged... */
+        const newFieldId = nextId++; const nextItemNumber = getNextDefaultItemNumber(inputFieldsData); const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "" }; inputFieldsData.push(newField); saveData(); renderInputFields(); focusAndScrollToField(newFieldId);
+    }
+    function focusAndScrollToField(fieldId) { /* ...unchanged... */
+        requestAnimationFrame(() => { const newGroup = inputFieldsContainer.querySelector(`.input-group[data-field-id="${fieldId}"]`); if (newGroup) { newGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); const newLabel = newGroup.querySelector('label.editable-label'); if (newLabel) { setTimeout(() => { newLabel.focus(); try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(newLabel); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { /* Ignore */ } }, 150); } } });
+    }
+    function handleTextareaInput(event) { /* ...unchanged... */
+        const textarea = event.target; const fieldId = parseInt(textarea.id.replace('input-', ''), 10); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { field.value = textarea.value; debounceSaveData(); } updateArticle();
+    }
+    let saveTimeout; function debounceSaveData(delay = 600) { /* ...unchanged... */ clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { saveData(); }, delay); }
 
-    function handleLabelBlur(event) {
-        const label = event.target;
-        const fieldId = parseInt(label.dataset.labelId, 10);
-        let newText = label.textContent.trim();
-        const field = inputFieldsData.find(f => f.id === fieldId);
-
-        if (field) {
-            const originalLabel = field.label;
-            // Fallback for empty label - use "未命名 ID:" instead of trying to guess next number
-            if (!newText) {
-                newText = `未命名 ${fieldId}:`;
-                label.textContent = newText;
-            }
-
-            if (newText !== originalLabel) {
-                field.label = newText;
-                const textarea = document.getElementById(`input-${fieldId}`);
-                const group = label.closest('.input-group');
-                const insertBtn = group?.querySelector('.insert-btn');
-                const deleteBtn = group?.querySelector('.delete-btn');
-
-                if (textarea) textarea.placeholder = `关于 "${newText.replace(':', '')}" 的内容...`;
-                // Update button labels for accessibility
-                if (insertBtn) insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${newText})`);
-                if (deleteBtn) deleteBtn.setAttribute('aria-label', `删除条目 ${newText}`);
-
-                saveData();
-                updateArticle();
-            }
+    // --- Character Counting and Time Estimation Function (Unchanged logic, uses speakingRate) ---
+    function updateCharacterCounts(text) {
+        let iTotal = 0, sTotal = 0, eTotal = 0, inum = 0;
+        for (let i = 0; i < text.length; i++) {
+            const c = text.charAt(i);
+            if (c.match(/[\u4e00-\u9fa5]/)) { iTotal++; } if (c.match(/[^\x00-\xff]/)) { sTotal++; } else { eTotal++; } if (c.match(/[0-9]/)) { inum++; }
         }
-    }
+        const totalChars = text.length, hanziCount = iTotal, biaodianCount = sTotal - iTotal, zimuCount = eTotal - inum, shuziCount = inum;
+        statsTotalEl.textContent = totalChars; statsHanziEl.textContent = hanziCount; statsBiaodianEl.textContent = biaodianCount; statsZimuEl.textContent = zimuCount; statsShuziEl.textContent = shuziCount;
 
-    function handleLabelKeydown(event) {
-        if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); }
-        else if (event.key === 'Escape') { const field = inputFieldsData.find(f => f.id === parseInt(event.target.dataset.labelId, 10)); if (field) event.target.textContent = field.label; event.target.blur(); }
-    }
-
-    function handleDeleteField(event) {
-        const button = event.target.closest('button.delete-btn');
-        if (!button) return;
-        const fieldIdToDelete = parseInt(button.dataset.fieldId, 10);
-        const field = inputFieldsData.find(f => f.id === fieldIdToDelete);
-        const labelToDelete = field ? field.label : `条目 ${fieldIdToDelete}`;
-
-        if (confirm(`确定要删除 "${labelToDelete}" 及其内容吗？`)) {
-            inputFieldsData = inputFieldsData.filter(f => f.id !== fieldIdToDelete);
-            saveData();
-            renderInputFields(); // Re-render the list
+        let minutes = 0, seconds = 0;
+        if (hanziCount > 0 && speakingRate > 0) {
+            const totalSeconds = Math.round((hanziCount / speakingRate) * 60);
+            minutes = Math.floor(totalSeconds / 60); seconds = totalSeconds % 60;
         }
+        // Only update the time value part, the rate in the label is handled separately
+        statsTimeEl.textContent = `${minutes}分${seconds}秒`;
     }
 
-    // --- MODIFIED: Use helper function for default label ---
-     function handleInsertFieldBelow(event) {
-        const button = event.target.closest('button.insert-btn');
-        if (!button) return;
-        const fieldIdToInsertBelow = parseInt(button.dataset.fieldId, 10);
-
-        const index = inputFieldsData.findIndex(f => f.id === fieldIdToInsertBelow);
-        if (index === -1) return; // Field not found
-
-        const newFieldId = nextId++; // Ensure unique ID using the global counter
-        const nextItemNumber = getNextDefaultItemNumber(inputFieldsData); // Get the next number based on current labels
-        const newField = {
-            id: newFieldId,
-            label: `${defaultItemLabelPrefix}${nextItemNumber}:`, // Use the calculated number
-            value: ""
-        };
-
-        inputFieldsData.splice(index + 1, 0, newField); // Insert into the array
-
-        saveData();
-        renderInputFields();
-        focusAndScrollToField(newFieldId);
+    // --- Core Article Update Function (Unchanged) ---
+    function updateArticle() { /* ...unchanged... */
+        const displayContent = inputFieldsData.map(field => `${field.label} ${field.value}`).join('\n'); outputArea.value = displayContent;
+        const contentForCounting = inputFieldsData.map(field => field.value).join('\n'); updateCharacterCounts(contentForCounting);
+        const hasAnyTrimmedValue = inputFieldsData.some(field => field.value.trim() !== ''); if (hasAnyTrimmedValue) { if (!copyBtn.classList.contains('copied')) { copyBtn.textContent = '复制文章'; } copyBtn.disabled = false; } else { copyBtn.disabled = true; copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied'); }
     }
 
-    // --- MODIFIED: Use helper function for default label ---
-    function handleAddField() { // Adds to the end
-        const newFieldId = nextId++; // Ensure unique ID
-        const nextItemNumber = getNextDefaultItemNumber(inputFieldsData); // Get the next number based on current labels
-        const newField = {
-            id: newFieldId,
-            label: `${defaultItemLabelPrefix}${nextItemNumber}:`, // Use the calculated number
-            value: ""
-        };
-        inputFieldsData.push(newField); // Add to the end
-
-        saveData();
-        renderInputFields();
-        focusAndScrollToField(newFieldId);
-    }
-
-    // Helper to focus and scroll (no changes needed here)
-    function focusAndScrollToField(fieldId) {
-         requestAnimationFrame(() => {
-             const newGroup = inputFieldsContainer.querySelector(`.input-group[data-field-id="${fieldId}"]`);
-             if (newGroup) {
-                 newGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                 const newLabel = newGroup.querySelector('label.editable-label');
-                 if (newLabel) {
-                     setTimeout(() => {
-                         newLabel.focus();
-                         try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(newLabel); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { /* Ignore selection errors */ }
-                     }, 150);
-                 }
-             }
-         });
-     }
-
-    function handleTextareaInput(event) {
-        const textarea = event.target;
-        const fieldId = parseInt(textarea.id.replace('input-', ''), 10);
-        const field = inputFieldsData.find(f => f.id === fieldId);
-        if (field) { field.value = textarea.value; debounceSaveData(); }
-        updateArticle();
-    }
-
-    // Debounce Saver (Unchanged)
-    let saveTimeout;
-    function debounceSaveData(delay = 600) { clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { saveData(); }, delay); }
-
-    // Core Article Update Function (Unchanged)
-    function updateArticle() {
-        const displayContent = inputFieldsData
-            .map(field => `${field.label} ${field.value}`)
-            .join('\n');
-        outputArea.value = displayContent;
-
-        const hasAnyTrimmedContent = inputFieldsData.some(field => field.value.trim() !== '');
-        if (hasAnyTrimmedContent) {
-             if (!copyBtn.classList.contains('copied')) { copyBtn.textContent = '复制文章'; }
-             copyBtn.disabled = false;
-        } else {
-            copyBtn.disabled = true;
-            copyBtn.textContent = '复制文章';
-            copyBtn.classList.remove('copied');
-        }
-    }
-
-    // Copy Button Logic (Unchanged)
-    copyBtn.addEventListener('click', () => {
-        if (copyBtn.disabled || copyBtn.classList.contains('copied')) return;
-        const textToCopy = inputFieldsData
-            .map(field => field.value.trim())
-            .filter(value => value !== '')
-            .join('\n');
-
-        if (!textToCopy && inputFieldsData.some(f => f.value && f.value.trim() !== '')) { return; } // Should be disabled, but double check
-        if (!textToCopy) return;
-
-        if (!navigator.clipboard) { alert('抱歉，您的浏览器不支持自动复制功能。请手动复制输出区域的内容。'); outputArea.focus(); outputArea.select(); return; }
-
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            copyBtn.textContent = '已复制!'; copyBtn.classList.add('copied'); copyBtn.disabled = true;
-            setTimeout(() => {
-                copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied');
-                const stillHasContent = inputFieldsData.some(field => field.value.trim() !== '');
-                copyBtn.disabled = !stillHasContent;
-            }, 2000);
-        }).catch(err => { console.error('无法复制文本: ', err); alert('复制失败，可能需要浏览器权限。请手动复制输出区域的内容。'); outputArea.focus(); outputArea.select(); });
+    // --- Copy Button Logic (Unchanged) ---
+    copyBtn.addEventListener('click', () => { /* ...unchanged... */
+        if (copyBtn.disabled || copyBtn.classList.contains('copied')) return; const textToCopy = inputFieldsData.map(field => field.value.trim()).filter(value => value !== '').join('\n'); if (!textToCopy && !inputFieldsData.some(f => f.value && f.value.trim() !== '')) { return; } if (!navigator.clipboard) { alert('抱歉，您的浏览器不支持自动复制功能。请手动复制所需内容。'); outputArea.focus(); outputArea.select(); return; } navigator.clipboard.writeText(textToCopy).then(() => { copyBtn.textContent = '已复制!'; copyBtn.classList.add('copied'); copyBtn.disabled = true; setTimeout(() => { copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied'); const stillHasContent = inputFieldsData.some(field => field.value.trim() !== ''); copyBtn.disabled = !stillHasContent; }, 2000); }).catch(err => { console.error('无法复制文本: ', err); alert('复制失败，可能需要浏览器权限。请手动复制所需内容。'); outputArea.focus(); outputArea.select(); });
     });
+
+    // --- NEW: Event Handlers for Editable Rate Span ---
+    function handleRateDblClick(event) {
+        const target = event.target;
+        target.contentEditable = 'true';
+        target.focus();
+        // Select text
+        try {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(target);
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+        } catch (e) {
+            console.error("Error selecting rate text:", e);
+        }
+    }
+
+    function handleRateBlur(event) {
+        const target = event.target;
+        const newRateText = target.textContent.trim();
+        let newRate = parseInt(newRateText, 10);
+        let isValid = false;
+
+        if (!isNaN(newRate) && newRate >= MIN_SPEAKING_RATE && newRate <= MAX_SPEAKING_RATE) {
+            isValid = true;
+        } else {
+             // Clamp or revert if invalid but still a number-like attempt
+             if (!isNaN(newRate)) {
+                 newRate = Math.max(MIN_SPEAKING_RATE, Math.min(MAX_SPEAKING_RATE, newRate));
+                 isValid = true; // Clamped value is valid
+             }
+             // If completely invalid (e.g., "abc"), newRate remains NaN or wrong, isValid stays false
+        }
+
+        target.contentEditable = 'false'; // Always disable editing on blur
+
+        if (isValid) {
+            if (newRate !== speakingRate) {
+                speakingRate = newRate;
+                target.textContent = speakingRate; // Update display to validated/clamped value
+                saveData();
+                updateArticle(); // Recalculate time
+            } else {
+                target.textContent = speakingRate; // Ensure display matches state even if no change
+            }
+        } else {
+            // Revert to the last valid rate if input was invalid
+            console.warn("Invalid rate input, reverting to:", speakingRate);
+            target.textContent = speakingRate;
+        }
+    }
+
+    function handleRateKeydown(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent newline
+            event.target.blur(); // Trigger blur to validate and save
+        } else if (event.key === 'Escape') {
+            event.target.textContent = speakingRate; // Revert text
+            event.target.blur(); // Trigger blur (which will find no change)
+        }
+        // Optional: Allow only digits? Maybe too restrictive.
+        // else if (!event.key.match(/[0-9]/) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'].includes(event.key)) {
+        //     event.preventDefault();
+        // }
+    }
 
     // --- Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
         addFieldBtn.addEventListener('click', handleAddField);
-        loadData(); // Load data first
-        renderInputFields(); // Then render
+        loadData(); // Loads fields AND rate, sets statsRateValueEl.textContent
+        renderInputFields(); // Renders fields, calls updateArticle
+
+        // Attach NEW listeners for the editable rate span
+        statsRateValueEl.addEventListener('dblclick', handleRateDblClick);
+        statsRateValueEl.addEventListener('blur', handleRateBlur);
+        statsRateValueEl.addEventListener('keydown', handleRateKeydown);
     });
 </script>
 
