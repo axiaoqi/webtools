@@ -155,5 +155,10 @@ def run_字数统计_route():
     return render_template('字数统计工具.html')
 
 
+@app.route('/文案生成助手')
+def run_文案生成助手_route():
+    return render_template('文案生成助手.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=7000)
