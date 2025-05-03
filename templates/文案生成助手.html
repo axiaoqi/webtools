@@ -2,23 +2,31 @@
 <html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>动态文章生成工具 (字数统计/勾选输出/双击改速率/复制纯文本/下载TXT)</title>
+    <title>动态文章生成工具 (字数统计/勾选状态保存/拖拽排序/双击改速率/复制纯文本/下载导入TXT)</title> <!-- Updated Title -->
     <style>
-        /* --- Styles mostly unchanged --- */
+        /* --- Base Styles --- */
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f8f9fa; color: #212529; }
         .container { max-width: 750px; margin: 20px auto; background: #fff; padding: 25px 35px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #dee2e6; }
         h1 { color: #343a40; text-align: center; margin-bottom: 15px; font-weight: 600; }
         .description { text-align: center; color: #6c757d; margin-bottom: 30px; font-size: 0.95em; }
         .input-fields { margin-bottom: 25px; padding-bottom: 10px; }
-        .input-group { margin-bottom: 18px; padding: 15px; border: 1px solid #e9ecef; border-radius: 6px; background-color: #fff; position: relative; display: flex; flex-direction: column; transition: box-shadow 0.2s ease-in-out; }
+        .input-group { margin-bottom: 18px; padding: 15px; border: 1px solid #e9ecef; border-radius: 6px; background-color: #fff; position: relative; display: flex; flex-direction: column;
+            transition: box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out, transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+         }
         .input-group:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .input-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; }
+        .input-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; cursor: grab; }
+        .input-group-header:active { cursor: grabbing; }
+
         label.editable-label { font-weight: 600; color: #495057; font-size: 0.95em; cursor: text; padding: 3px 6px; border-radius: 4px; transition: background-color 0.2s ease, box-shadow 0.2s ease; flex-grow: 1; word-break: break-word; line-height: 1.4; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; min-width: 50px; }
         label.editable-label:hover { background-color: #f1f3f5; }
-        label.editable-label:focus { background-color: #e7f5ff; outline: none; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); }
-        textarea.input-box { padding: 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em; min-height: 55px; resize: vertical; box-sizing: border-box; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; }
+        label.editable-label:focus, label.editable-label[contenteditable="true"] { background-color: #e7f5ff; outline: none; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); cursor: text !important; }
+        textarea.input-box { padding: 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em; min-height: 55px; resize: vertical; box-sizing: border-box; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; cursor: text; }
         textarea.input-box:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
-        .input-group-buttons { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .input-group-buttons { display: flex; align-items: center; gap: 6px; flex-shrink: 0; cursor: auto; }
         .include-checkbox-label { display: flex; align-items: center; cursor: pointer; margin-right: 4px; padding: 2px; border-radius: 3px; }
         .include-checkbox-label input[type="checkbox"] { margin: 0; width: 16px; height: 16px; cursor: pointer; accent-color: #0d6efd; vertical-align: middle; }
         .include-checkbox-label:hover { background-color: #f1f3f5; }
@@ -32,36 +40,20 @@
         #add-field-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: 500; margin-top: 20px; transition: background-color 0.3s ease; }
         #add-field-btn::before { content: '+'; font-size: 1.2em; line-height: 1; }
         #add-field-btn:hover { background-color: #0056b3; }
-        .action-button-group { display: flex; justify-content: center; gap: 15px; margin-top: 25px; margin-bottom: 30px; }
-
-        .action-button-group button {
-            padding: 12px 25px;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.05em;
-            font-weight: 500;
-            transition: background-color 0.3s ease, opacity 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .action-button-group button:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-            opacity: 0.65;
-        }
-
+        .action-button-group { display: flex; justify-content: center; gap: 15px; margin-top: 25px; margin-bottom: 30px; flex-wrap: wrap; }
+        .action-button-group button { padding: 12px 25px; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.05em; font-weight: 500; transition: background-color 0.3s ease, opacity 0.3s ease; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .action-button-group button:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.65; }
         #copy-btn { background-color: #28a745; }
         #copy-btn::before { content: '📋'; font-size: 1.1em; }
         #copy-btn:hover:not(:disabled) { background-color: #218838; }
         #copy-btn.copied { background-color: #198754; }
         #copy-btn.copied::before { content: '✅'; }
-
         #download-txt-btn { background-color: #fd7e14; }
         #download-txt-btn::before { content: '💾'; font-size: 1.1em; }
         #download-txt-btn:hover:not(:disabled) { background-color: #e66800; }
+        #import-txt-btn { background-color: #6f42c1; }
+        #import-txt-btn::before { content: '📤'; font-size: 1.1em; }
+        #import-txt-btn:hover:not(:disabled) { background-color: #59359a; }
 
         .output-section { margin-top: 20px; }
         #output-label { font-weight: 600; color: #343a40; display: block; margin-bottom: 8px; font-size: 1.1em; }
@@ -79,20 +71,32 @@
         #stats-rate-value:focus { background-color: #e7f5ff; outline: none; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); }
         .output-area-div { width: 100%; min-height: 200px; padding: 15px; border: 1px solid #ced4da; background-color: #f8f9fa; border-radius: 6px; font-size: 1em; line-height: 1.7; box-sizing: border-box; white-space: pre-wrap; overflow-wrap: break-word; transition: background-color 0.3s ease, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; color: #495057; display: block; margin-top: 0; overflow-y: auto; }
         .output-area-div:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); background-color: #fff; }
-        .output-area-div strong { font-weight: 700; color: #343a40; margin-right: 0.3em; /* Slightly reduced margin */ }
+        .output-area-div strong { font-weight: 700; color: #343a40; margin-right: 0.3em; }
         .output-area-div .empty-message { text-align: center; color: #6c757d; padding: 20px 0; font-style: italic; width: 100%; font-weight: normal; }
         .output-area-div > div:not(.empty-message) { margin-bottom: 0.2em; }
         .output-area-div > div:last-child { margin-bottom: 0; }
-        .empty-message {
-            text-align: center; color: #6c757d; padding: 20px 0; font-style: italic;
+        .empty-message { text-align: center; color: #6c757d; padding: 20px 0; font-style: italic; }
+
+        /* --- Drag and Drop Styles --- */
+        .input-group.dragging {
+            opacity: 0.5; border: 2px dashed #007bff; background-color: #e7f5ff; box-shadow: 0 8px 16px rgba(0,0,0,0.15);
         }
+        .input-group.drag-over-indicator {
+            border-top: 3px solid #0dcaf0; margin-top: 5px; margin-bottom: calc(18px + 5px);
+        }
+        .input-group-buttons, .input-group-buttons *, textarea.input-box, label.editable-label[contenteditable="true"], label.editable-label:focus, .include-checkbox-label, .include-checkbox-label input {
+            cursor: auto; -webkit-user-drag: none; user-drag: none; -moz-user-select: text; -webkit-user-select: text; -ms-user-select: text; user-select: text;
+        }
+         ::selection { background: #b3d4fc; }
+        ::-moz-selection { background: #b3d4fc; }
+
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>动态文章生成工具</h1>
-    <p class="description">输入内容实时生成带标签预览 (可<strong>勾选</strong>是否输出)。可修改标签、插入/删除条目。<strong>复制按钮仅复制勾选条目的纯文本。</strong> 新增 <strong>下载 TXT</strong> 按钮可保存所有标签和内容。实时字数统计、口播时长估算（<strong title="双击下方括号里的数字即可修改">速率可调</strong>）显示在预览区上方。</p>
+    <p class="description">输入内容实时生成带标签预览 (可<strong>勾选</strong>是否输出, <strong style="color: #dc3545;">无内容不显示</strong>)。可修改标签、插入/删除条目、<strong>拖拽排序</strong>。<strong>复制按钮仅复制勾选条目的纯文本。</strong> 新增 <strong>下载 TXT</strong> 按钮可保存所有标签、内容及勾选状态 (未勾选用 `[ ] ` 标记), <strong>导入 TXT</strong> 可恢复数据及勾选状态。实时字数统计、口播时长估算（<strong title="双击下方括号里的数字即可修改">速率可调</strong>）显示在预览区上方。</p> <!-- Updated Description -->
 
     <div id="input-fields" class="input-fields">
         <!-- Input fields will be generated here by JS -->
@@ -103,16 +107,18 @@
     <div class="action-button-group">
         <button id="copy-btn" disabled="">复制文章</button>
         <button id="download-txt-btn" disabled="">下载 TXT</button>
+        <button id="import-txt-btn">导入 TXT</button>
     </div>
+    <input type="file" id="import-file-input" accept=".txt" style="display: none;">
 
     <div class="output-section">
-        <label for="output-area" id="output-label">生成的文章 (带标签预览, 仅显示勾选条目):</label>
+        <label for="output-area" id="output-label">生成的文章 (预览区仅显示勾选且有内容的条目):</label>
         <div id="output-stats">
-             <span class="stat-item stat-item-total">总字数(勾选): <span class="stat-value" id="stats-total">0</span></span>
-             <span class="stat-item stat-item-hanzi">汉字(勾选): <span class="stat-value" id="stats-hanzi">0</span></span>
-             <span class="stat-item stat-item-punct">标点(全角): <span class="stat-value" id="stats-biaodian">0</span></span>
-             <span class="stat-item stat-item-letter">字母/符(半角): <span class="stat-value" id="stats-zimu">0</span></span>
-             <span class="stat-item stat-item-digit">数字: <span class="stat-value" id="stats-shuzi">0</span></span>
+             <span class="stat-item stat-item-total">总字数(勾选有内容): <span class="stat-value" id="stats-total">0</span></span>
+             <span class="stat-item stat-item-hanzi">汉字(勾选有内容): <span class="stat-value" id="stats-hanzi">0</span></span>
+             <span class="stat-item stat-item-punct">标点(全角)(勾选有内容): <span class="stat-value" id="stats-biaodian">0</span></span>
+             <span class="stat-item stat-item-letter">字母/符(半角)(勾选有内容): <span class="stat-value" id="stats-zimu">0</span></span>
+             <span class="stat-item stat-item-digit">数字(勾选有内容): <span class="stat-value" id="stats-shuzi">0</span></span>
              <br>
              <span class="stat-item stat-item-time">
                  口播时长(<span id="stats-rate-value" contenteditable="false" title="双击修改速率 (50-1000)">300</span>字/分钟):
@@ -132,6 +138,8 @@
     const addFieldBtn = document.getElementById('add-field-btn');
     const copyBtn = document.getElementById('copy-btn');
     const downloadTxtBtn = document.getElementById('download-txt-btn');
+    const importTxtBtn = document.getElementById('import-txt-btn');
+    const importFileInput = document.getElementById('import-file-input');
     const outputArea = document.getElementById('output-area');
     const statsTotalEl = document.getElementById('stats-total');
     const statsHanziEl = document.getElementById('stats-hanzi');
@@ -142,14 +150,17 @@
     const statsTimeEl = document.getElementById('stats-time');
 
     // Constants and State
-    const localStorageDataKey = 'dynamicArticleGeneratorData_v5';
+    const localStorageDataKey = 'dynamicArticleGeneratorData_v8'; // Increment version due to format change implication
     const defaultItemLabelPrefix = "新条目 ";
     const DEFAULT_SPEAKING_RATE = 300;
     const MIN_SPEAKING_RATE = 50;
     const MAX_SPEAKING_RATE = 1000;
+    const UNCHECKED_ITEM_PREFIX = "[ ] "; // Define the prefix for unchecked items
     let inputFieldsData = [];
     let nextId = 1;
     let speakingRate = DEFAULT_SPEAKING_RATE;
+    let draggedItemId = null;
+    let saveTimeout;
 
     // --- Helper Function: Escape HTML ---
     function escapeHTML(str) {
@@ -176,14 +187,20 @@
 
     // --- Data Persistence Functions (Save/Load) ---
     function saveData() {
-        // Update value and label from DOM elements before saving
+        // Update data model from UI before saving
         inputFieldsData.forEach(field => {
-            const textarea = document.getElementById(`input-${field.id}`);
+            const group = inputFieldsContainer.querySelector(`.input-group[data-field-id="${field.id}"]`);
+            if (!group) return;
+
+            const textarea = group.querySelector(`textarea#input-${field.id}`);
             if (textarea) field.value = textarea.value;
-            const label = document.getElementById(`label-${field.id}`);
-            if (label && label.textContent !== field.label) {
+
+            const label = group.querySelector(`label#label-${field.id}`);
+            if (label && document.activeElement !== label && label.textContent !== field.label) {
                 field.label = label.textContent.trim() || `未命名 ${field.id}:`;
             }
+             const checkbox = group.querySelector(`input#include-${field.id}`);
+             if (checkbox) field.includeInOutput = checkbox.checked;
         });
         const dataToSave = { fields: inputFieldsData, nextId: nextId, rate: speakingRate };
         try {
@@ -209,21 +226,23 @@
             try {
                 const parsedData = JSON.parse(savedData);
                 if (parsedData && Array.isArray(parsedData.fields)) {
-                    inputFieldsData = parsedData.fields.map(f => ({
-                        id: parseInt(f.id, 10),
-                        label: String(f.label || `未命名 ${f.id}:`).trim() || `未命名 ${f.id}:`,
+                     inputFieldsData = parsedData.fields.map((f, index) => ({
+                        id: parseInt(f.id, 10) || (Date.now() + index),
+                        label: String(f.label || `未命名 ${f.id || index}:`).trim() || `未命名 ${f.id || index}:`,
                         value: String(f.value || ""),
+                        // Ensure includeInOutput exists and is boolean, default to true
                         includeInOutput: typeof f.includeInOutput === 'boolean' ? f.includeInOutput : true
                     }));
                     nextId = parsedData.nextId && typeof parsedData.nextId === 'number' ? parsedData.nextId : 1;
                     if (inputFieldsData.length > 0) {
-                        nextId = Math.max(nextId, Math.max(...inputFieldsData.map(f => f.id)) + 1);
+                        const maxId = Math.max(0, ...inputFieldsData.map(f => f.id));
+                        nextId = Math.max(nextId, maxId + 1);
                     } else {
-                        nextId = 1;
+                         nextId = 1;
                     }
                 } else {
                      inputFieldsData = defaultFields;
-                     nextId = defaultFields.length > 0 ? Math.max(...defaultFields.map(f => f.id)) + 1 : 1;
+                     nextId = defaultFields.length > 0 ? Math.max(0, ...defaultFields.map(f => f.id)) + 1 : 1;
                 }
                 if (parsedData && typeof parsedData.rate === 'number' && parsedData.rate >= MIN_SPEAKING_RATE && parsedData.rate <= MAX_SPEAKING_RATE) {
                     loadedRate = parsedData.rate;
@@ -232,11 +251,11 @@
                 console.error("Error parsing saved data:", e);
                 localStorage.removeItem(localStorageDataKey);
                 inputFieldsData = defaultFields;
-                nextId = defaultFields.length > 0 ? Math.max(...defaultFields.map(f => f.id)) + 1 : 1;
+                nextId = defaultFields.length > 0 ? Math.max(0, ...defaultFields.map(f => f.id)) + 1 : 1;
             }
         } else {
             inputFieldsData = defaultFields;
-            nextId = defaultFields.length > 0 ? Math.max(...defaultFields.map(f => f.id)) + 1 : 1;
+            nextId = defaultFields.length > 0 ? Math.max(0, ...defaultFields.map(f => f.id)) + 1 : 1;
         }
         speakingRate = loadedRate;
         statsRateValueEl.textContent = speakingRate;
@@ -248,15 +267,18 @@
     // --- UI Rendering Function ---
     function renderInputFields() {
         inputFieldsContainer.innerHTML = '';
+
         if (inputFieldsData.length === 0) {
-            inputFieldsContainer.innerHTML = `<p class="empty-message">点击下方的 "${addFieldBtn.textContent}" 按钮来创建第一个输入框。</p>`;
+            inputFieldsContainer.innerHTML = `<p class="empty-message">点击下方的 "${addFieldBtn.textContent}" 按钮来创建第一个输入框，或使用 "导入 TXT" 按钮加载数据。</p>`;
             downloadTxtBtn.disabled = true;
         } else {
             downloadTxtBtn.disabled = false;
-            inputFieldsData.forEach(fieldData => {
+            inputFieldsData.forEach((fieldData, index) => {
                 const inputGroup = document.createElement('div');
                 inputGroup.classList.add('input-group');
                 inputGroup.dataset.fieldId = fieldData.id;
+                inputGroup.dataset.index = index;
+                inputGroup.draggable = true;
 
                 const header = document.createElement('div');
                 header.classList.add('input-group-header');
@@ -264,12 +286,34 @@
                 const label = document.createElement('label');
                 label.setAttribute('for', `input-${fieldData.id}`);
                 label.classList.add('editable-label');
-                label.setAttribute('contenteditable', 'true');
+                label.setAttribute('contenteditable', 'false');
                 label.dataset.labelId = fieldData.id;
                 label.textContent = fieldData.label;
                 label.setAttribute('id', `label-${fieldData.id}`);
-                let clickTimeout = null; const clickDelay = 250; label.addEventListener('mousedown', (event) => { if (event.target === label && document.activeElement !== label) event.preventDefault(); }); label.addEventListener('click', (event) => { if (event.detail === 1) { clearTimeout(clickTimeout); clickTimeout = setTimeout(() => { if (document.body.contains(label) && document.activeElement !== label) label.focus(); }, clickDelay); } }); label.addEventListener('dblclick', (event) => { if (event.target === label) { clearTimeout(clickTimeout); label.focus(); try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(label); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { console.error("Error selecting text:", e); } } });
-                label.addEventListener('blur', handleLabelBlur);
+                label.title = "单击或双击编辑标签";
+
+                let clickTimeout = null;
+                const clickDelay = 250;
+
+                label.addEventListener('mousedown', (event) => { if (label.isContentEditable) {} });
+                label.addEventListener('click', (event) => {
+                    if (event.detail === 1 && !label.isContentEditable && document.activeElement !== label) {
+                        clearTimeout(clickTimeout);
+                        clickTimeout = setTimeout(() => {
+                            if (document.body.contains(label)) {
+                                label.setAttribute('contenteditable', 'true'); label.focus();
+                                requestAnimationFrame(() => { try { window.getSelection()?.selectAllChildren(label); } catch (e) {} });
+                            }
+                        }, clickDelay);
+                    }
+                });
+                label.addEventListener('dblclick', (event) => {
+                     if (event.target === label) {
+                        clearTimeout(clickTimeout); label.setAttribute('contenteditable', 'true'); label.focus();
+                        requestAnimationFrame(() => { try { window.getSelection()?.selectAllChildren(label); } catch (e) {} });
+                     }
+                });
+                label.addEventListener('blur', (e) => { handleLabelBlur(e); e.target.setAttribute('contenteditable', 'false'); });
                 label.addEventListener('keydown', handleLabelKeydown);
 
                 const buttonContainer = document.createElement('div');
@@ -278,8 +322,7 @@
                 const insertBtn = document.createElement('button');
                 insertBtn.classList.add('action-icon-btn', 'insert-btn');
                 insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${fieldData.label})`);
-                insertBtn.title = '在此下方插入新条目';
-                insertBtn.textContent = '+';
+                insertBtn.title = '在此下方插入新条目'; insertBtn.textContent = '+';
                 insertBtn.dataset.fieldId = fieldData.id;
                 insertBtn.addEventListener('click', handleInsertFieldBelow);
 
@@ -289,18 +332,16 @@
 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.checked = fieldData.includeInOutput;
+                checkbox.checked = fieldData.includeInOutput; // Set checked state from data
                 checkbox.dataset.fieldId = fieldData.id;
                 checkbox.id = `include-${fieldData.id}`;
                 checkbox.addEventListener('change', handleIncludeCheckboxChange);
-
                 checkboxLabel.appendChild(checkbox);
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.classList.add('action-icon-btn', 'delete-btn');
                 deleteBtn.setAttribute('aria-label', `删除条目 ${fieldData.label}`);
-                deleteBtn.title = '删除此项';
-                deleteBtn.textContent = '−';
+                deleteBtn.title = '删除此项'; deleteBtn.textContent = '−';
                 deleteBtn.dataset.fieldId = fieldData.id;
                 deleteBtn.addEventListener('click', handleDeleteField);
 
@@ -330,14 +371,52 @@
 
     // --- Event Handlers (Label, Delete, Insert, Add, Textarea Input) ---
     function handleLabelBlur(event) {
-        const label = event.target; const fieldId = parseInt(label.dataset.labelId, 10); let newText = label.textContent.trim(); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { const originalLabel = field.label; if (!newText) { newText = `未命名 ${fieldId}:`; label.textContent = newText; } if (newText !== originalLabel) { field.label = newText; const textarea = document.getElementById(`input-${fieldId}`); const group = label.closest('.input-group'); const insertBtn = group?.querySelector('.insert-btn'); const deleteBtn = group?.querySelector('.delete-btn'); if (textarea) textarea.placeholder = `关于 "${newText.replace(':', '')}" 的内容...`; if (insertBtn) insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${newText})`); if (deleteBtn) deleteBtn.setAttribute('aria-label', `删除条目 ${newText}`); saveData(); updateArticle(); } }
+        const label = event.target;
+        const fieldId = parseInt(label.dataset.labelId, 10);
+        let newText = label.textContent.trim();
+        const field = inputFieldsData.find(f => f.id === fieldId);
+        if (field) {
+            const originalLabel = field.label;
+            if (!newText) { newText = `未命名 ${fieldId}:`; label.textContent = newText; }
+            if (newText !== originalLabel) {
+                field.label = newText;
+                const group = label.closest('.input-group');
+                const textarea = group?.querySelector(`#input-${fieldId}`);
+                const insertBtn = group?.querySelector('.insert-btn');
+                const deleteBtn = group?.querySelector('.delete-btn');
+                if (textarea) textarea.placeholder = `关于 "${newText.replace(':', '')}" 的内容...`;
+                if (insertBtn) insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${newText})`);
+                if (deleteBtn) deleteBtn.setAttribute('aria-label', `删除条目 ${newText}`);
+                debounceSaveData();
+                updateArticle(); // Update preview reflecting label change
+            }
+        }
+        label.setAttribute('contenteditable', 'false');
     }
+
     function handleLabelKeydown(event) {
-        if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); } else if (event.key === 'Escape') { const field = inputFieldsData.find(f => f.id === parseInt(event.target.dataset.labelId, 10)); if (field) event.target.textContent = field.label; event.target.blur(); }
+        if (event.target.isContentEditable) {
+            if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); }
+            else if (event.key === 'Escape') {
+                const field = inputFieldsData.find(f => f.id === parseInt(event.target.dataset.labelId, 10));
+                if (field) event.target.textContent = field.label;
+                event.target.blur();
+            }
+        }
     }
+
     function handleDeleteField(event) {
-        const button = event.target.closest('button.delete-btn'); if (!button) return; const fieldIdToDelete = parseInt(button.dataset.fieldId, 10); const field = inputFieldsData.find(f => f.id === fieldIdToDelete); const labelToDelete = field ? field.label : `条目 ${fieldIdToDelete}`; if (confirm(`确定要删除 "${labelToDelete}" 及其内容吗？`)) { inputFieldsData = inputFieldsData.filter(f => f.id !== fieldIdToDelete); saveData(); renderInputFields(); }
+        const button = event.target.closest('button.delete-btn'); if (!button) return;
+        const fieldIdToDelete = parseInt(button.dataset.fieldId, 10);
+        const field = inputFieldsData.find(f => f.id === fieldIdToDelete);
+        const labelToDelete = field ? field.label : `条目 ${fieldIdToDelete}`;
+        if (confirm(`确定要删除 "${labelToDelete}" 及其内容吗？`)) {
+            inputFieldsData = inputFieldsData.filter(f => f.id !== fieldIdToDelete);
+            saveData();
+            renderInputFields();
+        }
     }
+
     function handleInsertFieldBelow(event) {
         const button = event.target.closest('button.insert-btn'); if (!button) return;
         const fieldIdToInsertBelow = parseInt(button.dataset.fieldId, 10);
@@ -345,192 +424,347 @@
         if (index === -1) return;
         const newFieldId = nextId++;
         const nextItemNumber = getNextDefaultItemNumber(inputFieldsData);
-        const newField = {
-            id: newFieldId,
-            label: `${defaultItemLabelPrefix}${nextItemNumber}:`,
-            value: "",
-            includeInOutput: true
-        };
+        const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "", includeInOutput: true };
         inputFieldsData.splice(index + 1, 0, newField);
         saveData();
         renderInputFields();
         focusAndScrollToField(newFieldId);
     }
+
     function handleAddField() {
         const newFieldId = nextId++;
         const nextItemNumber = getNextDefaultItemNumber(inputFieldsData);
-        const newField = {
-            id: newFieldId,
-            label: `${defaultItemLabelPrefix}${nextItemNumber}:`,
-            value: "",
-            includeInOutput: true
-        };
+        const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "", includeInOutput: true };
         inputFieldsData.push(newField);
         saveData();
         renderInputFields();
         focusAndScrollToField(newFieldId);
     }
-    function focusAndScrollToField(fieldId) {
-        requestAnimationFrame(() => { const newGroup = inputFieldsContainer.querySelector(`.input-group[data-field-id="${fieldId}"]`); if (newGroup) { newGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); const newLabel = newGroup.querySelector('label.editable-label'); if (newLabel) { setTimeout(() => { newLabel.focus(); try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(newLabel); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { /* Ignore */ } }, 150); } } });
-    }
-    function handleTextareaInput(event) {
-        const textarea = event.target; const fieldId = parseInt(textarea.id.replace('input-', ''), 10); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { field.value = textarea.value; debounceSaveData(); } updateArticle();
-    }
-    let saveTimeout; function debounceSaveData(delay = 600) { clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { saveData(); }, delay); }
 
-    // --- Event Handler for Checkbox Change ---
+    function focusAndScrollToField(fieldId) {
+        requestAnimationFrame(() => {
+            const newGroup = inputFieldsContainer.querySelector(`.input-group[data-field-id="${fieldId}"]`);
+            if (newGroup) {
+                newGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                const newLabel = newGroup.querySelector('label.editable-label');
+                if (newLabel) {
+                    setTimeout(() => {
+                        newLabel.setAttribute('contenteditable', 'true'); newLabel.focus();
+                        try { window.getSelection()?.selectAllChildren(newLabel); } catch (e) {}
+                    }, 150);
+                }
+            }
+        });
+    }
+
+    function handleTextareaInput(event) {
+        const textarea = event.target;
+        const fieldId = parseInt(textarea.id.replace('input-', ''), 10);
+        const field = inputFieldsData.find(f => f.id === fieldId);
+        if (field) {
+            field.value = textarea.value;
+            debounceSaveData();
+        }
+        updateArticle();
+    }
+
+    function debounceSaveData(delay = 600) {
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+            saveData();
+        }, delay);
+    }
+
     function handleIncludeCheckboxChange(event) {
         const checkbox = event.target;
         const fieldId = parseInt(checkbox.dataset.fieldId, 10);
         const field = inputFieldsData.find(f => f.id === fieldId);
         if (field) {
             field.includeInOutput = checkbox.checked;
-            saveData();
+            debounceSaveData();
             updateArticle();
         }
     }
 
     // --- Character Counting and Time Estimation Function ---
     function updateCharacterCounts(text) {
-         let iTotal = 0, sTotal = 0, eTotal = 0, inum = 0; for (let i = 0; i < text.length; i++) { const c = text.charAt(i); if (c.match(/[\u4e00-\u9fa5]/)) { iTotal++; } if (c.match(/[^\x00-\xff]/)) { sTotal++; } else { eTotal++; } if (c.match(/[0-9]/)) { inum++; } }
-         const totalChars = text.length, hanziCount = iTotal, biaodianCount = sTotal - iTotal, zimuCount = eTotal - inum, shuziCount = inum;
-         statsTotalEl.textContent = totalChars; statsHanziEl.textContent = hanziCount; statsBiaodianEl.textContent = biaodianCount; statsZimuEl.textContent = zimuCount; statsShuziEl.textContent = shuziCount;
-         let minutes = 0, seconds = 0; if (hanziCount > 0 && speakingRate > 0) { const totalSeconds = Math.round((hanziCount / speakingRate) * 60); minutes = Math.floor(totalSeconds / 60); seconds = totalSeconds % 60; }
+         let hanziCount = 0, biaodianCount = 0, zimuCount = 0, shuziCount = 0;
+         for (let i = 0; i < text.length; i++) {
+             const char = text[i]; const code = char.charCodeAt(0);
+             if (char.match(/[\u4e00-\u9fa5]/)) { hanziCount++; }
+             else if (code >= 0xFF01 && code <= 0xFF60) { biaodianCount++; }
+             else if (code >= 0x3000 && code <= 0x303F) { biaodianCount++; }
+             else if (char.match(/[0-9]/)) { shuziCount++; }
+             else if (char.match(/[a-zA-Z]/)) { zimuCount++; }
+             else if (code >= 33 && code <= 126) { zimuCount++; }
+         }
+         const totalChars = hanziCount + biaodianCount + zimuCount + shuziCount;
+         statsTotalEl.textContent = totalChars; statsHanziEl.textContent = hanziCount;
+         statsBiaodianEl.textContent = biaodianCount; statsZimuEl.textContent = zimuCount;
+         statsShuziEl.textContent = shuziCount;
+         let minutes = 0, seconds = 0;
+         if (hanziCount > 0 && speakingRate > 0) {
+             const totalSeconds = Math.round((hanziCount / speakingRate) * 60);
+             minutes = Math.floor(totalSeconds / 60); seconds = totalSeconds % 60;
+         }
          statsTimeEl.textContent = `${minutes}分${seconds}秒`;
     }
 
-    // --- Core Article Update Function (Adds colon after label in preview) ---
+    // --- Core Article Update Function ---
     function updateArticle() {
-        // Filter fields for VISUAL output: must be checked AND have content
-        const fieldsToDisplay = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== '');
+        // Ensure data model reflects current UI state *before* generating output
+        inputFieldsData.forEach(field => {
+            const group = inputFieldsContainer.querySelector(`.input-group[data-field-id="${field.id}"]`);
+            if (!group) return;
+            const labelElement = group.querySelector(`label#label-${field.id}`);
+            if (labelElement && document.activeElement !== labelElement) {
+                const currentLabelText = labelElement.textContent.trim();
+                if (currentLabelText && currentLabelText !== field.label) field.label = currentLabelText;
+            }
+            const textareaElement = group.querySelector(`textarea#input-${field.id}`);
+            if(textareaElement && field.value !== textareaElement.value) field.value = textareaElement.value;
+            const checkboxElement = group.querySelector(`input#include-${field.id}`);
+            if (checkboxElement && field.includeInOutput !== checkboxElement.checked) field.includeInOutput = checkboxElement.checked;
+        });
 
+        // Filter for VISUAL display
+        const fieldsToDisplay = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== '');
         if (fieldsToDisplay.length === 0) {
-            outputArea.innerHTML = '<div class="empty-message">没有勾选且有内容的条目可显示...</div>';
+            outputArea.innerHTML = '<div class="empty-message">没有勾选且包含内容的条目可显示...</div>';
         } else {
-            const displayContentHTML = fieldsToDisplay
-                .map(field => {
-                    const safeLabel = escapeHTML(field.label.replace(/:$/, '')); // Remove potential trailing colon from label itself
-                    const safeValue = escapeHTML(field.value);
-                    const valuePart = safeValue ? ' ' + safeValue : ''; // Add space only if value exists
-                    // Add the colon directly after the label text within the <strong> tag
-                    return `<div><strong>${safeLabel}:</strong>${valuePart}</div>`;
-                })
-                .join('');
+            const displayContentHTML = fieldsToDisplay.map(field => {
+                const safeLabel = escapeHTML(field.label.replace(/:$/, ''));
+                const safeValue = escapeHTML(field.value);
+                return `<div><strong>${safeLabel}:</strong> ${safeValue}</div>`;
+            }).join('');
             outputArea.innerHTML = displayContentHTML;
         }
 
-        // Filter fields for COUNTING and COPYING: must be checked
-        const fieldsToCountAndCopy = inputFieldsData.filter(field => field.includeInOutput);
-        const contentForCounting = fieldsToCountAndCopy.map(field => field.value).join('\n');
-        updateCharacterCounts(contentForCounting);
+        // Filter for COUNTING and COPYING
+        const fieldsToCountAndCopy = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== '');
+        const contentForCountingAndCopy = fieldsToCountAndCopy.map(field => field.value.trim()).join('\n');
+        updateCharacterCounts(contentForCountingAndCopy);
 
-        // Enable/disable copy button based on whether ANY *checked* input field has a trimmed value
-        const hasIncludedTrimmedValue = fieldsToCountAndCopy.some(field => field.value.trim() !== '');
-        if (hasIncludedTrimmedValue) {
-            if (!copyBtn.classList.contains('copied')) {
-                copyBtn.textContent = '复制文章';
-            }
+        // Update Button States
+        if (contentForCountingAndCopy.length > 0) {
+            if (!copyBtn.classList.contains('copied')) copyBtn.textContent = '复制文章';
             copyBtn.disabled = false;
         } else {
-            copyBtn.disabled = true;
-            copyBtn.textContent = '复制文章';
-            copyBtn.classList.remove('copied');
+            copyBtn.disabled = true; copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied');
         }
-
-         // Enable/disable download button
-         downloadTxtBtn.disabled = inputFieldsData.length === 0;
+        downloadTxtBtn.disabled = inputFieldsData.length === 0;
     }
 
 
     // --- Copy Button Logic ---
     copyBtn.addEventListener('click', () => {
         if (copyBtn.disabled || copyBtn.classList.contains('copied')) return;
-
         const textToCopy = inputFieldsData
             .filter(field => field.includeInOutput && field.value.trim() !== '')
-            .map(field => field.value.trim())
-            .join('\n');
-
-        if (!textToCopy) { return; }
-
-        if (!navigator.clipboard) {
-            alert('抱歉，您的浏览器不支持自动复制功能。请手动复制所需内容。\n\n--- 内容开始 ---\n' + textToCopy + '\n--- 内容结束 ---');
-            return;
-        }
-
+            .map(field => field.value.trim()).join('\n');
+        if (!textToCopy) return;
         navigator.clipboard.writeText(textToCopy).then(() => {
-            copyBtn.textContent = '已复制!';
-            copyBtn.classList.add('copied');
-            copyBtn.disabled = true;
+            copyBtn.textContent = '已复制!'; copyBtn.classList.add('copied'); copyBtn.disabled = true;
             setTimeout(() => {
-                copyBtn.textContent = '复制文章';
-                copyBtn.classList.remove('copied');
+                copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied');
                 const stillHasContentToCopy = inputFieldsData.some(field => field.includeInOutput && field.value.trim() !== '');
                 copyBtn.disabled = !stillHasContentToCopy;
             }, 2000);
-        }).catch(err => {
-            console.error('无法复制文本: ', err);
-            alert('复制失败，可能需要浏览器权限。\n\n请手动复制所需内容:\n\n--- 内容开始 ---\n' + textToCopy + '\n--- 内容结束 ---');
-        });
+        }).catch(err => { console.error('无法复制文本: ', err); alert('复制失败。请手动复制。'); });
     });
 
-    // --- Download TXT Button Logic ---
+    // --- Download TXT Button Logic --- MODIFIED ---
     function handleDownloadTxt() {
         if (downloadTxtBtn.disabled || inputFieldsData.length === 0) return;
+        saveData(); // Ensure latest UI state is in the data model
 
-        // Update data from DOM just in case
-        inputFieldsData.forEach(field => {
-            const textarea = document.getElementById(`input-${field.id}`);
-            if (textarea) field.value = textarea.value;
-            const label = document.getElementById(`label-${field.id}`);
-            if (label && label.textContent !== field.label) {
-                 field.label = label.textContent.trim() || `未命名 ${field.id}:`;
-            }
-        });
-
-        // Format: Label: Value (ensure label ends with a colon if it doesn't)
         const textContent = inputFieldsData.map(field => {
-             const labelText = field.label.endsWith(':') ? field.label : field.label + ':';
-             return `${labelText} ${field.value}`; // Add space between label and value
-        }).join('\n\n'); // Use double newline for separation between items
+             // Add prefix "[ ] " if the item is NOT included in output
+             const labelPrefix = field.includeInOutput ? "" : UNCHECKED_ITEM_PREFIX;
+             const labelText = field.label.trim().replace(/:$/, '') + ':';
+             // Format: OptionalPrefix Label: Value
+             return `${labelPrefix}${labelText} ${field.value}`;
+        }).join('\n\n'); // Double newline between entries
 
         const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-
         const dateStr = new Date().toISOString().slice(0, 10);
         link.download = `article_data_${dateStr}.txt`;
-
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }
 
+    // --- Import TXT Logic --- MODIFIED ---
+    function handleImportTxtClick() {
+        importFileInput.value = null; // Reset to allow re-selecting same file
+        importFileInput.click();
+    }
+
+    function handleFileSelected(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        if (file.type !== 'text/plain') { alert('请选择一个有效的 .txt 文件。'); return; }
+        if (!confirm('这将覆盖当前所有数据，确定要导入吗？')) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const textContent = e.target.result;
+            try {
+                const parsedData = parseImportedTxt(textContent); // Use modified parser
+                if (parsedData === null) {
+                     alert('无法解析文件内容。请确保文件格式为 "标签: 内容" 或 "[ ] 标签: 内容"，条目间用双换行分隔。');
+                     return;
+                }
+                inputFieldsData = parsedData;
+                if (inputFieldsData.length > 0) {
+                    const maxImportedId = Math.max(0, ...inputFieldsData.map(f => f.id));
+                    nextId = maxImportedId + 1;
+                } else { nextId = 1; }
+                saveData(); // Save imported data immediately
+                renderInputFields(); // Update UI with imported data and states
+                alert('数据导入成功！');
+            } catch (parseError) {
+                console.error("Error parsing imported file:", parseError);
+                alert(`导入文件时出错：${parseError.message}`);
+            }
+        };
+        reader.onerror = (e) => { console.error("Error reading file:", e); alert('读取文件时出错。'); };
+        reader.readAsText(file);
+    }
+
+    function parseImportedTxt(textContent) { // MODIFIED to handle prefix
+        if (typeof textContent !== 'string' || textContent.trim() === '') { return []; }
+
+        const blocks = textContent.trim().split('\n\n');
+        const parsedFields = [];
+        let currentId = 1;
+
+        for (const block of blocks) {
+            const trimmedBlock = block.trim();
+            if (!trimmedBlock) continue;
+
+            const colonIndex = trimmedBlock.indexOf(':');
+            if (colonIndex > 0) { // Ensure colon exists and is not the first character
+                let rawLabelWithValuePrefix = trimmedBlock.substring(0, colonIndex).trim();
+                const value = trimmedBlock.substring(colonIndex + 1).trim();
+                let includeInOutput = true; // Default: checked
+                let finalLabel = rawLabelWithValuePrefix;
+
+                // Check for the unchecked prefix
+                if (rawLabelWithValuePrefix.startsWith(UNCHECKED_ITEM_PREFIX)) {
+                    includeInOutput = false; // Mark as unchecked
+                    // Remove the prefix from the label
+                    finalLabel = rawLabelWithValuePrefix.substring(UNCHECKED_ITEM_PREFIX.length).trim();
+                }
+
+                // Ensure label is not empty after potential prefix removal
+                if (!finalLabel) {
+                    finalLabel = `未命名 ${currentId}`; // Assign default label if empty
+                }
+
+                // Ensure label ends with a colon for internal consistency
+                if (!finalLabel.endsWith(':')) {
+                    finalLabel += ':';
+                }
+
+                parsedFields.push({
+                    id: currentId++,
+                    label: finalLabel, // Store the cleaned label
+                    value: value,
+                    includeInOutput: includeInOutput // Store the determined checked state
+                });
+            } else {
+                console.warn("Skipping invalid block during import (missing ':' or format error):", trimmedBlock);
+            }
+        }
+
+        if (parsedFields.length === 0 && textContent.trim().length > 0) {
+            console.warn("Import text was not empty, but no valid fields were parsed.");
+            return null; // Indicate parsing failure on non-empty content
+        }
+        return parsedFields;
+    }
 
     // --- Event Handlers for Editable Rate Span ---
     function handleRateDblClick(event) {
-        const target = event.target; target.contentEditable = 'true'; target.focus(); try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(target); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { console.error("Error selecting rate text:", e); }
+        const target = event.target; target.contentEditable = 'true'; target.focus();
+        requestAnimationFrame(() => { try { window.getSelection()?.selectAllChildren(target); } catch (e) {} });
     }
     function handleRateBlur(event) {
-         const target = event.target; const newRateText = target.textContent.trim(); let newRate = parseInt(newRateText, 10); let isValid = false; if (!isNaN(newRate) && newRate >= MIN_SPEAKING_RATE && newRate <= MAX_SPEAKING_RATE) { isValid = true; } else { if (!isNaN(newRate)) { newRate = Math.max(MIN_SPEAKING_RATE, Math.min(MAX_SPEAKING_RATE, newRate)); isValid = true; } } target.contentEditable = 'false'; if (isValid) { if (newRate !== speakingRate) { speakingRate = newRate; target.textContent = speakingRate; saveData(); updateArticle(); } else { target.textContent = speakingRate; } } else { console.warn("Invalid rate input, reverting to:", speakingRate); target.textContent = speakingRate; }
+         const target = event.target; const newRateText = target.textContent.trim();
+         let newRate = parseInt(newRateText, 10); let isValid = false;
+         if (!isNaN(newRate)) { newRate = Math.max(MIN_SPEAKING_RATE, Math.min(MAX_SPEAKING_RATE, newRate)); isValid = true; }
+         target.contentEditable = 'false';
+         if (isValid) {
+             if (newRate !== speakingRate) { speakingRate = newRate; target.textContent = speakingRate; debounceSaveData(); updateArticle(); }
+             else { target.textContent = speakingRate; }
+         } else { target.textContent = speakingRate; }
     }
     function handleRateKeydown(event) {
-         if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); } else if (event.key === 'Escape') { event.target.textContent = speakingRate; event.target.blur(); }
+        if (event.target.isContentEditable) {
+            if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); }
+            else if (event.key === 'Escape') { event.target.textContent = speakingRate; event.target.blur(); }
+        }
+    }
+
+    // --- Drag and Drop Event Handlers (Unchanged) ---
+    function handleDragStart(e) {
+        const targetGroup = e.target.closest('.input-group'); const actualTarget = e.target; if (!targetGroup) return;
+        if (actualTarget.tagName === 'TEXTAREA' || actualTarget.tagName === 'INPUT' || actualTarget.tagName === 'BUTTON' || actualTarget.closest('.input-group-buttons') || (actualTarget.classList.contains('editable-label') && actualTarget.isContentEditable) || window.getSelection()?.toString().length > 0) { e.preventDefault(); return; }
+        draggedItemId = parseInt(targetGroup.dataset.fieldId, 10); if (isNaN(draggedItemId)) return;
+        e.dataTransfer.setData('text/plain', draggedItemId.toString()); e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => { const element = inputFieldsContainer.querySelector(`.input-group[data-field-id="${draggedItemId}"]`); if(element) element.classList.add('dragging'); }, 0);
+    }
+    function handleDragOver(e) {
+        e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const targetGroup = e.target.closest('.input-group');
+        clearDragOverIndicators(); if (!targetGroup || !draggedItemId || parseInt(targetGroup.dataset.fieldId, 10) === draggedItemId) return;
+        targetGroup.classList.add('drag-over-indicator');
+    }
+    function handleDragLeave(e) {
+        if (!e.currentTarget.contains(e.relatedTarget)) { clearDragOverIndicators(); }
+        else { const targetGroup = e.target.closest('.input-group'); if (targetGroup && !targetGroup.contains(e.relatedTarget)) { targetGroup.classList.remove('drag-over-indicator'); targetGroup.style.marginTop = ''; targetGroup.style.marginBottom = ''; } }
+    }
+    function handleDrop(e) {
+        e.preventDefault(); clearDragOverIndicators(); const targetGroup = e.target.closest('.input-group'); const droppedItemIdStr = e.dataTransfer.getData('text/plain');
+        if (!droppedItemIdStr || !targetGroup) { handleDragEndCleanup(null); return; }
+        const draggedId = parseInt(droppedItemIdStr, 10); const targetId = parseInt(targetGroup.dataset.fieldId, 10);
+        if (isNaN(draggedId) || isNaN(targetId) || draggedId === targetId) { handleDragEndCleanup(draggedId); return; }
+        const draggedIndex = inputFieldsData.findIndex(field => field.id === draggedId); if (draggedIndex === -1) { console.error("Drag Error: Dragged item not found."); handleDragEndCleanup(draggedId); return; }
+        const [draggedItem] = inputFieldsData.splice(draggedIndex, 1);
+        const newTargetIndex = inputFieldsData.findIndex(field => field.id === targetId);
+        if (newTargetIndex !== -1) { inputFieldsData.splice(newTargetIndex, 0, draggedItem); }
+        else { inputFieldsData.push(draggedItem); console.warn("Drop target index issue, appended item."); }
+        saveData(); renderInputFields();
+    }
+    function handleDragEnd(e) { handleDragEndCleanup(draggedItemId); }
+    function handleDragEndCleanup(itemId) {
+        clearDragOverIndicators(); const draggedElement = inputFieldsContainer.querySelector(`.input-group.dragging`);
+        if (draggedElement) draggedElement.classList.remove('dragging'); draggedItemId = null;
+    }
+    function clearDragOverIndicators() {
+        inputFieldsContainer.querySelectorAll('.drag-over-indicator').forEach(el => { el.classList.remove('drag-over-indicator'); el.style.marginTop = ''; el.style.marginBottom = ''; });
     }
 
     // --- Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
         addFieldBtn.addEventListener('click', handleAddField);
         downloadTxtBtn.addEventListener('click', handleDownloadTxt);
-
+        importTxtBtn.addEventListener('click', handleImportTxtClick);
+        importFileInput.addEventListener('change', handleFileSelected);
         loadData();
         renderInputFields();
-
         statsRateValueEl.addEventListener('dblclick', handleRateDblClick);
         statsRateValueEl.addEventListener('blur', handleRateBlur);
         statsRateValueEl.addEventListener('keydown', handleRateKeydown);
+        inputFieldsContainer.addEventListener('dragstart', handleDragStart);
+        inputFieldsContainer.addEventListener('dragover', handleDragOver);
+        inputFieldsContainer.addEventListener('dragleave', handleDragLeave);
+        inputFieldsContainer.addEventListener('drop', handleDrop);
+        inputFieldsContainer.addEventListener('dragend', handleDragEnd);
     });
 </script>
 
