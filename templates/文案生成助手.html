@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>动态文章生成工具 (字数统计/双击修改口播速率/复制纯文本)</title>
     <style>
@@ -48,48 +47,46 @@
         .stat-item-letter .stat-value { color: #198754; }
         .stat-item-digit .stat-value { color: #ffc107; }
         .stat-item-time .stat-value { color: #6f42c1; }
-
-        /* --- NEW: Editable Rate Span Styling --- */
-        #stats-rate-value {
-            display: inline-block; /* Needed for padding/background */
-            font-weight: bold;
-            color: #6f42c1; /* Match time value color */
-            cursor: text;
-            padding: 1px 4px; /* Minimal padding */
-            border-radius: 3px;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
-            min-width: 25px; /* Ensure it doesn't collapse if empty */
+        #stats-rate-value { display: inline-block; font-weight: bold; color: #6f42c1; cursor: text; padding: 1px 4px; border-radius: 3px; transition: background-color 0.2s ease, box-shadow 0.2s ease; min-width: 25px; text-align: center; }
+        #stats-rate-value:hover { background-color: #f1f3f5; }
+        #stats-rate-value:focus { background-color: #e7f5ff; outline: none; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); }
+        .output-area-div { width: 100%; min-height: 200px; padding: 15px; border: 1px solid #ced4da; background-color: #f8f9fa; border-radius: 6px; font-size: 1em; line-height: 1.7; box-sizing: border-box; white-space: pre-wrap; overflow-wrap: break-word; transition: background-color 0.3s ease, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; color: #495057; display: block; margin-top: 0; overflow-y: auto; }
+        .output-area-div:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); background-color: #fff; }
+        .output-area-div strong { font-weight: 700; color: #343a40; margin-right: 0.5em; }
+         /* Empty message specific styles */
+        .output-area-div .empty-message {
             text-align: center;
+            color: #6c757d;
+            padding: 20px 0;
+            font-style: italic;
+            width: 100%;
+            /* Ensure strong tag style doesn't affect empty message if wrapped */
+            font-weight: normal;
         }
-        #stats-rate-value:hover {
-            background-color: #f1f3f5; /* Similar to label hover */
+        /* Ensure direct children divs have consistent spacing */
+        .output-area-div > div:not(.empty-message) {
+            margin-bottom: 0.2em; /* Small space between lines */
         }
-        #stats-rate-value:focus {
-            background-color: #e7f5ff; /* Similar to label focus */
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+         .output-area-div > div:last-child {
+            margin-bottom: 0;
         }
-        /* --- End New Styles --- */
-
-        #output-area { width: 100%; min-height: 200px; padding: 15px; border: 1px solid #ced4da; background-color: #f8f9fa; border-radius: 6px; font-size: 1em; line-height: 1.7; box-sizing: border-box; white-space: pre-wrap; overflow-wrap: break-word; transition: background-color 0.3s ease; color: #495057; display: block; margin-top: 0; }
-        #output-area:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); background-color: #fff; }
-        .empty-message { text-align:center; color:#6c757d; padding: 20px; font-style: italic; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>动态文章生成工具</h1>
-    <p class="description">输入内容实时生成带标签预览。可修改标签、插入/删除条目。<strong>复制按钮仅复制纯文本。</strong> 实时字数统计、口播时长估算（<strong title="双击下方括号里的数字即可修改">速率可调</strong>）显示在预览区上方。</p>
+    <p class="description">输入内容实时生成带标签预览 (标签加粗, 无内容不显示)。可修改标签、插入/删除条目。<strong>复制按钮仅复制纯文本。</strong> 实时字数统计、口播时长估算（<strong title="双击下方括号里的数字即可修改">速率可调</strong>）显示在预览区上方。</p>
 
     <div id="input-fields" class="input-fields">
-        <!-- Input fields will be rendered here by JS -->
+        <!-- Input fields will be generated here by JS -->
+        <div class="input-group" data-field-id="1"><div class="input-group-header"><label for="input-1" class="editable-label" contenteditable="true" data-label-id="1" id="label-1">引言:</label><div class="input-group-buttons"><button class="action-icon-btn insert-btn" aria-label="在此下方插入新条目 (引言:)" title="在此下方插入新条目" data-field-id="1">+</button><button class="action-icon-btn delete-btn" aria-label="删除条目 引言:" title="删除此项" data-field-id="1">−</button></div></div><textarea id="input-1" aria-describedby="label-1" class="input-box" rows="3" placeholder="关于 &quot;引言&quot; 的内容..."></textarea></div><div class="input-group" data-field-id="2"><div class="input-group-header"><label for="input-2" class="editable-label" contenteditable="true" data-label-id="2" id="label-2">核心观点 1:</label><div class="input-group-buttons"><button class="action-icon-btn insert-btn" aria-label="在此下方插入新条目 (核心观点 1:)" title="在此下方插入新条目" data-field-id="2">+</button><button class="action-icon-btn delete-btn" aria-label="删除条目 核心观点 1:" title="删除此项" data-field-id="2">−</button></div></div><textarea id="input-2" aria-describedby="label-2" class="input-box" rows="3" placeholder="关于 &quot;核心观点 1&quot; 的内容..."></textarea></div><div class="input-group" data-field-id="3"><div class="input-group-header"><label for="input-3" class="editable-label" contenteditable="true" data-label-id="3" id="label-3">核心观点 2:</label><div class="input-group-buttons"><button class="action-icon-btn insert-btn" aria-label="在此下方插入新条目 (核心观点 2:)" title="在此下方插入新条目" data-field-id="3">+</button><button class="action-icon-btn delete-btn" aria-label="删除条目 核心观点 2:" title="删除此项" data-field-id="3">−</button></div></div><textarea id="input-3" aria-describedby="label-3" class="input-box" rows="3" placeholder="关于 &quot;核心观点 2&quot; 的内容..."></textarea></div><div class="input-group" data-field-id="4"><div class="input-group-header"><label for="input-4" class="editable-label" contenteditable="true" data-label-id="4" id="label-4">支撑细节:</label><div class="input-group-buttons"><button class="action-icon-btn insert-btn" aria-label="在此下方插入新条目 (支撑细节:)" title="在此下方插入新条目" data-field-id="4">+</button><button class="action-icon-btn delete-btn" aria-label="删除条目 支撑细节:" title="删除此项" data-field-id="4">−</button></div></div><textarea id="input-4" aria-describedby="label-4" class="input-box" rows="3" placeholder="关于 &quot;支撑细节&quot; 的内容..."></textarea></div><div class="input-group" data-field-id="5"><div class="input-group-header"><label for="input-5" class="editable-label" contenteditable="true" data-label-id="5" id="label-5">结论:</label><div class="input-group-buttons"><button class="action-icon-btn insert-btn" aria-label="在此下方插入新条目 (结论:)" title="在此下方插入新条目" data-field-id="5">+</button><button class="action-icon-btn delete-btn" aria-label="删除条目 结论:" title="删除此项" data-field-id="5">−</button></div></div><textarea id="input-5" aria-describedby="label-5" class="input-box" rows="3" placeholder="关于 &quot;结论&quot; 的内容..."></textarea></div>
     </div>
 
     <button id="add-field-btn">添加新条目到末尾</button>
 
     <div class="action-button-group">
-        <button id="copy-btn" disabled>复制文章</button>
+        <button id="copy-btn" disabled="">复制文章</button>
     </div>
 
     <div class="output-section">
@@ -102,12 +99,13 @@
              <span class="stat-item stat-item-digit">数字: <span class="stat-value" id="stats-shuzi">0</span></span>
              <br>
              <span class="stat-item stat-item-time">
-                 口播时长(<span id="stats-rate-value" contenteditable="false" title="双击修改速率 (50-1000)">300</span>字/分钟): <!-- Editable rate span -->
+                 口播时长(<span id="stats-rate-value" contenteditable="false" title="双击修改速率 (50-1000)">300</span>字/分钟):
                  <span class="stat-value" id="stats-time">0分0秒</span>
              </span>
-             <!-- Rate input is removed -->
         </div>
-        <textarea id="output-area" readonly placeholder="在此实时显示生成的文章..."></textarea>
+        <div id="output-area" class="output-area-div" role="textbox" aria-readonly="true" aria-labelledby="output-label">
+             <!-- Content will be added by JS -->
+        </div>
     </div>
 
 </div>
@@ -123,12 +121,11 @@
     const statsBiaodianEl = document.getElementById('stats-biaodian');
     const statsZimuEl = document.getElementById('stats-zimu');
     const statsShuziEl = document.getElementById('stats-shuzi');
-    // const statsTimeLabelEl = document.getElementById('stats-time-label'); // No longer need separate label element
-    const statsRateValueEl = document.getElementById('stats-rate-value'); // NEW: Editable rate span
-    const statsTimeEl = document.getElementById('stats-time'); // Value for time
+    const statsRateValueEl = document.getElementById('stats-rate-value');
+    const statsTimeEl = document.getElementById('stats-time');
 
     // Constants and State
-    const localStorageDataKey = 'dynamicArticleGeneratorData_v4'; // Keep v4, structure is compatible
+    const localStorageDataKey = 'dynamicArticleGeneratorData_v4';
     const defaultItemLabelPrefix = "新条目 ";
     const DEFAULT_SPEAKING_RATE = 300;
     const MIN_SPEAKING_RATE = 50;
@@ -137,6 +134,13 @@
     let nextId = 1;
     let speakingRate = DEFAULT_SPEAKING_RATE;
 
+    // --- Helper Function: Escape HTML ---
+    function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
     // --- Helper Functions (getNextDefaultItemNumber - unchanged) ---
     function getNextDefaultItemNumber(currentFieldsData) { /* ...unchanged... */
         let maxNum = 0; const regex = new RegExp(`^${defaultItemLabelPrefix.trim()}\\s*(\\d+):?$`, 'i');
@@ -144,58 +148,25 @@
         return maxNum + 1;
     }
 
-    // --- Data Persistence Functions (Unchanged logic for saving/loading rate) ---
-    function saveData() {
-        inputFieldsData.forEach(field => {
-            const textarea = document.getElementById(`input-${field.id}`); if (textarea) field.value = textarea.value;
-            const label = document.getElementById(`label-${field.id}`); if (label && label.textContent !== field.label) { field.label = label.textContent.trim() || `未命名 ${field.id}:`; }
-        });
+    // --- Data Persistence Functions (Unchanged) ---
+    function saveData() { /* ...unchanged... */
+        inputFieldsData.forEach(field => { const textarea = document.getElementById(`input-${field.id}`); if (textarea) field.value = textarea.value; const label = document.getElementById(`label-${field.id}`); if (label && label.textContent !== field.label) { field.label = label.textContent.trim() || `未命名 ${field.id}:`; } });
         const dataToSave = { fields: inputFieldsData, nextId: nextId, rate: speakingRate };
         try { localStorage.setItem(localStorageDataKey, JSON.stringify(dataToSave)); }
         catch (e) { console.error("Error saving data to localStorage:", e); alert("无法保存数据，可能是本地存储已满或被禁用。"); }
     }
-
-    function loadData() {
-        const savedData = localStorage.getItem(localStorageDataKey);
-        let loadedRate = DEFAULT_SPEAKING_RATE;
-        if (savedData) {
-            try {
-                const parsedData = JSON.parse(savedData);
-                if (parsedData && Array.isArray(parsedData.fields)) {
-                    inputFieldsData = parsedData.fields;
-                    inputFieldsData.forEach(f => { f.id = parseInt(f.id, 10); f.value = String(f.value || ""); f.label = String(f.label || `未命名 ${f.id}:`).trim(); if (!f.label) f.label = `未命名 ${f.id}:`; });
-                    nextId = parsedData.nextId && typeof parsedData.nextId === 'number' ? parsedData.nextId : 1;
-                    if (inputFieldsData.length > 0) { nextId = Math.max(nextId, Math.max(...inputFieldsData.map(f => f.id)) + 1); } else { nextId = 1; }
-                }
-                if (parsedData && typeof parsedData.rate === 'number' && parsedData.rate >= MIN_SPEAKING_RATE && parsedData.rate <= MAX_SPEAKING_RATE) {
-                    loadedRate = parsedData.rate;
-                }
-            } catch (e) {
-                console.error("Error parsing saved data:", e); localStorage.removeItem(localStorageDataKey);
-                inputFieldsData = [ { id: 1, label: "引言:", value: "" }, { id: 2, label: "核心观点 1:", value: "" }, { id: 3, label: "核心观点 2:", value: "" }, { id: 4, label: "支撑细节:", value: "" }, { id: 5, label: "结论:", value: "" } ];
-                nextId = inputFieldsData.length > 0 ? Math.max(...inputFieldsData.map(f => f.id)) + 1 : 1;
-            }
-        } else {
-            inputFieldsData = [ { id: 1, label: "引言:", value: "" }, { id: 2, label: "核心观点 1:", value: "" }, { id: 3, label: "核心观点 2:", value: "" }, { id: 4, label: "支撑细节:", value: "" }, { id: 5, label: "结论:", value: "" } ];
-            nextId = inputFieldsData.length > 0 ? Math.max(...inputFieldsData.map(f => f.id)) + 1 : 1;
-        }
-
-        // Apply loaded/default rate AND update the display span
-        speakingRate = loadedRate;
-        statsRateValueEl.textContent = speakingRate; // Set the editable span's text
-
-        if (!savedData) { saveData(); }
+    function loadData() { /* ...unchanged... */
+        const savedData = localStorage.getItem(localStorageDataKey); let loadedRate = DEFAULT_SPEAKING_RATE; if (savedData) { try { const parsedData = JSON.parse(savedData); if (parsedData && Array.isArray(parsedData.fields)) { inputFieldsData = parsedData.fields; inputFieldsData.forEach(f => { f.id = parseInt(f.id, 10); f.value = String(f.value || ""); f.label = String(f.label || `未命名 ${f.id}:`).trim(); if (!f.label) f.label = `未命名 ${f.id}:`; }); nextId = parsedData.nextId && typeof parsedData.nextId === 'number' ? parsedData.nextId : 1; if (inputFieldsData.length > 0) { nextId = Math.max(nextId, Math.max(...inputFieldsData.map(f => f.id)) + 1); } else { nextId = 1; } } if (parsedData && typeof parsedData.rate === 'number' && parsedData.rate >= MIN_SPEAKING_RATE && parsedData.rate <= MAX_SPEAKING_RATE) { loadedRate = parsedData.rate; } } catch (e) { console.error("Error parsing saved data:", e); localStorage.removeItem(localStorageDataKey); inputFieldsData = [ { id: 1, label: "引言:", value: "" }, { id: 2, label: "核心观点 1:", value: "" }, { id: 3, label: "核心观点 2:", value: "" }, { id: 4, label: "支撑细节:", value: "" }, { id: 5, label: "结论:", value: "" } ]; nextId = inputFieldsData.length > 0 ? Math.max(...inputFieldsData.map(f => f.id)) + 1 : 1; } } else { inputFieldsData = [ { id: 1, label: "引言:", value: "" }, { id: 2, label: "核心观点 1:", value: "" }, { id: 3, label: "核心观点 2:", value: "" }, { id: 4, label: "支撑细节:", value: "" }, { id: 5, label: "结论:", value: "" } ]; nextId = inputFieldsData.length > 0 ? Math.max(...inputFieldsData.map(f => f.id)) + 1 : 1; }
+        speakingRate = loadedRate; statsRateValueEl.textContent = speakingRate; if (!savedData) { saveData(); }
     }
 
     // --- UI Rendering Function (Unchanged) ---
     function renderInputFields() { /* ...unchanged... */
-        inputFieldsContainer.innerHTML = '';
-        if (inputFieldsData.length === 0) { inputFieldsContainer.innerHTML = `<p class="empty-message">点击下方的 "${addFieldBtn.textContent}" 按钮来创建第一个输入框。</p>`; }
-        else { inputFieldsData.forEach(fieldData => { const inputGroup = document.createElement('div'); inputGroup.classList.add('input-group'); inputGroup.dataset.fieldId = fieldData.id; const header = document.createElement('div'); header.classList.add('input-group-header'); const label = document.createElement('label'); label.setAttribute('for', `input-${fieldData.id}`); label.classList.add('editable-label'); label.setAttribute('contenteditable', 'true'); label.dataset.labelId = fieldData.id; label.textContent = fieldData.label; label.setAttribute('id', `label-${fieldData.id}`); let clickTimeout = null; const clickDelay = 250; label.addEventListener('mousedown', (event) => { if (event.target === label && document.activeElement !== label) event.preventDefault(); }); label.addEventListener('click', (event) => { if (event.detail === 1) { clearTimeout(clickTimeout); clickTimeout = setTimeout(() => { if (document.body.contains(label) && document.activeElement !== label) label.focus(); }, clickDelay); } }); label.addEventListener('dblclick', (event) => { if (event.target === label) { clearTimeout(clickTimeout); label.focus(); try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(label); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { console.error("Error selecting text:", e); } } }); label.addEventListener('blur', handleLabelBlur); label.addEventListener('keydown', handleLabelKeydown); const buttonContainer = document.createElement('div'); buttonContainer.classList.add('input-group-buttons'); const insertBtn = document.createElement('button'); insertBtn.classList.add('action-icon-btn', 'insert-btn'); insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${fieldData.label})`); insertBtn.title = '在此下方插入新条目'; insertBtn.textContent = '+'; insertBtn.dataset.fieldId = fieldData.id; insertBtn.addEventListener('click', handleInsertFieldBelow); const deleteBtn = document.createElement('button'); deleteBtn.classList.add('action-icon-btn', 'delete-btn'); deleteBtn.setAttribute('aria-label', `删除条目 ${fieldData.label}`); deleteBtn.title = '删除此项'; deleteBtn.textContent = '−'; deleteBtn.dataset.fieldId = fieldData.id; deleteBtn.addEventListener('click', handleDeleteField); buttonContainer.appendChild(insertBtn); buttonContainer.appendChild(deleteBtn); header.appendChild(label); header.appendChild(buttonContainer); const textarea = document.createElement('textarea'); textarea.setAttribute('id', `input-${fieldData.id}`); textarea.setAttribute('aria-describedby', `label-${fieldData.id}`); textarea.classList.add('input-box'); textarea.setAttribute('rows', '3'); textarea.setAttribute('placeholder', `关于 "${fieldData.label.replace(':', '')}" 的内容...`); textarea.value = fieldData.value || ""; textarea.addEventListener('input', handleTextareaInput); inputGroup.appendChild(header); inputGroup.appendChild(textarea); inputFieldsContainer.appendChild(inputGroup); }); }
+        inputFieldsContainer.innerHTML = ''; if (inputFieldsData.length === 0) { inputFieldsContainer.innerHTML = `<p class="empty-message">点击下方的 "${addFieldBtn.textContent}" 按钮来创建第一个输入框。</p>`; } else { inputFieldsData.forEach(fieldData => { const inputGroup = document.createElement('div'); inputGroup.classList.add('input-group'); inputGroup.dataset.fieldId = fieldData.id; const header = document.createElement('div'); header.classList.add('input-group-header'); const label = document.createElement('label'); label.setAttribute('for', `input-${fieldData.id}`); label.classList.add('editable-label'); label.setAttribute('contenteditable', 'true'); label.dataset.labelId = fieldData.id; label.textContent = fieldData.label; label.setAttribute('id', `label-${fieldData.id}`); let clickTimeout = null; const clickDelay = 250; label.addEventListener('mousedown', (event) => { if (event.target === label && document.activeElement !== label) event.preventDefault(); }); label.addEventListener('click', (event) => { if (event.detail === 1) { clearTimeout(clickTimeout); clickTimeout = setTimeout(() => { if (document.body.contains(label) && document.activeElement !== label) label.focus(); }, clickDelay); } }); label.addEventListener('dblclick', (event) => { if (event.target === label) { clearTimeout(clickTimeout); label.focus(); try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(label); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { console.error("Error selecting text:", e); } } }); label.addEventListener('blur', handleLabelBlur); label.addEventListener('keydown', handleLabelKeydown); const buttonContainer = document.createElement('div'); buttonContainer.classList.add('input-group-buttons'); const insertBtn = document.createElement('button'); insertBtn.classList.add('action-icon-btn', 'insert-btn'); insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${fieldData.label})`); insertBtn.title = '在此下方插入新条目'; insertBtn.textContent = '+'; insertBtn.dataset.fieldId = fieldData.id; insertBtn.addEventListener('click', handleInsertFieldBelow); const deleteBtn = document.createElement('button'); deleteBtn.classList.add('action-icon-btn', 'delete-btn'); deleteBtn.setAttribute('aria-label', `删除条目 ${fieldData.label}`); deleteBtn.title = '删除此项'; deleteBtn.textContent = '−'; deleteBtn.dataset.fieldId = fieldData.id; deleteBtn.addEventListener('click', handleDeleteField); buttonContainer.appendChild(insertBtn); buttonContainer.appendChild(deleteBtn); header.appendChild(label); header.appendChild(buttonContainer); const textarea = document.createElement('textarea'); textarea.setAttribute('id', `input-${fieldData.id}`); textarea.setAttribute('aria-describedby', `label-${fieldData.id}`); textarea.classList.add('input-box'); textarea.setAttribute('rows', '3'); textarea.setAttribute('placeholder', `关于 "${fieldData.label.replace(':', '')}" 的内容...`); textarea.value = fieldData.value || ""; textarea.addEventListener('input', handleTextareaInput); inputGroup.appendChild(header); inputGroup.appendChild(textarea); inputFieldsContainer.appendChild(inputGroup); }); }
         updateArticle();
     }
 
-    // --- Event Handlers (Label, Delete, Insert, Add - unchanged) ---
+    // --- Event Handlers (Label, Delete, Insert, Add, Textarea Input - unchanged) ---
     function handleLabelBlur(event) { /* ...unchanged... */
         const label = event.target; const fieldId = parseInt(label.dataset.labelId, 10); let newText = label.textContent.trim(); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { const originalLabel = field.label; if (!newText) { newText = `未命名 ${fieldId}:`; label.textContent = newText; } if (newText !== originalLabel) { field.label = newText; const textarea = document.getElementById(`input-${fieldId}`); const group = label.closest('.input-group'); const insertBtn = group?.querySelector('.insert-btn'); const deleteBtn = group?.querySelector('.delete-btn'); if (textarea) textarea.placeholder = `关于 "${newText.replace(':', '')}" 的内容...`; if (insertBtn) insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${newText})`); if (deleteBtn) deleteBtn.setAttribute('aria-label', `删除条目 ${newText}`); saveData(); updateArticle(); } }
     }
@@ -219,115 +190,92 @@
     }
     let saveTimeout; function debounceSaveData(delay = 600) { /* ...unchanged... */ clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { saveData(); }, delay); }
 
-    // --- Character Counting and Time Estimation Function (Unchanged logic, uses speakingRate) ---
-    function updateCharacterCounts(text) {
-        let iTotal = 0, sTotal = 0, eTotal = 0, inum = 0;
-        for (let i = 0; i < text.length; i++) {
-            const c = text.charAt(i);
-            if (c.match(/[\u4e00-\u9fa5]/)) { iTotal++; } if (c.match(/[^\x00-\xff]/)) { sTotal++; } else { eTotal++; } if (c.match(/[0-9]/)) { inum++; }
-        }
+    // --- Character Counting and Time Estimation Function (Unchanged) ---
+    function updateCharacterCounts(text) { /* ...unchanged... */
+        let iTotal = 0, sTotal = 0, eTotal = 0, inum = 0; for (let i = 0; i < text.length; i++) { const c = text.charAt(i); if (c.match(/[\u4e00-\u9fa5]/)) { iTotal++; } if (c.match(/[^\x00-\xff]/)) { sTotal++; } else { eTotal++; } if (c.match(/[0-9]/)) { inum++; } }
         const totalChars = text.length, hanziCount = iTotal, biaodianCount = sTotal - iTotal, zimuCount = eTotal - inum, shuziCount = inum;
         statsTotalEl.textContent = totalChars; statsHanziEl.textContent = hanziCount; statsBiaodianEl.textContent = biaodianCount; statsZimuEl.textContent = zimuCount; statsShuziEl.textContent = shuziCount;
-
-        let minutes = 0, seconds = 0;
-        if (hanziCount > 0 && speakingRate > 0) {
-            const totalSeconds = Math.round((hanziCount / speakingRate) * 60);
-            minutes = Math.floor(totalSeconds / 60); seconds = totalSeconds % 60;
-        }
-        // Only update the time value part, the rate in the label is handled separately
+        let minutes = 0, seconds = 0; if (hanziCount > 0 && speakingRate > 0) { const totalSeconds = Math.round((hanziCount / speakingRate) * 60); minutes = Math.floor(totalSeconds / 60); seconds = totalSeconds % 60; }
         statsTimeEl.textContent = `${minutes}分${seconds}秒`;
     }
 
-    // --- Core Article Update Function (Unchanged) ---
-    function updateArticle() { /* ...unchanged... */
-        const displayContent = inputFieldsData.map(field => `${field.label} ${field.value}`).join('\n'); outputArea.value = displayContent;
-        const contentForCounting = inputFieldsData.map(field => field.value).join('\n'); updateCharacterCounts(contentForCounting);
-        const hasAnyTrimmedValue = inputFieldsData.some(field => field.value.trim() !== ''); if (hasAnyTrimmedValue) { if (!copyBtn.classList.contains('copied')) { copyBtn.textContent = '复制文章'; } copyBtn.disabled = false; } else { copyBtn.disabled = true; copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied'); }
+    // --- MODIFIED: Core Article Update Function (Outputs HTML to DIV, skips empty values) ---
+    function updateArticle() {
+        // Filter fields to include only those with non-whitespace content
+        const fieldsWithValue = inputFieldsData.filter(field => field.value.trim() !== '');
+
+        if (fieldsWithValue.length === 0) {
+            // If no fields have actual content, show the empty message
+            outputArea.innerHTML = '<div class="empty-message">在此实时显示生成的文章...</div>';
+        } else {
+            // Construct HTML content ONLY for fields with values
+            const displayContentHTML = fieldsWithValue
+                .map(field => {
+                    // Escape label and value to prevent XSS
+                    const safeLabel = escapeHTML(field.label);
+                    // Use the original value (not trimmed) for display, but add space
+                    const safeValue = escapeHTML(field.value);
+                    const valuePart = ' ' + safeValue; // Add space before the value
+
+                    // Wrap each entry in a div
+                    // It's guaranteed field.value is not just whitespace here
+                    return `<div><strong>${safeLabel}</strong>${valuePart}</div>`;
+                })
+                .join(''); // Join the divs directly
+
+            outputArea.innerHTML = displayContentHTML; // Update the DIV's content
+        }
+
+        // --- Content for counting and copy button logic remains the same ---
+        // Count characters based on ALL input values (including empty ones)
+        const contentForCounting = inputFieldsData.map(field => field.value).join('\n');
+        updateCharacterCounts(contentForCounting);
+
+        // Enable/disable copy button based on whether ANY input field has a trimmed value
+        const hasAnyTrimmedValue = inputFieldsData.some(field => field.value.trim() !== '');
+        if (hasAnyTrimmedValue) {
+            if (!copyBtn.classList.contains('copied')) {
+                copyBtn.textContent = '复制文章';
+            }
+            copyBtn.disabled = false;
+        } else {
+            copyBtn.disabled = true;
+            copyBtn.textContent = '复制文章';
+            copyBtn.classList.remove('copied');
+        }
     }
+
 
     // --- Copy Button Logic (Unchanged) ---
     copyBtn.addEventListener('click', () => { /* ...unchanged... */
-        if (copyBtn.disabled || copyBtn.classList.contains('copied')) return; const textToCopy = inputFieldsData.map(field => field.value.trim()).filter(value => value !== '').join('\n'); if (!textToCopy && !inputFieldsData.some(f => f.value && f.value.trim() !== '')) { return; } if (!navigator.clipboard) { alert('抱歉，您的浏览器不支持自动复制功能。请手动复制所需内容。'); outputArea.focus(); outputArea.select(); return; } navigator.clipboard.writeText(textToCopy).then(() => { copyBtn.textContent = '已复制!'; copyBtn.classList.add('copied'); copyBtn.disabled = true; setTimeout(() => { copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied'); const stillHasContent = inputFieldsData.some(field => field.value.trim() !== ''); copyBtn.disabled = !stillHasContent; }, 2000); }).catch(err => { console.error('无法复制文本: ', err); alert('复制失败，可能需要浏览器权限。请手动复制所需内容。'); outputArea.focus(); outputArea.select(); });
+        if (copyBtn.disabled || copyBtn.classList.contains('copied')) return; const textToCopy = inputFieldsData.map(field => field.value.trim()).filter(value => value !== '').join('\n'); if (!textToCopy && !inputFieldsData.some(f => f.value && f.value.trim() !== '')) { return; } if (!navigator.clipboard) { alert('抱歉，您的浏览器不支持自动复制功能。请手动复制所需内容。\n\n--- 内容开始 ---\n' + textToCopy + '\n--- 内容结束 ---'); return; }
+        navigator.clipboard.writeText(textToCopy).then(() => { copyBtn.textContent = '已复制!'; copyBtn.classList.add('copied'); copyBtn.disabled = true; setTimeout(() => { copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied'); const stillHasContent = inputFieldsData.some(field => field.value.trim() !== ''); copyBtn.disabled = !stillHasContent; }, 2000); }).catch(err => { console.error('无法复制文本: ', err); alert('复制失败，可能需要浏览器权限。\n\n请手动复制所需内容:\n\n--- 内容开始 ---\n' + textToCopy + '\n--- 内容结束 ---'); });
     });
 
-    // --- NEW: Event Handlers for Editable Rate Span ---
-    function handleRateDblClick(event) {
-        const target = event.target;
-        target.contentEditable = 'true';
-        target.focus();
-        // Select text
-        try {
-            const selection = window.getSelection();
-            const range = document.createRange();
-            range.selectNodeContents(target);
-            selection?.removeAllRanges();
-            selection?.addRange(range);
-        } catch (e) {
-            console.error("Error selecting rate text:", e);
-        }
+    // --- Event Handlers for Editable Rate Span (Unchanged) ---
+    function handleRateDblClick(event) { /* ...unchanged... */
+        const target = event.target; target.contentEditable = 'true'; target.focus(); try { const selection = window.getSelection(); const range = document.createRange(); range.selectNodeContents(target); selection?.removeAllRanges(); selection?.addRange(range); } catch (e) { console.error("Error selecting rate text:", e); }
     }
-
-    function handleRateBlur(event) {
-        const target = event.target;
-        const newRateText = target.textContent.trim();
-        let newRate = parseInt(newRateText, 10);
-        let isValid = false;
-
-        if (!isNaN(newRate) && newRate >= MIN_SPEAKING_RATE && newRate <= MAX_SPEAKING_RATE) {
-            isValid = true;
-        } else {
-             // Clamp or revert if invalid but still a number-like attempt
-             if (!isNaN(newRate)) {
-                 newRate = Math.max(MIN_SPEAKING_RATE, Math.min(MAX_SPEAKING_RATE, newRate));
-                 isValid = true; // Clamped value is valid
-             }
-             // If completely invalid (e.g., "abc"), newRate remains NaN or wrong, isValid stays false
-        }
-
-        target.contentEditable = 'false'; // Always disable editing on blur
-
-        if (isValid) {
-            if (newRate !== speakingRate) {
-                speakingRate = newRate;
-                target.textContent = speakingRate; // Update display to validated/clamped value
-                saveData();
-                updateArticle(); // Recalculate time
-            } else {
-                target.textContent = speakingRate; // Ensure display matches state even if no change
-            }
-        } else {
-            // Revert to the last valid rate if input was invalid
-            console.warn("Invalid rate input, reverting to:", speakingRate);
-            target.textContent = speakingRate;
-        }
+    function handleRateBlur(event) { /* ...unchanged... */
+        const target = event.target; const newRateText = target.textContent.trim(); let newRate = parseInt(newRateText, 10); let isValid = false; if (!isNaN(newRate) && newRate >= MIN_SPEAKING_RATE && newRate <= MAX_SPEAKING_RATE) { isValid = true; } else { if (!isNaN(newRate)) { newRate = Math.max(MIN_SPEAKING_RATE, Math.min(MAX_SPEAKING_RATE, newRate)); isValid = true; } } target.contentEditable = 'false'; if (isValid) { if (newRate !== speakingRate) { speakingRate = newRate; target.textContent = speakingRate; saveData(); updateArticle(); } else { target.textContent = speakingRate; } } else { console.warn("Invalid rate input, reverting to:", speakingRate); target.textContent = speakingRate; }
     }
-
-    function handleRateKeydown(event) {
-        if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent newline
-            event.target.blur(); // Trigger blur to validate and save
-        } else if (event.key === 'Escape') {
-            event.target.textContent = speakingRate; // Revert text
-            event.target.blur(); // Trigger blur (which will find no change)
-        }
-        // Optional: Allow only digits? Maybe too restrictive.
-        // else if (!event.key.match(/[0-9]/) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'].includes(event.key)) {
-        //     event.preventDefault();
-        // }
+    function handleRateKeydown(event) { /* ...unchanged... */
+        if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); } else if (event.key === 'Escape') { event.target.textContent = speakingRate; event.target.blur(); }
     }
 
     // --- Initialization ---
     document.addEventListener('DOMContentLoaded', () => {
         addFieldBtn.addEventListener('click', handleAddField);
-        loadData(); // Loads fields AND rate, sets statsRateValueEl.textContent
-        renderInputFields(); // Renders fields, calls updateArticle
+        loadData();
+        renderInputFields(); // Calls the modified updateArticle
 
-        // Attach NEW listeners for the editable rate span
         statsRateValueEl.addEventListener('dblclick', handleRateDblClick);
         statsRateValueEl.addEventListener('blur', handleRateBlur);
         statsRateValueEl.addEventListener('keydown', handleRateKeydown);
+
+        // Initial update needed in case loaded data starts empty or becomes empty
+        updateArticle();
     });
 </script>
 
-</body>
-</html>
+</body></html>
