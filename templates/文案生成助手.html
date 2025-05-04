@@ -90,6 +90,18 @@
          ::selection { background: #b3d4fc; }
         ::-moz-selection { background: #b3d4fc; }
 
+        /* Style for temporary textarea used by fallback copy */
+        .copy-fallback-textarea {
+            position: fixed; /* Or absolute */
+            top: -9999px;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1; /* Ensure it's behind everything */
+            width: 10px; /* Minimal size */
+            height: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -133,7 +145,7 @@
 </div>
 
 <script>
-    // DOM Elements
+    // DOM Elements (unchanged)
     const inputFieldsContainer = document.getElementById('input-fields');
     const addFieldBtn = document.getElementById('add-field-btn');
     const copyBtn = document.getElementById('copy-btn');
@@ -149,27 +161,27 @@
     const statsRateValueEl = document.getElementById('stats-rate-value');
     const statsTimeEl = document.getElementById('stats-time');
 
-    // Constants and State
-    const localStorageDataKey = 'dynamicArticleGeneratorData_v8'; // Increment version due to format change implication
+    // Constants and State (unchanged)
+    const localStorageDataKey = 'dynamicArticleGeneratorData_v8';
     const defaultItemLabelPrefix = "新条目 ";
     const DEFAULT_SPEAKING_RATE = 300;
     const MIN_SPEAKING_RATE = 50;
     const MAX_SPEAKING_RATE = 1000;
-    const UNCHECKED_ITEM_PREFIX = "[ ] "; // Define the prefix for unchecked items
+    const UNCHECKED_ITEM_PREFIX = "[ ] ";
     let inputFieldsData = [];
     let nextId = 1;
     let speakingRate = DEFAULT_SPEAKING_RATE;
     let draggedItemId = null;
     let saveTimeout;
 
-    // --- Helper Function: Escape HTML ---
+    // --- Helper Function: Escape HTML --- (unchanged)
     function escapeHTML(str) {
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
     }
 
-    // --- Helper Functions (getNextDefaultItemNumber) ---
+    // --- Helper Functions (getNextDefaultItemNumber) --- (unchanged)
     function getNextDefaultItemNumber(currentFieldsData) {
         let maxNum = 0;
         const regex = new RegExp(`^${defaultItemLabelPrefix.trim()}\\s*(\\d+):?$`, 'i');
@@ -185,16 +197,13 @@
         return maxNum + 1;
     }
 
-    // --- Data Persistence Functions (Save/Load) ---
+    // --- Data Persistence Functions (Save/Load) --- (unchanged)
     function saveData() {
-        // Update data model from UI before saving
         inputFieldsData.forEach(field => {
             const group = inputFieldsContainer.querySelector(`.input-group[data-field-id="${field.id}"]`);
             if (!group) return;
-
             const textarea = group.querySelector(`textarea#input-${field.id}`);
             if (textarea) field.value = textarea.value;
-
             const label = group.querySelector(`label#label-${field.id}`);
             if (label && document.activeElement !== label && label.textContent !== field.label) {
                 field.label = label.textContent.trim() || `未命名 ${field.id}:`;
@@ -210,7 +219,6 @@
             alert("无法保存数据，可能是本地存储已满或被禁用。");
         }
     }
-
     function loadData() {
         const savedData = localStorage.getItem(localStorageDataKey);
         let loadedRate = DEFAULT_SPEAKING_RATE;
@@ -221,7 +229,6 @@
             { id: 4, label: "支撑细节:", value: "", includeInOutput: true },
             { id: 5, label: "结论:", value: "", includeInOutput: true }
         ];
-
         if (savedData) {
             try {
                 const parsedData = JSON.parse(savedData);
@@ -230,16 +237,13 @@
                         id: parseInt(f.id, 10) || (Date.now() + index),
                         label: String(f.label || `未命名 ${f.id || index}:`).trim() || `未命名 ${f.id || index}:`,
                         value: String(f.value || ""),
-                        // Ensure includeInOutput exists and is boolean, default to true
                         includeInOutput: typeof f.includeInOutput === 'boolean' ? f.includeInOutput : true
                     }));
                     nextId = parsedData.nextId && typeof parsedData.nextId === 'number' ? parsedData.nextId : 1;
                     if (inputFieldsData.length > 0) {
                         const maxId = Math.max(0, ...inputFieldsData.map(f => f.id));
                         nextId = Math.max(nextId, maxId + 1);
-                    } else {
-                         nextId = 1;
-                    }
+                    } else { nextId = 1; }
                 } else {
                      inputFieldsData = defaultFields;
                      nextId = defaultFields.length > 0 ? Math.max(0, ...defaultFields.map(f => f.id)) + 1 : 1;
@@ -259,15 +263,12 @@
         }
         speakingRate = loadedRate;
         statsRateValueEl.textContent = speakingRate;
-        if (!savedData) {
-             saveData();
-        }
+        if (!savedData) { saveData(); }
     }
 
-    // --- UI Rendering Function ---
+    // --- UI Rendering Function --- (unchanged)
     function renderInputFields() {
         inputFieldsContainer.innerHTML = '';
-
         if (inputFieldsData.length === 0) {
             inputFieldsContainer.innerHTML = `<p class="empty-message">点击下方的 "${addFieldBtn.textContent}" 按钮来创建第一个输入框，或使用 "导入 TXT" 按钮加载数据。</p>`;
             downloadTxtBtn.disabled = true;
@@ -279,10 +280,8 @@
                 inputGroup.dataset.fieldId = fieldData.id;
                 inputGroup.dataset.index = index;
                 inputGroup.draggable = true;
-
                 const header = document.createElement('div');
                 header.classList.add('input-group-header');
-
                 const label = document.createElement('label');
                 label.setAttribute('for', `input-${fieldData.id}`);
                 label.classList.add('editable-label');
@@ -291,278 +290,102 @@
                 label.textContent = fieldData.label;
                 label.setAttribute('id', `label-${fieldData.id}`);
                 label.title = "单击或双击编辑标签";
-
-                let clickTimeout = null;
-                const clickDelay = 250;
-
+                let clickTimeout = null; const clickDelay = 250;
                 label.addEventListener('mousedown', (event) => { if (label.isContentEditable) {} });
-                label.addEventListener('click', (event) => {
-                    if (event.detail === 1 && !label.isContentEditable && document.activeElement !== label) {
-                        clearTimeout(clickTimeout);
-                        clickTimeout = setTimeout(() => {
-                            if (document.body.contains(label)) {
-                                label.setAttribute('contenteditable', 'true'); label.focus();
-                                requestAnimationFrame(() => { try { window.getSelection()?.selectAllChildren(label); } catch (e) {} });
-                            }
-                        }, clickDelay);
-                    }
-                });
-                label.addEventListener('dblclick', (event) => {
-                     if (event.target === label) {
-                        clearTimeout(clickTimeout); label.setAttribute('contenteditable', 'true'); label.focus();
-                        requestAnimationFrame(() => { try { window.getSelection()?.selectAllChildren(label); } catch (e) {} });
-                     }
-                });
+                label.addEventListener('click', (event) => { if (event.detail === 1 && !label.isContentEditable && document.activeElement !== label) { clearTimeout(clickTimeout); clickTimeout = setTimeout(() => { if (document.body.contains(label)) { label.setAttribute('contenteditable', 'true'); label.focus(); requestAnimationFrame(() => { try { window.getSelection()?.selectAllChildren(label); } catch (e) {} }); } }, clickDelay); } });
+                label.addEventListener('dblclick', (event) => { if (event.target === label) { clearTimeout(clickTimeout); label.setAttribute('contenteditable', 'true'); label.focus(); requestAnimationFrame(() => { try { window.getSelection()?.selectAllChildren(label); } catch (e) {} }); } });
                 label.addEventListener('blur', (e) => { handleLabelBlur(e); e.target.setAttribute('contenteditable', 'false'); });
                 label.addEventListener('keydown', handleLabelKeydown);
-
-                const buttonContainer = document.createElement('div');
-                buttonContainer.classList.add('input-group-buttons');
-
-                const insertBtn = document.createElement('button');
-                insertBtn.classList.add('action-icon-btn', 'insert-btn');
-                insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${fieldData.label})`);
-                insertBtn.title = '在此下方插入新条目'; insertBtn.textContent = '+';
-                insertBtn.dataset.fieldId = fieldData.id;
-                insertBtn.addEventListener('click', handleInsertFieldBelow);
-
-                const checkboxLabel = document.createElement('label');
-                checkboxLabel.classList.add('include-checkbox-label');
-                checkboxLabel.title = '勾选此项以包含在输出和复制内容中';
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = fieldData.includeInOutput; // Set checked state from data
-                checkbox.dataset.fieldId = fieldData.id;
-                checkbox.id = `include-${fieldData.id}`;
-                checkbox.addEventListener('change', handleIncludeCheckboxChange);
-                checkboxLabel.appendChild(checkbox);
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.classList.add('action-icon-btn', 'delete-btn');
-                deleteBtn.setAttribute('aria-label', `删除条目 ${fieldData.label}`);
-                deleteBtn.title = '删除此项'; deleteBtn.textContent = '−';
-                deleteBtn.dataset.fieldId = fieldData.id;
-                deleteBtn.addEventListener('click', handleDeleteField);
-
-                buttonContainer.appendChild(insertBtn);
-                buttonContainer.appendChild(checkboxLabel);
-                buttonContainer.appendChild(deleteBtn);
-
-                header.appendChild(label);
-                header.appendChild(buttonContainer);
-
-                const textarea = document.createElement('textarea');
-                textarea.setAttribute('id', `input-${fieldData.id}`);
-                textarea.setAttribute('aria-describedby', `label-${fieldData.id}`);
-                textarea.classList.add('input-box');
-                textarea.setAttribute('rows', '3');
-                textarea.setAttribute('placeholder', `关于 "${fieldData.label.replace(':', '')}" 的内容...`);
-                textarea.value = fieldData.value || "";
-                textarea.addEventListener('input', handleTextareaInput);
-
-                inputGroup.appendChild(header);
-                inputGroup.appendChild(textarea);
+                const buttonContainer = document.createElement('div'); buttonContainer.classList.add('input-group-buttons');
+                const insertBtn = document.createElement('button'); insertBtn.classList.add('action-icon-btn', 'insert-btn'); insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${fieldData.label})`); insertBtn.title = '在此下方插入新条目'; insertBtn.textContent = '+'; insertBtn.dataset.fieldId = fieldData.id; insertBtn.addEventListener('click', handleInsertFieldBelow);
+                const checkboxLabel = document.createElement('label'); checkboxLabel.classList.add('include-checkbox-label'); checkboxLabel.title = '勾选此项以包含在输出和复制内容中';
+                const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = fieldData.includeInOutput; checkbox.dataset.fieldId = fieldData.id; checkbox.id = `include-${fieldData.id}`; checkbox.addEventListener('change', handleIncludeCheckboxChange); checkboxLabel.appendChild(checkbox);
+                const deleteBtn = document.createElement('button'); deleteBtn.classList.add('action-icon-btn', 'delete-btn'); deleteBtn.setAttribute('aria-label', `删除条目 ${fieldData.label}`); deleteBtn.title = '删除此项'; deleteBtn.textContent = '−'; deleteBtn.dataset.fieldId = fieldData.id; deleteBtn.addEventListener('click', handleDeleteField);
+                buttonContainer.appendChild(insertBtn); buttonContainer.appendChild(checkboxLabel); buttonContainer.appendChild(deleteBtn);
+                header.appendChild(label); header.appendChild(buttonContainer);
+                const textarea = document.createElement('textarea'); textarea.setAttribute('id', `input-${fieldData.id}`); textarea.setAttribute('aria-describedby', `label-${fieldData.id}`); textarea.classList.add('input-box'); textarea.setAttribute('rows', '3'); textarea.setAttribute('placeholder', `关于 "${fieldData.label.replace(':', '')}" 的内容...`); textarea.value = fieldData.value || ""; textarea.addEventListener('input', handleTextareaInput);
+                inputGroup.appendChild(header); inputGroup.appendChild(textarea);
                 inputFieldsContainer.appendChild(inputGroup);
             });
         }
         updateArticle();
     }
 
-    // --- Event Handlers (Label, Delete, Insert, Add, Textarea Input) ---
-    function handleLabelBlur(event) {
-        const label = event.target;
-        const fieldId = parseInt(label.dataset.labelId, 10);
-        let newText = label.textContent.trim();
-        const field = inputFieldsData.find(f => f.id === fieldId);
-        if (field) {
-            const originalLabel = field.label;
-            if (!newText) { newText = `未命名 ${fieldId}:`; label.textContent = newText; }
-            if (newText !== originalLabel) {
-                field.label = newText;
-                const group = label.closest('.input-group');
-                const textarea = group?.querySelector(`#input-${fieldId}`);
-                const insertBtn = group?.querySelector('.insert-btn');
-                const deleteBtn = group?.querySelector('.delete-btn');
-                if (textarea) textarea.placeholder = `关于 "${newText.replace(':', '')}" 的内容...`;
-                if (insertBtn) insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${newText})`);
-                if (deleteBtn) deleteBtn.setAttribute('aria-label', `删除条目 ${newText}`);
-                debounceSaveData();
-                updateArticle(); // Update preview reflecting label change
-            }
-        }
-        label.setAttribute('contenteditable', 'false');
-    }
+    // --- Event Handlers (Label, Delete, Insert, Add, Textarea Input) --- (unchanged)
+    function handleLabelBlur(event) { const label = event.target; const fieldId = parseInt(label.dataset.labelId, 10); let newText = label.textContent.trim(); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { const originalLabel = field.label; if (!newText) { newText = `未命名 ${fieldId}:`; label.textContent = newText; } if (newText !== originalLabel) { field.label = newText; const group = label.closest('.input-group'); const textarea = group?.querySelector(`#input-${fieldId}`); const insertBtn = group?.querySelector('.insert-btn'); const deleteBtn = group?.querySelector('.delete-btn'); if (textarea) textarea.placeholder = `关于 "${newText.replace(':', '')}" 的内容...`; if (insertBtn) insertBtn.setAttribute('aria-label', `在此下方插入新条目 (${newText})`); if (deleteBtn) deleteBtn.setAttribute('aria-label', `删除条目 ${newText}`); debounceSaveData(); updateArticle(); } } label.setAttribute('contenteditable', 'false'); }
+    function handleLabelKeydown(event) { if (event.target.isContentEditable) { if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); } else if (event.key === 'Escape') { const field = inputFieldsData.find(f => f.id === parseInt(event.target.dataset.labelId, 10)); if (field) event.target.textContent = field.label; event.target.blur(); } } }
+    function handleDeleteField(event) { const button = event.target.closest('button.delete-btn'); if (!button) return; const fieldIdToDelete = parseInt(button.dataset.fieldId, 10); const field = inputFieldsData.find(f => f.id === fieldIdToDelete); const labelToDelete = field ? field.label : `条目 ${fieldIdToDelete}`; if (confirm(`确定要删除 "${labelToDelete}" 及其内容吗？`)) { inputFieldsData = inputFieldsData.filter(f => f.id !== fieldIdToDelete); saveData(); renderInputFields(); } }
+    function handleInsertFieldBelow(event) { const button = event.target.closest('button.insert-btn'); if (!button) return; const fieldIdToInsertBelow = parseInt(button.dataset.fieldId, 10); const index = inputFieldsData.findIndex(f => f.id === fieldIdToInsertBelow); if (index === -1) return; const newFieldId = nextId++; const nextItemNumber = getNextDefaultItemNumber(inputFieldsData); const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "", includeInOutput: true }; inputFieldsData.splice(index + 1, 0, newField); saveData(); renderInputFields(); focusAndScrollToField(newFieldId); }
+    function handleAddField() { const newFieldId = nextId++; const nextItemNumber = getNextDefaultItemNumber(inputFieldsData); const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "", includeInOutput: true }; inputFieldsData.push(newField); saveData(); renderInputFields(); focusAndScrollToField(newFieldId); }
+    function focusAndScrollToField(fieldId) { requestAnimationFrame(() => { const newGroup = inputFieldsContainer.querySelector(`.input-group[data-field-id="${fieldId}"]`); if (newGroup) { newGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); const newLabel = newGroup.querySelector('label.editable-label'); if (newLabel) { setTimeout(() => { newLabel.setAttribute('contenteditable', 'true'); newLabel.focus(); try { window.getSelection()?.selectAllChildren(newLabel); } catch (e) {} }, 150); } } }); }
+    function handleTextareaInput(event) { const textarea = event.target; const fieldId = parseInt(textarea.id.replace('input-', ''), 10); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { field.value = textarea.value; debounceSaveData(); } updateArticle(); }
+    function debounceSaveData(delay = 600) { clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { saveData(); }, delay); }
+    function handleIncludeCheckboxChange(event) { const checkbox = event.target; const fieldId = parseInt(checkbox.dataset.fieldId, 10); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { field.includeInOutput = checkbox.checked; debounceSaveData(); updateArticle(); } }
 
-    function handleLabelKeydown(event) {
-        if (event.target.isContentEditable) {
-            if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); }
-            else if (event.key === 'Escape') {
-                const field = inputFieldsData.find(f => f.id === parseInt(event.target.dataset.labelId, 10));
-                if (field) event.target.textContent = field.label;
-                event.target.blur();
-            }
-        }
-    }
+    // --- Character Counting and Time Estimation Function --- (unchanged)
+    function updateCharacterCounts(text) { let hanziCount = 0, biaodianCount = 0, zimuCount = 0, shuziCount = 0; for (let i = 0; i < text.length; i++) { const char = text[i]; const code = char.charCodeAt(0); if (char.match(/[\u4e00-\u9fa5]/)) { hanziCount++; } else if (code >= 0xFF01 && code <= 0xFF60) { biaodianCount++; } else if (code >= 0x3000 && code <= 0x303F) { biaodianCount++; } else if (char.match(/[0-9]/)) { shuziCount++; } else if (char.match(/[a-zA-Z]/)) { zimuCount++; } else if (code >= 33 && code <= 126) { zimuCount++; } } const totalChars = hanziCount + biaodianCount + zimuCount + shuziCount; statsTotalEl.textContent = totalChars; statsHanziEl.textContent = hanziCount; statsBiaodianEl.textContent = biaodianCount; statsZimuEl.textContent = zimuCount; statsShuziEl.textContent = shuziCount; let minutes = 0, seconds = 0; if (hanziCount > 0 && speakingRate > 0) { const totalSeconds = Math.round((hanziCount / speakingRate) * 60); minutes = Math.floor(totalSeconds / 60); seconds = totalSeconds % 60; } statsTimeEl.textContent = `${minutes}分${seconds}秒`; }
 
-    function handleDeleteField(event) {
-        const button = event.target.closest('button.delete-btn'); if (!button) return;
-        const fieldIdToDelete = parseInt(button.dataset.fieldId, 10);
-        const field = inputFieldsData.find(f => f.id === fieldIdToDelete);
-        const labelToDelete = field ? field.label : `条目 ${fieldIdToDelete}`;
-        if (confirm(`确定要删除 "${labelToDelete}" 及其内容吗？`)) {
-            inputFieldsData = inputFieldsData.filter(f => f.id !== fieldIdToDelete);
-            saveData();
-            renderInputFields();
-        }
-    }
-
-    function handleInsertFieldBelow(event) {
-        const button = event.target.closest('button.insert-btn'); if (!button) return;
-        const fieldIdToInsertBelow = parseInt(button.dataset.fieldId, 10);
-        const index = inputFieldsData.findIndex(f => f.id === fieldIdToInsertBelow);
-        if (index === -1) return;
-        const newFieldId = nextId++;
-        const nextItemNumber = getNextDefaultItemNumber(inputFieldsData);
-        const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "", includeInOutput: true };
-        inputFieldsData.splice(index + 1, 0, newField);
-        saveData();
-        renderInputFields();
-        focusAndScrollToField(newFieldId);
-    }
-
-    function handleAddField() {
-        const newFieldId = nextId++;
-        const nextItemNumber = getNextDefaultItemNumber(inputFieldsData);
-        const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "", includeInOutput: true };
-        inputFieldsData.push(newField);
-        saveData();
-        renderInputFields();
-        focusAndScrollToField(newFieldId);
-    }
-
-    function focusAndScrollToField(fieldId) {
-        requestAnimationFrame(() => {
-            const newGroup = inputFieldsContainer.querySelector(`.input-group[data-field-id="${fieldId}"]`);
-            if (newGroup) {
-                newGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                const newLabel = newGroup.querySelector('label.editable-label');
-                if (newLabel) {
-                    setTimeout(() => {
-                        newLabel.setAttribute('contenteditable', 'true'); newLabel.focus();
-                        try { window.getSelection()?.selectAllChildren(newLabel); } catch (e) {}
-                    }, 150);
-                }
-            }
-        });
-    }
-
-    function handleTextareaInput(event) {
-        const textarea = event.target;
-        const fieldId = parseInt(textarea.id.replace('input-', ''), 10);
-        const field = inputFieldsData.find(f => f.id === fieldId);
-        if (field) {
-            field.value = textarea.value;
-            debounceSaveData();
-        }
-        updateArticle();
-    }
-
-    function debounceSaveData(delay = 600) {
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => {
-            saveData();
-        }, delay);
-    }
-
-    function handleIncludeCheckboxChange(event) {
-        const checkbox = event.target;
-        const fieldId = parseInt(checkbox.dataset.fieldId, 10);
-        const field = inputFieldsData.find(f => f.id === fieldId);
-        if (field) {
-            field.includeInOutput = checkbox.checked;
-            debounceSaveData();
-            updateArticle();
-        }
-    }
-
-    // --- Character Counting and Time Estimation Function ---
-    function updateCharacterCounts(text) {
-         let hanziCount = 0, biaodianCount = 0, zimuCount = 0, shuziCount = 0;
-         for (let i = 0; i < text.length; i++) {
-             const char = text[i]; const code = char.charCodeAt(0);
-             if (char.match(/[\u4e00-\u9fa5]/)) { hanziCount++; }
-             else if (code >= 0xFF01 && code <= 0xFF60) { biaodianCount++; }
-             else if (code >= 0x3000 && code <= 0x303F) { biaodianCount++; }
-             else if (char.match(/[0-9]/)) { shuziCount++; }
-             else if (char.match(/[a-zA-Z]/)) { zimuCount++; }
-             else if (code >= 33 && code <= 126) { zimuCount++; }
-         }
-         const totalChars = hanziCount + biaodianCount + zimuCount + shuziCount;
-         statsTotalEl.textContent = totalChars; statsHanziEl.textContent = hanziCount;
-         statsBiaodianEl.textContent = biaodianCount; statsZimuEl.textContent = zimuCount;
-         statsShuziEl.textContent = shuziCount;
-         let minutes = 0, seconds = 0;
-         if (hanziCount > 0 && speakingRate > 0) {
-             const totalSeconds = Math.round((hanziCount / speakingRate) * 60);
-             minutes = Math.floor(totalSeconds / 60); seconds = totalSeconds % 60;
-         }
-         statsTimeEl.textContent = `${minutes}分${seconds}秒`;
-    }
-
-    // --- Core Article Update Function ---
-    function updateArticle() {
-        // Ensure data model reflects current UI state *before* generating output
-        inputFieldsData.forEach(field => {
-            const group = inputFieldsContainer.querySelector(`.input-group[data-field-id="${field.id}"]`);
-            if (!group) return;
-            const labelElement = group.querySelector(`label#label-${field.id}`);
-            if (labelElement && document.activeElement !== labelElement) {
-                const currentLabelText = labelElement.textContent.trim();
-                if (currentLabelText && currentLabelText !== field.label) field.label = currentLabelText;
-            }
-            const textareaElement = group.querySelector(`textarea#input-${field.id}`);
-            if(textareaElement && field.value !== textareaElement.value) field.value = textareaElement.value;
-            const checkboxElement = group.querySelector(`input#include-${field.id}`);
-            if (checkboxElement && field.includeInOutput !== checkboxElement.checked) field.includeInOutput = checkboxElement.checked;
-        });
-
-        // Filter for VISUAL display
-        const fieldsToDisplay = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== '');
-        if (fieldsToDisplay.length === 0) {
-            outputArea.innerHTML = '<div class="empty-message">没有勾选且包含内容的条目可显示...</div>';
-        } else {
-            const displayContentHTML = fieldsToDisplay.map(field => {
-                const safeLabel = escapeHTML(field.label.replace(/:$/, ''));
-                const safeValue = escapeHTML(field.value);
-                return `<div><strong>${safeLabel}:</strong> ${safeValue}</div>`;
-            }).join('');
-            outputArea.innerHTML = displayContentHTML;
-        }
-
-        // Filter for COUNTING and COPYING
-        const fieldsToCountAndCopy = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== '');
-        const contentForCountingAndCopy = fieldsToCountAndCopy.map(field => field.value.trim()).join('\n');
-        updateCharacterCounts(contentForCountingAndCopy);
-
-        // Update Button States
-        if (contentForCountingAndCopy.length > 0) {
-            if (!copyBtn.classList.contains('copied')) copyBtn.textContent = '复制文章';
-            copyBtn.disabled = false;
-        } else {
-            copyBtn.disabled = true; copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied');
-        }
-        downloadTxtBtn.disabled = inputFieldsData.length === 0;
-    }
+    // --- Core Article Update Function --- (unchanged)
+    function updateArticle() { inputFieldsData.forEach(field => { const group = inputFieldsContainer.querySelector(`.input-group[data-field-id="${field.id}"]`); if (!group) return; const labelElement = group.querySelector(`label#label-${field.id}`); if (labelElement && document.activeElement !== labelElement) { const currentLabelText = labelElement.textContent.trim(); if (currentLabelText && currentLabelText !== field.label) field.label = currentLabelText; } const textareaElement = group.querySelector(`textarea#input-${field.id}`); if(textareaElement && field.value !== textareaElement.value) field.value = textareaElement.value; const checkboxElement = group.querySelector(`input#include-${field.id}`); if (checkboxElement && field.includeInOutput !== checkboxElement.checked) field.includeInOutput = checkboxElement.checked; }); const fieldsToDisplay = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== ''); if (fieldsToDisplay.length === 0) { outputArea.innerHTML = '<div class="empty-message">没有勾选且包含内容的条目可显示...</div>'; } else { const displayContentHTML = fieldsToDisplay.map(field => { const safeLabel = escapeHTML(field.label.replace(/:$/, '')); const safeValue = escapeHTML(field.value); return `<div><strong>${safeLabel}:</strong> ${safeValue}</div>`; }).join(''); outputArea.innerHTML = displayContentHTML; } const fieldsToCountAndCopy = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== ''); const contentForCountingAndCopy = fieldsToCountAndCopy.map(field => field.value.trim()).join('\n'); updateCharacterCounts(contentForCountingAndCopy); if (contentForCountingAndCopy.length > 0) { if (!copyBtn.classList.contains('copied')) copyBtn.textContent = '复制文章'; copyBtn.disabled = false; } else { copyBtn.disabled = true; copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied'); } downloadTxtBtn.disabled = inputFieldsData.length === 0; }
 
 
-    // --- Copy Button Logic ---
+    // --- Copy Button Logic --- MODIFIED to use fallback ---
     copyBtn.addEventListener('click', () => {
         if (copyBtn.disabled || copyBtn.classList.contains('copied')) return;
+
         const textToCopy = inputFieldsData
             .filter(field => field.includeInOutput && field.value.trim() !== '')
             .map(field => field.value.trim()).join('\n');
+
         if (!textToCopy) return;
+
+        // --- Fallback Copy Method using document.execCommand ---
+        // Create a temporary textarea element
+        const fallbackTextArea = document.createElement('textarea');
+        fallbackTextArea.value = textToCopy;
+        // Make it non-editable and visually hidden but still part of the DOM
+        fallbackTextArea.setAttribute('readonly', '');
+        // Use a class for styling the hidden textarea
+        fallbackTextArea.classList.add('copy-fallback-textarea');
+
+        document.body.appendChild(fallbackTextArea);
+
+        // Select the text inside the textarea
+        fallbackTextArea.select();
+        // For mobile devices
+        fallbackTextArea.setSelectionRange(0, 99999);
+
+        let success = false;
+        try {
+            // Execute the copy command
+            success = document.execCommand('copy');
+            console.log('Fallback copy command success:', success);
+        } catch (err) {
+            console.error('Fallback copy command failed:', err);
+            success = false;
+        }
+
+        // Remove the temporary textarea
+        document.body.removeChild(fallbackTextArea);
+
+        // Provide feedback to the user
+        if (success) {
+            copyBtn.textContent = '已复制!'; copyBtn.classList.add('copied'); copyBtn.disabled = true;
+            setTimeout(() => {
+                copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied');
+                const stillHasContentToCopy = inputFieldsData.some(field => field.includeInOutput && field.value.trim() !== '');
+                copyBtn.disabled = !stillHasContentToCopy;
+            }, 2000);
+        } else {
+            // If even the fallback fails, notify the user.
+            console.error('无法使用 document.execCommand 复制文本。');
+            alert('自动复制失败。请手动选中预览区内容进行复制。');
+            // Optional: Keep the button enabled to allow manual copying
+            // copyBtn.disabled = false;
+        }
+        // --- End of Fallback Copy Method ---
+
+        /* --- Original navigator.clipboard (commented out for fallback) ---
         navigator.clipboard.writeText(textToCopy).then(() => {
             copyBtn.textContent = '已复制!'; copyBtn.classList.add('copied'); copyBtn.disabled = true;
             setTimeout(() => {
@@ -570,186 +393,36 @@
                 const stillHasContentToCopy = inputFieldsData.some(field => field.includeInOutput && field.value.trim() !== '');
                 copyBtn.disabled = !stillHasContentToCopy;
             }, 2000);
-        }).catch(err => { console.error('无法复制文本: ', err); alert('复制失败。请手动复制。'); });
+        }).catch(err => {
+             console.error('无法使用 navigator.clipboard 复制文本: ', err);
+             alert('复制失败。您的浏览器可能不支持或在非安全环境下运行。请尝试手动复制。');
+        });
+        */
     });
 
-    // --- Download TXT Button Logic --- MODIFIED ---
-    function handleDownloadTxt() {
-        if (downloadTxtBtn.disabled || inputFieldsData.length === 0) return;
-        saveData(); // Ensure latest UI state is in the data model
+    // --- Download TXT Button Logic --- (unchanged)
+    function handleDownloadTxt() { if (downloadTxtBtn.disabled || inputFieldsData.length === 0) return; saveData(); const textContent = inputFieldsData.map(field => { const labelPrefix = field.includeInOutput ? "" : UNCHECKED_ITEM_PREFIX; const labelText = field.label.trim().replace(/:$/, '') + ':'; return `${labelPrefix}${labelText} ${field.value}`; }).join('\n\n'); const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; const dateStr = new Date().toISOString().slice(0, 10); link.download = `article_data_${dateStr}.txt`; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); }
 
-        const textContent = inputFieldsData.map(field => {
-             // Add prefix "[ ] " if the item is NOT included in output
-             const labelPrefix = field.includeInOutput ? "" : UNCHECKED_ITEM_PREFIX;
-             const labelText = field.label.trim().replace(/:$/, '') + ':';
-             // Format: OptionalPrefix Label: Value
-             return `${labelPrefix}${labelText} ${field.value}`;
-        }).join('\n\n'); // Double newline between entries
+    // --- Import TXT Logic --- (unchanged)
+    function handleImportTxtClick() { importFileInput.value = null; importFileInput.click(); }
+    function handleFileSelected(event) { const file = event.target.files[0]; if (!file) return; if (file.type !== 'text/plain') { alert('请选择一个有效的 .txt 文件。'); return; } if (!confirm('这将覆盖当前所有数据，确定要导入吗？')) return; const reader = new FileReader(); reader.onload = (e) => { const textContent = e.target.result; try { const parsedData = parseImportedTxt(textContent); if (parsedData === null) { alert('无法解析文件内容。请确保文件格式为 "标签: 内容" 或 "[ ] 标签: 内容"，条目间用双换行分隔。'); return; } inputFieldsData = parsedData; if (inputFieldsData.length > 0) { const maxImportedId = Math.max(0, ...inputFieldsData.map(f => f.id)); nextId = maxImportedId + 1; } else { nextId = 1; } saveData(); renderInputFields(); alert('数据导入成功！'); } catch (parseError) { console.error("Error parsing imported file:", parseError); alert(`导入文件时出错：${parseError.message}`); } }; reader.onerror = (e) => { console.error("Error reading file:", e); alert('读取文件时出错。'); }; reader.readAsText(file); }
+    function parseImportedTxt(textContent) { if (typeof textContent !== 'string' || textContent.trim() === '') { return []; } const blocks = textContent.trim().split('\n\n'); const parsedFields = []; let currentId = 1; for (const block of blocks) { const trimmedBlock = block.trim(); if (!trimmedBlock) continue; const colonIndex = trimmedBlock.indexOf(':'); if (colonIndex > 0) { let rawLabelWithValuePrefix = trimmedBlock.substring(0, colonIndex).trim(); const value = trimmedBlock.substring(colonIndex + 1).trim(); let includeInOutput = true; let finalLabel = rawLabelWithValuePrefix; if (rawLabelWithValuePrefix.startsWith(UNCHECKED_ITEM_PREFIX)) { includeInOutput = false; finalLabel = rawLabelWithValuePrefix.substring(UNCHECKED_ITEM_PREFIX.length).trim(); } if (!finalLabel) { finalLabel = `未命名 ${currentId}`; } if (!finalLabel.endsWith(':')) { finalLabel += ':'; } parsedFields.push({ id: currentId++, label: finalLabel, value: value, includeInOutput: includeInOutput }); } else { console.warn("Skipping invalid block during import (missing ':' or format error):", trimmedBlock); } } if (parsedFields.length === 0 && textContent.trim().length > 0) { console.warn("Import text was not empty, but no valid fields were parsed."); return null; } return parsedFields; }
 
-        const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        const dateStr = new Date().toISOString().slice(0, 10);
-        link.download = `article_data_${dateStr}.txt`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
+    // --- Event Handlers for Editable Rate Span --- (unchanged)
+    function handleRateDblClick(event) { const target = event.target; target.contentEditable = 'true'; target.focus(); requestAnimationFrame(() => { try { window.getSelection()?.selectAllChildren(target); } catch (e) {} }); }
+    function handleRateBlur(event) { const target = event.target; const newRateText = target.textContent.trim(); let newRate = parseInt(newRateText, 10); let isValid = false; if (!isNaN(newRate)) { newRate = Math.max(MIN_SPEAKING_RATE, Math.min(MAX_SPEAKING_RATE, newRate)); isValid = true; } target.contentEditable = 'false'; if (isValid) { if (newRate !== speakingRate) { speakingRate = newRate; target.textContent = speakingRate; debounceSaveData(); updateArticle(); } else { target.textContent = speakingRate; } } else { target.textContent = speakingRate; } }
+    function handleRateKeydown(event) { if (event.target.isContentEditable) { if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); } else if (event.key === 'Escape') { event.target.textContent = speakingRate; event.target.blur(); } } }
 
-    // --- Import TXT Logic --- MODIFIED ---
-    function handleImportTxtClick() {
-        importFileInput.value = null; // Reset to allow re-selecting same file
-        importFileInput.click();
-    }
-
-    function handleFileSelected(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        if (file.type !== 'text/plain') { alert('请选择一个有效的 .txt 文件。'); return; }
-        if (!confirm('这将覆盖当前所有数据，确定要导入吗？')) return;
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const textContent = e.target.result;
-            try {
-                const parsedData = parseImportedTxt(textContent); // Use modified parser
-                if (parsedData === null) {
-                     alert('无法解析文件内容。请确保文件格式为 "标签: 内容" 或 "[ ] 标签: 内容"，条目间用双换行分隔。');
-                     return;
-                }
-                inputFieldsData = parsedData;
-                if (inputFieldsData.length > 0) {
-                    const maxImportedId = Math.max(0, ...inputFieldsData.map(f => f.id));
-                    nextId = maxImportedId + 1;
-                } else { nextId = 1; }
-                saveData(); // Save imported data immediately
-                renderInputFields(); // Update UI with imported data and states
-                alert('数据导入成功！');
-            } catch (parseError) {
-                console.error("Error parsing imported file:", parseError);
-                alert(`导入文件时出错：${parseError.message}`);
-            }
-        };
-        reader.onerror = (e) => { console.error("Error reading file:", e); alert('读取文件时出错。'); };
-        reader.readAsText(file);
-    }
-
-    function parseImportedTxt(textContent) { // MODIFIED to handle prefix
-        if (typeof textContent !== 'string' || textContent.trim() === '') { return []; }
-
-        const blocks = textContent.trim().split('\n\n');
-        const parsedFields = [];
-        let currentId = 1;
-
-        for (const block of blocks) {
-            const trimmedBlock = block.trim();
-            if (!trimmedBlock) continue;
-
-            const colonIndex = trimmedBlock.indexOf(':');
-            if (colonIndex > 0) { // Ensure colon exists and is not the first character
-                let rawLabelWithValuePrefix = trimmedBlock.substring(0, colonIndex).trim();
-                const value = trimmedBlock.substring(colonIndex + 1).trim();
-                let includeInOutput = true; // Default: checked
-                let finalLabel = rawLabelWithValuePrefix;
-
-                // Check for the unchecked prefix
-                if (rawLabelWithValuePrefix.startsWith(UNCHECKED_ITEM_PREFIX)) {
-                    includeInOutput = false; // Mark as unchecked
-                    // Remove the prefix from the label
-                    finalLabel = rawLabelWithValuePrefix.substring(UNCHECKED_ITEM_PREFIX.length).trim();
-                }
-
-                // Ensure label is not empty after potential prefix removal
-                if (!finalLabel) {
-                    finalLabel = `未命名 ${currentId}`; // Assign default label if empty
-                }
-
-                // Ensure label ends with a colon for internal consistency
-                if (!finalLabel.endsWith(':')) {
-                    finalLabel += ':';
-                }
-
-                parsedFields.push({
-                    id: currentId++,
-                    label: finalLabel, // Store the cleaned label
-                    value: value,
-                    includeInOutput: includeInOutput // Store the determined checked state
-                });
-            } else {
-                console.warn("Skipping invalid block during import (missing ':' or format error):", trimmedBlock);
-            }
-        }
-
-        if (parsedFields.length === 0 && textContent.trim().length > 0) {
-            console.warn("Import text was not empty, but no valid fields were parsed.");
-            return null; // Indicate parsing failure on non-empty content
-        }
-        return parsedFields;
-    }
-
-    // --- Event Handlers for Editable Rate Span ---
-    function handleRateDblClick(event) {
-        const target = event.target; target.contentEditable = 'true'; target.focus();
-        requestAnimationFrame(() => { try { window.getSelection()?.selectAllChildren(target); } catch (e) {} });
-    }
-    function handleRateBlur(event) {
-         const target = event.target; const newRateText = target.textContent.trim();
-         let newRate = parseInt(newRateText, 10); let isValid = false;
-         if (!isNaN(newRate)) { newRate = Math.max(MIN_SPEAKING_RATE, Math.min(MAX_SPEAKING_RATE, newRate)); isValid = true; }
-         target.contentEditable = 'false';
-         if (isValid) {
-             if (newRate !== speakingRate) { speakingRate = newRate; target.textContent = speakingRate; debounceSaveData(); updateArticle(); }
-             else { target.textContent = speakingRate; }
-         } else { target.textContent = speakingRate; }
-    }
-    function handleRateKeydown(event) {
-        if (event.target.isContentEditable) {
-            if (event.key === 'Enter') { event.preventDefault(); event.target.blur(); }
-            else if (event.key === 'Escape') { event.target.textContent = speakingRate; event.target.blur(); }
-        }
-    }
-
-    // --- Drag and Drop Event Handlers (Unchanged) ---
-    function handleDragStart(e) {
-        const targetGroup = e.target.closest('.input-group'); const actualTarget = e.target; if (!targetGroup) return;
-        if (actualTarget.tagName === 'TEXTAREA' || actualTarget.tagName === 'INPUT' || actualTarget.tagName === 'BUTTON' || actualTarget.closest('.input-group-buttons') || (actualTarget.classList.contains('editable-label') && actualTarget.isContentEditable) || window.getSelection()?.toString().length > 0) { e.preventDefault(); return; }
-        draggedItemId = parseInt(targetGroup.dataset.fieldId, 10); if (isNaN(draggedItemId)) return;
-        e.dataTransfer.setData('text/plain', draggedItemId.toString()); e.dataTransfer.effectAllowed = 'move';
-        setTimeout(() => { const element = inputFieldsContainer.querySelector(`.input-group[data-field-id="${draggedItemId}"]`); if(element) element.classList.add('dragging'); }, 0);
-    }
-    function handleDragOver(e) {
-        e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const targetGroup = e.target.closest('.input-group');
-        clearDragOverIndicators(); if (!targetGroup || !draggedItemId || parseInt(targetGroup.dataset.fieldId, 10) === draggedItemId) return;
-        targetGroup.classList.add('drag-over-indicator');
-    }
-    function handleDragLeave(e) {
-        if (!e.currentTarget.contains(e.relatedTarget)) { clearDragOverIndicators(); }
-        else { const targetGroup = e.target.closest('.input-group'); if (targetGroup && !targetGroup.contains(e.relatedTarget)) { targetGroup.classList.remove('drag-over-indicator'); targetGroup.style.marginTop = ''; targetGroup.style.marginBottom = ''; } }
-    }
-    function handleDrop(e) {
-        e.preventDefault(); clearDragOverIndicators(); const targetGroup = e.target.closest('.input-group'); const droppedItemIdStr = e.dataTransfer.getData('text/plain');
-        if (!droppedItemIdStr || !targetGroup) { handleDragEndCleanup(null); return; }
-        const draggedId = parseInt(droppedItemIdStr, 10); const targetId = parseInt(targetGroup.dataset.fieldId, 10);
-        if (isNaN(draggedId) || isNaN(targetId) || draggedId === targetId) { handleDragEndCleanup(draggedId); return; }
-        const draggedIndex = inputFieldsData.findIndex(field => field.id === draggedId); if (draggedIndex === -1) { console.error("Drag Error: Dragged item not found."); handleDragEndCleanup(draggedId); return; }
-        const [draggedItem] = inputFieldsData.splice(draggedIndex, 1);
-        const newTargetIndex = inputFieldsData.findIndex(field => field.id === targetId);
-        if (newTargetIndex !== -1) { inputFieldsData.splice(newTargetIndex, 0, draggedItem); }
-        else { inputFieldsData.push(draggedItem); console.warn("Drop target index issue, appended item."); }
-        saveData(); renderInputFields();
-    }
+    // --- Drag and Drop Event Handlers --- (unchanged)
+    function handleDragStart(e) { const targetGroup = e.target.closest('.input-group'); const actualTarget = e.target; if (!targetGroup) return; if (actualTarget.tagName === 'TEXTAREA' || actualTarget.tagName === 'INPUT' || actualTarget.tagName === 'BUTTON' || actualTarget.closest('.input-group-buttons') || (actualTarget.classList.contains('editable-label') && actualTarget.isContentEditable) || window.getSelection()?.toString().length > 0) { e.preventDefault(); return; } draggedItemId = parseInt(targetGroup.dataset.fieldId, 10); if (isNaN(draggedItemId)) return; e.dataTransfer.setData('text/plain', draggedItemId.toString()); e.dataTransfer.effectAllowed = 'move'; setTimeout(() => { const element = inputFieldsContainer.querySelector(`.input-group[data-field-id="${draggedItemId}"]`); if(element) element.classList.add('dragging'); }, 0); }
+    function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const targetGroup = e.target.closest('.input-group'); clearDragOverIndicators(); if (!targetGroup || !draggedItemId || parseInt(targetGroup.dataset.fieldId, 10) === draggedItemId) return; targetGroup.classList.add('drag-over-indicator'); }
+    function handleDragLeave(e) { if (!e.currentTarget.contains(e.relatedTarget)) { clearDragOverIndicators(); } else { const targetGroup = e.target.closest('.input-group'); if (targetGroup && !targetGroup.contains(e.relatedTarget)) { targetGroup.classList.remove('drag-over-indicator'); targetGroup.style.marginTop = ''; targetGroup.style.marginBottom = ''; } } }
+    function handleDrop(e) { e.preventDefault(); clearDragOverIndicators(); const targetGroup = e.target.closest('.input-group'); const droppedItemIdStr = e.dataTransfer.getData('text/plain'); if (!droppedItemIdStr || !targetGroup) { handleDragEndCleanup(null); return; } const draggedId = parseInt(droppedItemIdStr, 10); const targetId = parseInt(targetGroup.dataset.fieldId, 10); if (isNaN(draggedId) || isNaN(targetId) || draggedId === targetId) { handleDragEndCleanup(draggedId); return; } const draggedIndex = inputFieldsData.findIndex(field => field.id === draggedId); if (draggedIndex === -1) { console.error("Drag Error: Dragged item not found."); handleDragEndCleanup(draggedId); return; } const [draggedItem] = inputFieldsData.splice(draggedIndex, 1); const newTargetIndex = inputFieldsData.findIndex(field => field.id === targetId); if (newTargetIndex !== -1) { inputFieldsData.splice(newTargetIndex, 0, draggedItem); } else { inputFieldsData.push(draggedItem); console.warn("Drop target index issue, appended item."); } saveData(); renderInputFields(); }
     function handleDragEnd(e) { handleDragEndCleanup(draggedItemId); }
-    function handleDragEndCleanup(itemId) {
-        clearDragOverIndicators(); const draggedElement = inputFieldsContainer.querySelector(`.input-group.dragging`);
-        if (draggedElement) draggedElement.classList.remove('dragging'); draggedItemId = null;
-    }
-    function clearDragOverIndicators() {
-        inputFieldsContainer.querySelectorAll('.drag-over-indicator').forEach(el => { el.classList.remove('drag-over-indicator'); el.style.marginTop = ''; el.style.marginBottom = ''; });
-    }
+    function handleDragEndCleanup(itemId) { clearDragOverIndicators(); const draggedElement = inputFieldsContainer.querySelector(`.input-group.dragging`); if (draggedElement) draggedElement.classList.remove('dragging'); draggedItemId = null; }
+    function clearDragOverIndicators() { inputFieldsContainer.querySelectorAll('.drag-over-indicator').forEach(el => { el.classList.remove('drag-over-indicator'); el.style.marginTop = ''; el.style.marginBottom = ''; }); }
 
-    // --- Initialization ---
+    // --- Initialization --- (unchanged)
     document.addEventListener('DOMContentLoaded', () => {
         addFieldBtn.addEventListener('click', handleAddField);
         downloadTxtBtn.addEventListener('click', handleDownloadTxt);
