@@ -160,5 +160,10 @@ def run_文案生成助手_route():
     return render_template('文案生成助手.html')
 
 
+@app.route('/取消文案换行')
+def run_取消文案换行_route():
+    return render_template('取消文案换行.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=7000)
