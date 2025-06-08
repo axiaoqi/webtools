@@ -14,22 +14,22 @@ class TongYongXueXiJi(XianyuTextGenerator):
         self.choice_items.append(choice_item)
 
         # 第2句，标题
-        second_list = self._open_file_by_sep(self.data_dir / r'文案素材2_抄王\1_名称.txt')
+        second_list = self._open_file_by_sep(self.data_dir / r'通用_文案\1_名称.txt', sep='\n\n')
         choice_item = random.choice(second_list)
         self.choice_items.append(choice_item)
 
         # 第3句，故事，售卖原因--通用文案
-        third_list = self._open_file_by_sep(self.data_dir / r'01通用文案\03_故事.txt')
+        third_list = self._open_file_by_sep(self.data_dir / r'01通用文案\03_故事.txt', sep='\n\n')
         choice_item = random.choice(third_list)
         self.choice_items.append('\n' + choice_item)
 
         # 第4句，配置，分割符分割
-        fourth_list = self._open_file_by_sep(self.data_dir / r'文案素材2_抄王\3_参数.txt', sep='\n\n')
+        fourth_list = self._open_file_by_sep(self.data_dir / r'通用_文案\3_参数.txt', sep='\n\n')
         choice_item = random.choice(fourth_list)
         self.choice_items.append(choice_item)
 
         # 第5句，售后，分割符分割
-        fifth_list = self._open_file_by_sep(self.data_dir / r'文案素材2_抄王\4_售后.txt', sep='\n\n')
+        fifth_list = self._open_file_by_sep(self.data_dir / r'通用_文案\4_售后.txt', sep='\n\n')
         choice_item = random.choice(fifth_list)
         self.choice_items.append(choice_item)
 
