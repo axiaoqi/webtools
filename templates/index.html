@@ -3,30 +3,26 @@
 {% block title %}我的工具库{% endblock %}
 
 {% block content %}
-    <!--网站网址-->
-    {% set base_url = "http://iuhui.com" %}
+<div class="container mt-4">
 
-    <div class="button-container">
-        <a href="{{ base_url ~ ':4000/02项目/2024幼小虚拟资料项目/幼小资料链接.html' }}" class="btn" target="_blank">电子资料</a>
-        <a href="{{ base_url ~ ':4000/02项目/2024Python项目/python系列链接.html' }}" class="btn" target="_blank">Python链接</a>
-        <a href="{{ base_url ~ ':4000/02项目/2024学习机项目/售后文案.html' }}" class="btn" target="_blank">学习机售后</a>
+    <!-- 内部工具展示区 -->
+{#    <h2 class="text-center mb-4">全部工具</h2>#}
+    <!-- 创建一个统一的按钮容器 -->
+    <div class="d-flex justify-content-center flex-wrap gap-3">
 
-        <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_好好学习') }}" class="btn">闲鱼学习机文案_好好学习</a>
-        <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_花花') }}" class="btn">闲鱼学习机文案_花花</a>
-        <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_苏苏') }}" class="btn">闲鱼学习机文案_苏苏</a>
-        <a href="{{ url_for('run_program', program_name='闲鱼学习机文案_通用') }}" class="btn">闲鱼学习机文案_通用</a>
+        <!-- 只循环 all_home_links 这一个列表 -->
+        {% for link in all_home_links %}
+            {% if link.name != '首页' %}
+                {# 判断是否是外部链接，如果是，则在新窗口打开 #}
+                {% set target_blank = 'target="_blank" rel="noopener noreferrer"' if 'http' in link.url else '' %}
 
-{#        <a href="{{ url_for('run_program', program_name='闲鱼点读笔文案') }}" class="btn">闲鱼点读笔文案</a>#}
+                <a href="{{ link.url }}" class="btn btn-primary" {{ target_blank | safe }}>
+                    {{ link.name }}
+                </a>
+            {% endif %}
+        {% endfor %}
 
-        <a href="{{ url_for('run_违禁词检测_route') }}" class="btn">违禁词检测</a>
-        <a href="{{ url_for('run_淘宝分享链接转真实URL_route') }}" class="btn">淘宝分享链接转真实URL</a>
-        <a href="{{ url_for('run_股票分红监测_route') }}" class="btn">股票分红监测</a>
-        <a href="{{ url_for('run_xunfei_route') }}" class="btn">讯飞原创文案生成</a>
-        <a href="{{ url_for('run_字数统计_route') }}" class="btn">字符数统计</a>
-        <a href="{{ url_for('run_文案生成助手_route') }}" class="btn">文案生成助手</a>
-        <a href="{{ url_for('run_取消文案换行_route') }}" class="btn">取消文案换行</a>
-
-{#        <a href="https://www.eteste.com/" class="btn" target="_blank">字符数统计</a>#}
-        <!-- 添加更多按钮 -->
     </div>
+
+</div>
 {% endblock %}

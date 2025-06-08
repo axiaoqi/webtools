@@ -90,27 +90,32 @@
                     </button>
                     <!-- 菜单项 -->
                     <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav"> <!-- 默认对齐左边，无需 ms-auto -->
+                        <ul class="navbar-nav">
 
-                            <!-- 单独菜单, 首页 -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('home') }}">首页</a>
-                            </li>
+                            <!-- 动态生成导航栏 -->
+                            {% for category, items in nav_links | groupby('category') %}
+                                {% if category == '' %}
+                                    <!-- 顶级菜单 -->
+                                    {% for item in items %}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{{ item.url }}">{{ item.name }}</a>
+                                    </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <!-- 下拉菜单 -->
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown-{{ category|urlencode }}" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            {{ category }}
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown-{{ category|urlencode }}">
+                                            {% for item in items %}
+                                            <li><a class="dropdown-item" href="{{ item.url }}" {% if 'http' in item.url %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ item.name }}</a></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
 
-                            <!-- 单独菜单, 讯飞改文案 -->
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('run_xunfei_route') }}">改文案</a>
-                            </li>
-
-                            <!-- 下拉菜单, 股票 -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    股票
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" href="{{ url_for('run_股票分红监测_route') }}">股票分红</a></li>
-                                </ul>
-                            </li>
                         </ul>
                     </div>
                 </div>
