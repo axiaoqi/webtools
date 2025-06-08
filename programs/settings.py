@@ -9,7 +9,7 @@ if not SynologyDrive.exists():
 
 
 # 学习机文件夹根目录
-xuexiji_dir = SynologyDrive / r'01新项目记录\02_AI学习机'
+xuexiji_dir = SynologyDrive / r'01项目记录\02_AI学习机'
 
 # 讯飞api文件位置
 xunfei_config_file_path = SynologyDrive / r'config_file\xunfei_config_file.json'
