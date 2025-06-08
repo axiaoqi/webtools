@@ -3,12 +3,9 @@ from functools import wraps
 
 from flask import Flask, render_template, request, url_for
 
-from programs.music.music import add_music_url
-from programs.music.query_url_from_csv import query_musics
 from programs.quant.股票分红监控 import calculate_stock_dividends
-from programs.text import 闲鱼学习机文案_通用, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_苏苏
+from programs.text import 闲鱼学习机文案_通用, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_智慧学习
 from programs.text.违禁词检测.违禁词检测 import load_banned_words, check_for_banned_words
-from programs import 淘宝分享链接转真实URL
 from programs.xunfei.xunfei import xunfei_lite
 
 from config import EXTERNAL_LINKS, COMMON_PROGRAMS
@@ -108,23 +105,11 @@ def run_program(program_name):
         result = 闲鱼学习机文案_通用.run()
     elif program_name == '闲鱼学习机文案_好好学习':
         result = 闲鱼学习机文案_好好学习.run()
-    elif program_name == '闲鱼学习机文案_苏苏':
-        result = 闲鱼学习机文案_苏苏.run()
+    elif program_name == '闲鱼学习机文案_智慧学习':
+        result = 闲鱼学习机文案_智慧学习.run()
 
     # 继续为其他程序添加分支
     return render_template('program.html', program_name=program_name, result=result)
-
-
-@app.route('/淘宝分享链接转真实URL', methods=['GET', 'POST'])
-@add_to_nav('淘宝分享链接转真实URL', show_in_nav=False)  # 这个在导航栏
-def run_淘宝分享链接转真实URL_route():
-    result = ""
-    if request.method == 'POST':
-        input_data = request.form['input_data']
-        print(input_data)
-        result = 淘宝分享链接转真实URL.run(input_data)
-
-    return render_template('taobao_realurl.html', result=result)
 
 
 @app.route('/违禁词检测', methods=['GET', 'POST'])

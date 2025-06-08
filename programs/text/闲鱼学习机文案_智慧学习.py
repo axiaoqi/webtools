@@ -38,10 +38,6 @@ class SuSu(XianyuTextGenerator):
 
         return self.choice_items
 
-    def __str__(self):
-        # return '\n'.join(self.choice_items)
-        return '\n'.join(['\n' + element if '【' in element else element for element in self.choice_items])
-
 
 def run():
     x = SuSu(xuexiji_dir / '01文案')

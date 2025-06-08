@@ -49,8 +49,8 @@ COMMON_PROGRAMS = [
     },
     {
         'endpoint': 'run_program',
-        'params': {'program_name': '闲鱼学习机文案_苏苏'},
-        'name': '学习机文案(苏苏)',
+        'params': {'program_name': '闲鱼学习机文案_智慧学习'},
+        'name': '学习机文案(智慧学习)',
         'category': '文案',
         'show_in_nav': SHOW_IN_NAV,  # <-- 这个也只出现在首页
         'order': 20

@@ -1,298 +1,123 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>自适应去除换行并复制工具</title>
-    <style>
-        /* 基本重置和盒子模型 */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+{% extends 'base.html' %}
 
-        /* 使用 rem 单位作为基础，方便整体缩放 */
-        html {
-            font-size: 16px; /* 定义 1rem 的基础大小 */
-        }
+{% block title %}去除换行符工具{% endblock %}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 1rem; /* 使用 rem 单位 */
-            color: #333;
-            line-height: 1.6;
-        }
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7 text-center">
 
-        .container {
-            background-color: #ffffff;
-            padding: 2.5rem; /* 使用 rem 单位 */
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            width: 100%; /* 占满父容器宽度 */
-            max-width: 700px; /* 设定一个合理的桌面最大宽度 */
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem; /* 1.25 * 16px = 20px */
-        }
+            <!-- 1. 标题和描述 -->
+            <h1 class="h2 mb-3">去除换行符</h1>
+            <p class="text-muted mb-4">
+                将文本粘贴到下方，点击按钮即可去除所有换行并复制结果。
+            </p>
 
-        h1 {
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 1.8rem; /* 相对字体大小 */
-            margin-bottom: 0.5rem;
-        }
+            <!-- 2. 使用带 placeholder 的标准文本输入域 -->
+            <div class="mb-3">
+                <textarea class="form-control"
+                          id="inputText"
+                          rows="12"
+                          placeholder="在此处输入或粘贴文本..."
+                          autofocus></textarea>
+            </div>
 
-        p.description {
-            color: #555;
-            font-size: 1rem; /* 标准字体大小 */
-            margin-bottom: 0.8rem;
-        }
+            <!-- 3. 操作按钮 -->
+            <div class="d-grid gap-2 col-8 mx-auto">
+                <button id="copyButton" class="btn btn-primary btn-lg">
+                    <i class="bi bi-clipboard-check-fill me-2"></i> 去除换行并复制
+                </button>
+            </div>
 
-        textarea {
-            width: 100%;
-            min-height: 12rem; /* ~192px */
-            padding: 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 1rem;
-            resize: vertical;
-            font-family: inherit;
-            line-height: 1.5;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
+            <!-- 4. 状态消息提示区 -->
+            <div id="statusMessage" class="mt-3 small fw-bold" style="min-height: 1.5rem;"></div>
 
-        textarea:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
-            outline: none;
-        }
-
-        button {
-            padding: 0.75rem 1.5rem; /* ~12px 24px */
-            font-size: 1.05rem;
-            font-weight: 500;
-            color: #ffffff;
-            background-image: linear-gradient(45deg, #007bff, #0056b3);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-image 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
-            box-shadow: 0 2px 5px rgba(0, 86, 179, 0.2);
-            align-self: center; /* 让按钮在 flex 容器中居中（如果需要） */
-            /* 可以给按钮一个最大宽度，防止在极宽容器里变得过长 */
-            max-width: 300px;
-            width: 100%; /* 在小屏幕上占满宽度（配合 max-width） */
-        }
-
-        button:hover {
-            background-image: linear-gradient(45deg, #0069d9, #004cae);
-            box-shadow: 0 4px 10px rgba(0, 86, 179, 0.3);
-            transform: translateY(-2px);
-        }
-
-        button:active {
-             transform: translateY(0px);
-             box-shadow: 0 1px 3px rgba(0, 86, 179, 0.2);
-        }
-
-        #statusMessage {
-            margin-top: 0.5rem;
-            font-size: 0.9rem;
-            min-height: 1.5em; /* 使用 em 相对当前字体大小 */
-            transition: color 0.3s ease;
-            font-weight: 500;
-        }
-
-        #statusMessage.success {
-            color: #28a745;
-        }
-
-        #statusMessage.error {
-            color: #dc3545;
-        }
-
-        /* --- 响应式断点 --- */
-
-        /* 中等屏幕 (平板电脑, < 992px) */
-        @media (max-width: 991.98px) {
-            .container {
-                max-width: 600px; /* 稍微减小最大宽度 */
-            }
-            h1 {
-                font-size: 1.6rem;
-            }
-            textarea {
-                min-height: 10rem; /* ~160px */
-            }
-        }
-
-        /* 小型屏幕 (横向手机, < 768px) */
-        @media (max-width: 767.98px) {
-            body {
-                padding: 0.8rem; /* 减少页面边距 */
-                align-items: flex-start; /* 内容顶部对齐，避免小屏幕键盘弹出问题 */
-                padding-top: 2rem; /* 顶部留些空间 */
-            }
-            .container {
-                padding: 1.5rem; /* 减小容器内边距 */
-                max-width: none; /* 移除最大宽度限制，让其自然填充 */
-                margin: 0 auto; /* 保证水平居中 */
-                gap: 1rem; /* 减小元素间距 */
-            }
-            h1 {
-                font-size: 1.5rem;
-            }
-            p.description {
-                font-size: 0.95rem;
-            }
-            textarea {
-                min-height: 8rem; /* ~128px */
-                padding: 0.8rem;
-            }
-            button {
-                padding: 0.7rem 1.2rem;
-                font-size: 1rem;
-                /* 在这个尺寸下，按钮宽度可以考虑不占满 */
-                width: auto; /* 让按钮宽度由内容决定 */
-                max-width: none; /* 取消最大宽度 */
-            }
-        }
-
-        /* 超小型屏幕 (竖向手机, < 576px) */
-        @media (max-width: 575.98px) {
-             body {
-                 padding: 0.5rem; /* 进一步减少页面边距 */
-                 padding-top: 1.5rem;
-             }
-            .container {
-                padding: 1rem; /* 进一步减小容器内边距 */
-                border-radius: 8px; /* 可以减小圆角 */
-            }
-             h1 {
-                font-size: 1.3rem;
-            }
-             p.description {
-                font-size: 0.9rem;
-             }
-            textarea {
-                min-height: 7rem; /* ~112px */
-                font-size: 0.95rem;
-            }
-             button {
-                 width: 100%; /* 在最小屏幕上，按钮再次占满宽度更方便点击 */
-             }
-            #statusMessage {
-                font-size: 0.85rem;
-            }
-        }
-
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h1>去除换行符</h1>
-    <p class="description">粘贴文本到下方，点击按钮即可去除所有换行符并复制结果。</p>
-    <textarea id="inputText" placeholder="在此处输入或粘贴文本..."></textarea>
-    <button id="copyButton">去除换行并复制</button>
-    <p id="statusMessage"></p>
+        </div>
+    </div>
 </div>
+{% endblock %}
 
+
+{% block scripts %}
 <script>
-    // JavaScript 部分保持不变，它不影响布局的自适应
-    const textArea = document.getElementById('inputText');
-    const copyButton = document.getElementById('copyButton');
-    const statusMessage = document.getElementById('statusMessage');
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // 获取页面元素
+        const textArea = document.getElementById('inputText');
+        const copyButton = document.getElementById('copyButton');
+        const statusMessage = document.getElementById('statusMessage');
 
-    copyButton.addEventListener('click', () => {
-        const originalText = textArea.value;
-        // 修复：如果原始文本就是空的，直接替换可能得到空字符串，也应处理
-        if (!originalText.trim()) {
-             statusMessage.textContent = '输入框为空或只有空白字符。';
-             statusMessage.className = 'error'; // 使用类名控制样式
-             setTimeout(() => {
-                 statusMessage.textContent = '';
-                 statusMessage.className = '';
-             }, 2500);
-             return;
+        // 为按钮添加点击事件监听
+        copyButton.addEventListener('click', () => {
+            const originalText = textArea.value;
+
+            // 检查输入是否为空
+            if (!originalText.trim()) {
+                showStatus('输入框为空或只有空白字符。', 'danger');
+                return;
+            }
+
+            // 使用正则表达式去除所有类型的换行符
+            const textWithoutNewlines = originalText.replace(/(\r\n|\n|\r)/gm, "");
+
+            // 检查处理后是否为空 (例如，用户只输入了换行符)
+            if (!textWithoutNewlines) {
+                showStatus('处理后的文本为空（可能只有换行符）。', 'danger');
+                return;
+            }
+
+            // 优先使用现代、安全的 Clipboard API 进行复制
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(textWithoutNewlines).then(() => {
+                    showStatus('已成功复制到剪贴板！', 'success');
+                }).catch(err => {
+                    console.error('使用 Clipboard API 复制失败: ', err);
+                    showStatus('复制失败！请尝试手动复制。', 'danger');
+                    fallbackCopy(textWithoutNewlines); // 失败时尝试备用方法
+                });
+            } else {
+                // 如果 Clipboard API 不可用（例如在非 HTTPS 网站上）
+                console.warn('Clipboard API 不可用，尝试使用旧方法。');
+                fallbackCopy(textWithoutNewlines);
+            }
+        });
+
+        // 统一的状态消息显示函数
+        function showStatus(message, type = 'success') {
+            // 根据类型设置 Bootstrap 的文本颜色类 (text-success, text-danger)
+            statusMessage.className = `mt-3 small fw-bold text-${type}`;
+            statusMessage.textContent = message;
+
+            // 3秒后自动清除消息
+            setTimeout(() => {
+                statusMessage.textContent = '';
+                statusMessage.className = 'mt-3 small fw-bold';
+            }, 3000);
         }
 
-        const textWithoutNewlines = originalText.replace(/(\r\n|\n|\r)/gm, "");
+        // 备用的复制方法，兼容性更好
+        function fallbackCopy(text) {
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = text;
+            tempTextArea.style.position = 'fixed';
+            tempTextArea.style.top = '-9999px'; // 移出视窗外
+            document.body.appendChild(tempTextArea);
+            tempTextArea.focus();
+            tempTextArea.select();
 
-        statusMessage.textContent = '';
-        statusMessage.className = '';
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showStatus('已通过备用方法复制！', 'success');
+                } else {
+                    showStatus('备用复制方法也失败了，请手动复制。', 'danger');
+                }
+            } catch (err) {
+                console.error('使用 document.execCommand 复制失败: ', err);
+                showStatus('复制出错了，请手动复制。', 'danger');
+            }
 
-        // 检查处理后是否为空（理论上只有原文本全是换行符时）
-        if (!textWithoutNewlines && originalText.trim()) {
-             statusMessage.textContent = '处理后的文本为空（可能只有换行符）。';
-             statusMessage.className = 'error';
-              setTimeout(() => {
-                 statusMessage.textContent = '';
-                 statusMessage.className = '';
-             }, 2500);
-             return;
-        }
-
-
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(textWithoutNewlines).then(() => {
-                statusMessage.textContent = '已成功复制到剪贴板！';
-                statusMessage.classList.add('success');
-                setTimeout(() => {
-                    statusMessage.textContent = '';
-                    statusMessage.className = '';
-                }, 2500);
-            }).catch(err => {
-                console.error('使用 Clipboard API 复制失败: ', err);
-                statusMessage.textContent = '复制失败！请手动复制。';
-                statusMessage.classList.add('error');
-                fallbackCopyTextToClipboard(textWithoutNewlines);
-            });
-        } else {
-            console.warn('Clipboard API 不可用，尝试使用旧方法。');
-            fallbackCopyTextToClipboard(textWithoutNewlines);
+            document.body.removeChild(tempTextArea);
         }
     });
-
-    function fallbackCopyTextToClipboard(text) {
-        const tempTextArea = document.createElement("textarea");
-        tempTextArea.value = text;
-        tempTextArea.style.position = 'fixed';
-        tempTextArea.style.top = '-9999px';
-        tempTextArea.style.left = '-9999px';
-        document.body.appendChild(tempTextArea);
-        tempTextArea.focus();
-        tempTextArea.select();
-
-        try {
-            const successful = document.execCommand('copy');
-            if (successful) {
-                statusMessage.textContent = '已通过备用方法复制！';
-                statusMessage.classList.add('success');
-                setTimeout(() => {
-                    statusMessage.textContent = '';
-                    statusMessage.className = '';
-                 }, 2500);
-            } else {
-                 statusMessage.textContent = '备用复制方法也失败了，请手动复制。';
-                 statusMessage.classList.add('error');
-            }
-        } catch (err) {
-            console.error('使用 document.execCommand 复制失败: ', err);
-            statusMessage.textContent = '复制出错了，请手动复制。';
-            statusMessage.classList.add('error');
-        }
-
-        document.body.removeChild(tempTextArea);
-    }
 </script>
-
-</body>
-</html>
+{% endblock %}

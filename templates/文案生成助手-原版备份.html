@@ -1,159 +1,149 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
-{% block title %}动态文章生成工具{% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态文章生成工具 (字数统计/勾选状态保存/拖拽排序/双击改速率/复制纯文本/下载导入TXT)</title> <!-- Updated Title -->
+    <style>
+        /* --- Base Styles --- */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f8f9fa; color: #212529; }
+        .container { max-width: 750px; margin: 20px auto; background: #fff; padding: 25px 35px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #dee2e6; }
+        h1 { color: #343a40; text-align: center; margin-bottom: 15px; font-weight: 600; }
+        .description { text-align: center; color: #6c757d; margin-bottom: 30px; font-size: 0.95em; }
+        .input-fields { margin-bottom: 25px; padding-bottom: 10px; }
+        .input-group { margin-bottom: 18px; padding: 15px; border: 1px solid #e9ecef; border-radius: 6px; background-color: #fff; position: relative; display: flex; flex-direction: column;
+            transition: box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out, transform 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+         }
+        .input-group:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .input-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; cursor: grab; }
+        .input-group-header:active { cursor: grabbing; }
 
-{% block head_styles %}
-<style>
-    /* -------------------------------------------------- */
-    /* 1. 隔离容器和基础重置 */
-    /* -------------------------------------------------- */
-    #dynamic-article-tool {
-        /* 在这里重置掉一些可能从 Bootstrap 继承来的全局样式 */
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        line-height: 1.6;
-        color: #212529;
-        text-align: left; /* 重置 Bootstrap 可能的 center-align */
-    }
-    /* 让容器内的所有元素都继承这些基础样式，并重置盒子模型 */
-    #dynamic-article-tool *,
-    #dynamic-article-tool *::before,
-    #dynamic-article-tool *::after {
-        box-sizing: border-box;
-    }
-    /* 重置 Bootstrap 对标题的样式影响 */
-    #dynamic-article-tool h1 {
-        font-size: 2rem;
-        font-weight: 600;
-        margin-bottom: 15px;
-        color: #343a40;
-        text-align: center;
-    }
-    /* 确保 body 的 padding 不会影响到我们自己的布局 */
-    body {
-        padding: 0;
-    }
-    main {
-        padding-top: 1rem; /* 给内容区顶部一些空间 */
-    }
+        label.editable-label { font-weight: 600; color: #495057; font-size: 0.95em; cursor: text; padding: 3px 6px; border-radius: 4px; transition: background-color 0.2s ease, box-shadow 0.2s ease; flex-grow: 1; word-break: break-word; line-height: 1.4; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; min-width: 50px; }
+        label.editable-label:hover { background-color: #f1f3f5; }
+        label.editable-label:focus, label.editable-label[contenteditable="true"] { background-color: #e7f5ff; outline: none; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); cursor: text !important; }
+        textarea.input-box { padding: 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em; min-height: 55px; resize: vertical; box-sizing: border-box; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; cursor: text; }
+        textarea.input-box:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
+        .input-group-buttons { display: flex; align-items: center; gap: 6px; flex-shrink: 0; cursor: auto; }
+        .include-checkbox-label { display: flex; align-items: center; cursor: pointer; margin-right: 4px; padding: 2px; border-radius: 3px; }
+        .include-checkbox-label input[type="checkbox"] { margin: 0; width: 16px; height: 16px; cursor: pointer; accent-color: #0d6efd; vertical-align: middle; }
+        .include-checkbox-label:hover { background-color: #f1f3f5; }
+        button.action-icon-btn { color: white; border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 18px; font-weight: bold; line-height: 26px; text-align: center; cursor: pointer; padding: 0; transition: background-color 0.2s ease, transform 0.1s ease; display: flex; align-items: center; justify-content: center; }
+        button.action-icon-btn:hover { transform: scale(1.1); }
+        button.action-icon-btn:active { transform: scale(1); }
+        button.insert-btn { background-color: #198754; }
+        button.insert-btn:hover { background-color: #157347; }
+        button.delete-btn { background-color: #e63946; }
+        button.delete-btn:hover { background-color: #d62828; }
+        #add-field-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: 500; margin-top: 20px; transition: background-color 0.3s ease; }
+        #add-field-btn::before { content: '+'; font-size: 1.2em; line-height: 1; }
+        #add-field-btn:hover { background-color: #0056b3; }
+        .action-button-group { display: flex; justify-content: center; gap: 15px; margin-top: 25px; margin-bottom: 30px; flex-wrap: wrap; }
+        .action-button-group button { padding: 12px 25px; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.05em; font-weight: 500; transition: background-color 0.3s ease, opacity 0.3s ease; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .action-button-group button:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.65; }
+        #copy-btn { background-color: #28a745; }
+        #copy-btn::before { content: '📋'; font-size: 1.1em; }
+        #copy-btn:hover:not(:disabled) { background-color: #218838; }
+        #copy-btn.copied { background-color: #198754; }
+        #copy-btn.copied::before { content: '✅'; }
+        #download-txt-btn { background-color: #fd7e14; }
+        #download-txt-btn::before { content: '💾'; font-size: 1.1em; }
+        #download-txt-btn:hover:not(:disabled) { background-color: #e66800; }
+        #import-txt-btn { background-color: #6f42c1; }
+        #import-txt-btn::before { content: '📤'; font-size: 1.1em; }
+        #import-txt-btn:hover:not(:disabled) { background-color: #59359a; }
 
-    /* -------------------------------------------------- */
-    /* 2. 你所有的原始 CSS，每个选择器前都加上 #dynamic-article-tool */
-    /* -------------------------------------------------- */
-    #dynamic-article-tool .container { max-width: 750px; margin: 20px auto; background: #fff; padding: 25px 35px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #dee2e6; }
-    #dynamic-article-tool .description { text-align: center; color: #6c757d; margin-bottom: 30px; font-size: 0.95em; }
-    #dynamic-article-tool .input-fields { margin-bottom: 25px; padding-bottom: 10px; }
-    #dynamic-article-tool .input-group { margin-bottom: 18px; padding: 15px; border: 1px solid #e9ecef; border-radius: 6px; background-color: #fff; position: relative; display: flex; flex-direction: column; transition: box-shadow 0.2s ease-in-out, opacity 0.2s ease-in-out, transform 0.2s ease-in-out, border-color 0.2s ease-in-out; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
-    #dynamic-article-tool .input-group:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    #dynamic-article-tool .input-group-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 10px; cursor: grab; }
-    #dynamic-article-tool .input-group-header:active { cursor: grabbing; }
-    #dynamic-article-tool label.editable-label { font-weight: 600; color: #495057; font-size: 0.95em; cursor: text; padding: 3px 6px; border-radius: 4px; transition: background-color 0.2s ease, box-shadow 0.2s ease; flex-grow: 1; word-break: break-word; line-height: 1.4; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text; user-select: text; min-width: 50px; }
-    #dynamic-article-tool label.editable-label:hover { background-color: #f1f3f5; }
-    #dynamic-article-tool label.editable-label:focus, #dynamic-article-tool label.editable-label[contenteditable="true"] { background-color: #e7f5ff; outline: none; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); cursor: text !important; }
-    #dynamic-article-tool textarea.input-box { padding: 12px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1em; min-height: 55px; resize: vertical; box-sizing: border-box; width: 100%; transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; cursor: text; }
-    #dynamic-article-tool textarea.input-box:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
-    #dynamic-article-tool .input-group-buttons { display: flex; align-items: center; gap: 6px; flex-shrink: 0; cursor: auto; }
-    #dynamic-article-tool .include-checkbox-label { display: flex; align-items: center; cursor: pointer; margin-right: 4px; padding: 2px; border-radius: 3px; }
-    #dynamic-article-tool .include-checkbox-label input[type="checkbox"] { margin: 0; width: 16px; height: 16px; cursor: pointer; accent-color: #0d6efd; vertical-align: middle; }
-    #dynamic-article-tool .include-checkbox-label:hover { background-color: #f1f3f5; }
-    #dynamic-article-tool button.action-icon-btn { color: white; border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 18px; font-weight: bold; line-height: 26px; text-align: center; cursor: pointer; padding: 0; transition: background-color 0.2s ease, transform 0.1s ease; display: flex; align-items: center; justify-content: center; }
-    #dynamic-article-tool button.action-icon-btn:hover { transform: scale(1.1); }
-    #dynamic-article-tool button.action-icon-btn:active { transform: scale(1); }
-    #dynamic-article-tool button.insert-btn { background-color: #198754; }
-    #dynamic-article-tool button.insert-btn:hover { background-color: #157347; }
-    #dynamic-article-tool button.delete-btn { background-color: #e63946; }
-    #dynamic-article-tool button.delete-btn:hover { background-color: #d62828; }
-    #dynamic-article-tool #add-field-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: 500; margin-top: 20px; transition: background-color 0.3s ease; }
-    #dynamic-article-tool #add-field-btn::before { content: '+'; font-size: 1.2em; line-height: 1; }
-    #dynamic-article-tool #add-field-btn:hover { background-color: #0056b3; }
-    #dynamic-article-tool .action-button-group { display: flex; justify-content: center; gap: 15px; margin-top: 25px; margin-bottom: 30px; flex-wrap: wrap; }
-    #dynamic-article-tool .action-button-group button { padding: 12px 25px; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1.05em; font-weight: 500; transition: background-color 0.3s ease, opacity 0.3s ease; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-    #dynamic-article-tool .action-button-group button:disabled { background-color: #6c757d; cursor: not-allowed; opacity: 0.65; }
-    #dynamic-article-tool #copy-btn { background-color: #28a745; }
-    #dynamic-article-tool #copy-btn::before { content: '📋'; font-size: 1.1em; }
-    #dynamic-article-tool #copy-btn:hover:not(:disabled) { background-color: #218838; }
-    #dynamic-article-tool #copy-btn.copied { background-color: #198754; }
-    #dynamic-article-tool #copy-btn.copied::before { content: '✅'; }
-    #dynamic-article-tool #download-txt-btn { background-color: #fd7e14; }
-    #dynamic-article-tool #download-txt-btn::before { content: '💾'; font-size: 1.1em; }
-    #dynamic-article-tool #download-txt-btn:hover:not(:disabled) { background-color: #e66800; }
-    #dynamic-article-tool #import-txt-btn { background-color: #6f42c1; }
-    #dynamic-article-tool #import-txt-btn::before { content: '📤'; font-size: 1.1em; }
-    #dynamic-article-tool #import-txt-btn:hover:not(:disabled) { background-color: #59359a; }
-    #dynamic-article-tool .output-section { margin-top: 20px; }
-    #dynamic-article-tool #output-label { font-weight: 600; color: #343a40; display: block; margin-bottom: 8px; font-size: 1.1em; }
-    #dynamic-article-tool #output-stats { font-size: 0.88em; color: #6c757d; margin-bottom: 10px; line-height: 1.8; padding-left: 5px; }
-    #dynamic-article-tool .stat-item { display: inline-block; margin-right: 15px; white-space: nowrap; margin-bottom: 5px; }
-    #dynamic-article-tool .stat-item:last-child { margin-right: 0; }
-    #dynamic-article-tool .stat-value { font-weight: bold; color: #495057; }
-    #dynamic-article-tool .stat-item-hanzi .stat-value { color: #dc3545; }
-    #dynamic-article-tool .stat-item-punct .stat-value { color: #0dcaf0; }
-    #dynamic-article-tool .stat-item-letter .stat-value { color: #198754; }
-    #dynamic-article-tool .stat-item-digit .stat-value { color: #ffc107; }
-    #dynamic-article-tool .stat-item-time .stat-value { color: #6f42c1; }
-    #dynamic-article-tool #stats-rate-value { display: inline-block; font-weight: bold; color: #6f42c1; cursor: text; padding: 1px 4px; border-radius: 3px; transition: background-color 0.2s ease, box-shadow 0.2s ease; min-width: 25px; text-align: center; }
-    #dynamic-article-tool #stats-rate-value:hover { background-color: #f1f3f5; }
-    #dynamic-article-tool #stats-rate-value:focus { background-color: #e7f5ff; outline: none; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); }
-    #dynamic-article-tool .output-area-div { width: 100%; min-height: 200px; padding: 15px; border: 1px solid #ced4da; background-color: #f8f9fa; border-radius: 6px; font-size: 1em; line-height: 1.7; box-sizing: border-box; white-space: pre-wrap; overflow-wrap: break-word; transition: background-color 0.3s ease, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; color: #495057; display: block; margin-top: 0; overflow-y: auto; }
-    #dynamic-article-tool .output-area-div:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); background-color: #fff; }
-    #dynamic-article-tool .output-area-div strong { font-weight: 700; color: #343a40; margin-right: 0.3em; }
-    #dynamic-article-tool .output-area-div .empty-message { text-align: center; color: #6c757d; padding: 20px 0; font-style: italic; width: 100%; font-weight: normal; }
-    #dynamic-article-tool .output-area-div > div:not(.empty-message) { margin-bottom: 0.2em; }
-    #dynamic-article-tool .output-area-div > div:last-child { margin-bottom: 0; }
-    #dynamic-article-tool .empty-message { text-align: center; color: #6c757d; padding: 20px 0; font-style: italic; }
-    #dynamic-article-tool .input-group.dragging { opacity: 0.5; border: 2px dashed #007bff; background-color: #e7f5ff; box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
-    #dynamic-article-tool .input-group.drag-over-indicator { border-top: 3px solid #0dcaf0; margin-top: 5px; margin-bottom: calc(18px + 5px); }
-    #dynamic-article-tool .input-group-buttons, #dynamic-article-tool .input-group-buttons *, #dynamic-article-tool textarea.input-box, #dynamic-article-tool label.editable-label[contenteditable="true"], #dynamic-article-tool label.editable-label:focus, #dynamic-article-tool .include-checkbox-label, #dynamic-article-tool .include-checkbox-label input { cursor: auto; -webkit-user-drag: none; user-drag: none; -moz-user-select: text; -webkit-user-select: text; -ms-user-select: text; user-select: text; }
-    #dynamic-article-tool ::selection { background: #b3d4fc; }
-    #dynamic-article-tool ::-moz-selection { background: #b3d4fc; }
-    #dynamic-article-tool .copy-fallback-textarea { position: fixed; top: -9999px; left: -9999px; opacity: 0; pointer-events: none; z-index: -1; width: 10px; height: 10px; }
-</style>
-{% endblock %}
+        .output-section { margin-top: 20px; }
+        #output-label { font-weight: 600; color: #343a40; display: block; margin-bottom: 8px; font-size: 1.1em; }
+        #output-stats { font-size: 0.88em; color: #6c757d; margin-bottom: 10px; line-height: 1.8; padding-left: 5px; }
+        .stat-item { display: inline-block; margin-right: 15px; white-space: nowrap; margin-bottom: 5px; }
+        .stat-item:last-child { margin-right: 0; }
+        .stat-value { font-weight: bold; color: #495057; }
+        .stat-item-hanzi .stat-value { color: #dc3545; }
+        .stat-item-punct .stat-value { color: #0dcaf0; }
+        .stat-item-letter .stat-value { color: #198754; }
+        .stat-item-digit .stat-value { color: #ffc107; }
+        .stat-item-time .stat-value { color: #6f42c1; }
+        #stats-rate-value { display: inline-block; font-weight: bold; color: #6f42c1; cursor: text; padding: 1px 4px; border-radius: 3px; transition: background-color 0.2s ease, box-shadow 0.2s ease; min-width: 25px; text-align: center; }
+        #stats-rate-value:hover { background-color: #f1f3f5; }
+        #stats-rate-value:focus { background-color: #e7f5ff; outline: none; box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2); }
+        .output-area-div { width: 100%; min-height: 200px; padding: 15px; border: 1px solid #ced4da; background-color: #f8f9fa; border-radius: 6px; font-size: 1em; line-height: 1.7; box-sizing: border-box; white-space: pre-wrap; overflow-wrap: break-word; transition: background-color 0.3s ease, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; color: #495057; display: block; margin-top: 0; overflow-y: auto; }
+        .output-area-div:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); background-color: #fff; }
+        .output-area-div strong { font-weight: 700; color: #343a40; margin-right: 0.3em; }
+        .output-area-div .empty-message { text-align: center; color: #6c757d; padding: 20px 0; font-style: italic; width: 100%; font-weight: normal; }
+        .output-area-div > div:not(.empty-message) { margin-bottom: 0.2em; }
+        .output-area-div > div:last-child { margin-bottom: 0; }
+        .empty-message { text-align: center; color: #6c757d; padding: 20px 0; font-style: italic; }
 
+        /* --- Drag and Drop Styles --- */
+        .input-group.dragging {
+            opacity: 0.5; border: 2px dashed #007bff; background-color: #e7f5ff; box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        .input-group.drag-over-indicator {
+            border-top: 3px solid #0dcaf0; margin-top: 5px; margin-bottom: calc(18px + 5px);
+        }
+        .input-group-buttons, .input-group-buttons *, textarea.input-box, label.editable-label[contenteditable="true"], label.editable-label:focus, .include-checkbox-label, .include-checkbox-label input {
+            cursor: auto; -webkit-user-drag: none; user-drag: none; -moz-user-select: text; -webkit-user-select: text; -ms-user-select: text; user-select: text;
+        }
+         ::selection { background: #b3d4fc; }
+        ::-moz-selection { background: #b3d4fc; }
 
-{% block content %}
-{# 创建一个唯一的 ID 来包裹你的整个应用，用于 CSS 隔离 #}
-<div id="dynamic-article-tool">
-    <div class="container">
-        <h1>动态文章生成工具</h1>
-        <p class="description">输入内容实时生成带标签预览 (可<strong>勾选</strong>是否输出, <strong style="color: #dc3545;">无内容不显示</strong>)。可修改标签、插入/删除条目、<strong>拖拽排序</strong>。<strong>复制按钮仅复制勾选条目的纯文本。</strong> 新增 <strong>下载 TXT</strong> 按钮可保存所有标签、内容及勾选状态 (未勾选用 `[ ] ` 标记), <strong>导入 TXT</strong> 可恢复数据及勾选状态。实时字数统计、口播时长估算（<strong title="双击下方括号里的数字即可修改">速率可调</strong>）显示在预览区上方。</p>
+        /* Style for temporary textarea used by fallback copy */
+        .copy-fallback-textarea {
+            position: fixed; /* Or absolute */
+            top: -9999px;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1; /* Ensure it's behind everything */
+            width: 10px; /* Minimal size */
+            height: 10px;
+        }
 
-        <div id="input-fields" class="input-fields">
-            <!-- Input fields will be generated here by JS -->
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>动态文章生成工具</h1>
+    <p class="description">输入内容实时生成带标签预览 (可<strong>勾选</strong>是否输出, <strong style="color: #dc3545;">无内容不显示</strong>)。可修改标签、插入/删除条目、<strong>拖拽排序</strong>。<strong>复制按钮仅复制勾选条目的纯文本。</strong> 新增 <strong>下载 TXT</strong> 按钮可保存所有标签、内容及勾选状态 (未勾选用 `[ ] ` 标记), <strong>导入 TXT</strong> 可恢复数据及勾选状态。实时字数统计、口播时长估算（<strong title="双击下方括号里的数字即可修改">速率可调</strong>）显示在预览区上方。</p> <!-- Updated Description -->
+
+    <div id="input-fields" class="input-fields">
+        <!-- Input fields will be generated here by JS -->
+    </div>
+
+    <button id="add-field-btn">添加新条目到末尾</button>
+
+    <div class="action-button-group">
+        <button id="copy-btn" disabled="">复制文章</button>
+        <button id="download-txt-btn" disabled="">下载 TXT</button>
+        <button id="import-txt-btn">导入 TXT</button>
+    </div>
+    <input type="file" id="import-file-input" accept=".txt" style="display: none;">
+
+    <div class="output-section">
+        <label for="output-area" id="output-label">生成的文章 (预览区仅显示勾选且有内容的条目):</label>
+        <div id="output-stats">
+             <span class="stat-item stat-item-total">总字数(勾选有内容): <span class="stat-value" id="stats-total">0</span></span>
+             <span class="stat-item stat-item-hanzi">汉字(勾选有内容): <span class="stat-value" id="stats-hanzi">0</span></span>
+             <span class="stat-item stat-item-punct">标点(全角)(勾选有内容): <span class="stat-value" id="stats-biaodian">0</span></span>
+             <span class="stat-item stat-item-letter">字母/符(半角)(勾选有内容): <span class="stat-value" id="stats-zimu">0</span></span>
+             <span class="stat-item stat-item-digit">数字(勾选有内容): <span class="stat-value" id="stats-shuzi">0</span></span>
+             <br>
+             <span class="stat-item stat-item-time">
+                 口播时长(<span id="stats-rate-value" contenteditable="false" title="双击修改速率 (50-1000)">300</span>字/分钟):
+                 <span class="stat-value" id="stats-time">0分0秒</span>
+             </span>
         </div>
-
-        <button id="add-field-btn">添加新条目到末尾</button>
-
-        <div class="action-button-group">
-            <button id="copy-btn" disabled>复制文章</button>
-            <button id="download-txt-btn" disabled>下载 TXT</button>
-            <button id="import-txt-btn">导入 TXT</button>
-        </div>
-        <input type="file" id="import-file-input" accept=".txt" style="display: none;">
-
-        <div class="output-section">
-            <label for="output-area" id="output-label">生成的文章 (预览区仅显示勾选且有内容的条目):</label>
-            <div id="output-stats">
-                 <span class="stat-item stat-item-total">总字数(勾选有内容): <span class="stat-value" id="stats-total">0</span></span>
-                 <span class="stat-item stat-item-hanzi">汉字(勾选有内容): <span class="stat-value" id="stats-hanzi">0</span></span>
-                 <span class="stat-item stat-item-punct">标点(全角)(勾选有内容): <span class="stat-value" id="stats-biaodian">0</span></span>
-                 <span class="stat-item stat-item-letter">字母/符(半角)(勾选有内容): <span class="stat-value" id="stats-zimu">0</span></span>
-                 <span class="stat-item stat-item-digit">数字(勾选有内容): <span class="stat-value" id="stats-shuzi">0</span></span>
-                 <br>
-                 <span class="stat-item stat-item-time">
-                     口播时长(<span id="stats-rate-value" contenteditable="false" title="双击修改速率 (50-1000)">300</span>字/分钟):
-                     <span class="stat-value" id="stats-time">0分0秒</span>
-                 </span>
-            </div>
-            <div id="output-area" class="output-area-div" role="textbox" aria-readonly="true" aria-labelledby="output-label">
-                 <!-- Content will be added by JS -->
-            </div>
+        <div id="output-area" class="output-area-div" role="textbox" aria-readonly="true" aria-labelledby="output-label">
+             <!-- Content will be added by JS -->
         </div>
     </div>
-</div>
-{% endblock %}
 
-{% block scripts %}
-{# 你的原生 JavaScript 代码完全不需要修改，可以直接粘贴在这里 #}
+</div>
+
 <script>
     // DOM Elements (unchanged)
     const inputFieldsContainer = document.getElementById('input-fields');
@@ -327,7 +317,7 @@
     function handleDeleteField(event) { const button = event.target.closest('button.delete-btn'); if (!button) return; const fieldIdToDelete = parseInt(button.dataset.fieldId, 10); const field = inputFieldsData.find(f => f.id === fieldIdToDelete); const labelToDelete = field ? field.label : `条目 ${fieldIdToDelete}`; if (confirm(`确定要删除 "${labelToDelete}" 及其内容吗？`)) { inputFieldsData = inputFieldsData.filter(f => f.id !== fieldIdToDelete); saveData(); renderInputFields(); } }
     function handleInsertFieldBelow(event) { const button = event.target.closest('button.insert-btn'); if (!button) return; const fieldIdToInsertBelow = parseInt(button.dataset.fieldId, 10); const index = inputFieldsData.findIndex(f => f.id === fieldIdToInsertBelow); if (index === -1) return; const newFieldId = nextId++; const nextItemNumber = getNextDefaultItemNumber(inputFieldsData); const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "", includeInOutput: true }; inputFieldsData.splice(index + 1, 0, newField); saveData(); renderInputFields(); focusAndScrollToField(newFieldId); }
     function handleAddField() { const newFieldId = nextId++; const nextItemNumber = getNextDefaultItemNumber(inputFieldsData); const newField = { id: newFieldId, label: `${defaultItemLabelPrefix}${nextItemNumber}:`, value: "", includeInOutput: true }; inputFieldsData.push(newField); saveData(); renderInputFields(); focusAndScrollToField(newFieldId); }
-    function focusAndScrollToField(fieldId) { requestAnimationFrame(() => { const newGroup = inputFieldsContainer.querySelector(`.input-group[data-field-id="${fieldId}"]`); if (newGroup) { newGroup.scrollIntoView({ behavior: 'smooth', 'block': 'center' }); const newLabel = newGroup.querySelector('label.editable-label'); if (newLabel) { setTimeout(() => { newLabel.setAttribute('contenteditable', 'true'); newLabel.focus(); try { window.getSelection()?.selectAllChildren(newLabel); } catch (e) {} }, 150); } } }); }
+    function focusAndScrollToField(fieldId) { requestAnimationFrame(() => { const newGroup = inputFieldsContainer.querySelector(`.input-group[data-field-id="${fieldId}"]`); if (newGroup) { newGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); const newLabel = newGroup.querySelector('label.editable-label'); if (newLabel) { setTimeout(() => { newLabel.setAttribute('contenteditable', 'true'); newLabel.focus(); try { window.getSelection()?.selectAllChildren(newLabel); } catch (e) {} }, 150); } } }); }
     function handleTextareaInput(event) { const textarea = event.target; const fieldId = parseInt(textarea.id.replace('input-', ''), 10); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { field.value = textarea.value; debounceSaveData(); } updateArticle(); }
     function debounceSaveData(delay = 600) { clearTimeout(saveTimeout); saveTimeout = setTimeout(() => { saveData(); }, delay); }
     function handleIncludeCheckboxChange(event) { const checkbox = event.target; const fieldId = parseInt(checkbox.dataset.fieldId, 10); const field = inputFieldsData.find(f => f.id === fieldId); if (field) { field.includeInOutput = checkbox.checked; debounceSaveData(); updateArticle(); } }
@@ -338,25 +328,47 @@
     // --- Core Article Update Function --- (unchanged)
     function updateArticle() { inputFieldsData.forEach(field => { const group = inputFieldsContainer.querySelector(`.input-group[data-field-id="${field.id}"]`); if (!group) return; const labelElement = group.querySelector(`label#label-${field.id}`); if (labelElement && document.activeElement !== labelElement) { const currentLabelText = labelElement.textContent.trim(); if (currentLabelText && currentLabelText !== field.label) field.label = currentLabelText; } const textareaElement = group.querySelector(`textarea#input-${field.id}`); if(textareaElement && field.value !== textareaElement.value) field.value = textareaElement.value; const checkboxElement = group.querySelector(`input#include-${field.id}`); if (checkboxElement && field.includeInOutput !== checkboxElement.checked) field.includeInOutput = checkboxElement.checked; }); const fieldsToDisplay = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== ''); if (fieldsToDisplay.length === 0) { outputArea.innerHTML = '<div class="empty-message">没有勾选且包含内容的条目可显示...</div>'; } else { const displayContentHTML = fieldsToDisplay.map(field => { const safeLabel = escapeHTML(field.label.replace(/:$/, '')); const safeValue = escapeHTML(field.value); return `<div><strong>${safeLabel}:</strong> ${safeValue}</div>`; }).join(''); outputArea.innerHTML = displayContentHTML; } const fieldsToCountAndCopy = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== ''); const contentForCountingAndCopy = fieldsToCountAndCopy.map(field => field.value.trim()).join('\n'); updateCharacterCounts(contentForCountingAndCopy); if (contentForCountingAndCopy.length > 0) { if (!copyBtn.classList.contains('copied')) copyBtn.textContent = '复制文章'; copyBtn.disabled = false; } else { copyBtn.disabled = true; copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied'); } downloadTxtBtn.disabled = inputFieldsData.length === 0; }
 
-    // --- Copy Button Logic --- (unchanged)
+
+    // --- Copy Button Logic --- MODIFIED to use fallback ---
     copyBtn.addEventListener('click', () => {
         if (copyBtn.disabled || copyBtn.classList.contains('copied')) return;
-        const textToCopy = inputFieldsData.filter(field => field.includeInOutput && field.value.trim() !== '').map(field => field.value.trim()).join('\n');
+
+        const textToCopy = inputFieldsData
+            .filter(field => field.includeInOutput && field.value.trim() !== '')
+            .map(field => field.value.trim()).join('\n');
+
         if (!textToCopy) return;
+
+        // --- Fallback Copy Method using document.execCommand ---
+        // Create a temporary textarea element
         const fallbackTextArea = document.createElement('textarea');
         fallbackTextArea.value = textToCopy;
+        // Make it non-editable and visually hidden but still part of the DOM
         fallbackTextArea.setAttribute('readonly', '');
+        // Use a class for styling the hidden textarea
         fallbackTextArea.classList.add('copy-fallback-textarea');
+
         document.body.appendChild(fallbackTextArea);
+
+        // Select the text inside the textarea
         fallbackTextArea.select();
+        // For mobile devices
         fallbackTextArea.setSelectionRange(0, 99999);
+
         let success = false;
         try {
+            // Execute the copy command
             success = document.execCommand('copy');
+            console.log('Fallback copy command success:', success);
         } catch (err) {
+            console.error('Fallback copy command failed:', err);
             success = false;
         }
+
+        // Remove the temporary textarea
         document.body.removeChild(fallbackTextArea);
+
+        // Provide feedback to the user
         if (success) {
             copyBtn.textContent = '已复制!'; copyBtn.classList.add('copied'); copyBtn.disabled = true;
             setTimeout(() => {
@@ -365,8 +377,27 @@
                 copyBtn.disabled = !stillHasContentToCopy;
             }, 2000);
         } else {
+            // If even the fallback fails, notify the user.
+            console.error('无法使用 document.execCommand 复制文本。');
             alert('自动复制失败。请手动选中预览区内容进行复制。');
+            // Optional: Keep the button enabled to allow manual copying
+            // copyBtn.disabled = false;
         }
+        // --- End of Fallback Copy Method ---
+
+        /* --- Original navigator.clipboard (commented out for fallback) ---
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            copyBtn.textContent = '已复制!'; copyBtn.classList.add('copied'); copyBtn.disabled = true;
+            setTimeout(() => {
+                copyBtn.textContent = '复制文章'; copyBtn.classList.remove('copied');
+                const stillHasContentToCopy = inputFieldsData.some(field => field.includeInOutput && field.value.trim() !== '');
+                copyBtn.disabled = !stillHasContentToCopy;
+            }, 2000);
+        }).catch(err => {
+             console.error('无法使用 navigator.clipboard 复制文本: ', err);
+             alert('复制失败。您的浏览器可能不支持或在非安全环境下运行。请尝试手动复制。');
+        });
+        */
     });
 
     // --- Download TXT Button Logic --- (unchanged)
@@ -385,13 +416,13 @@
     // --- Drag and Drop Event Handlers --- (unchanged)
     function handleDragStart(e) { const targetGroup = e.target.closest('.input-group'); const actualTarget = e.target; if (!targetGroup) return; if (actualTarget.tagName === 'TEXTAREA' || actualTarget.tagName === 'INPUT' || actualTarget.tagName === 'BUTTON' || actualTarget.closest('.input-group-buttons') || (actualTarget.classList.contains('editable-label') && actualTarget.isContentEditable) || window.getSelection()?.toString().length > 0) { e.preventDefault(); return; } draggedItemId = parseInt(targetGroup.dataset.fieldId, 10); if (isNaN(draggedItemId)) return; e.dataTransfer.setData('text/plain', draggedItemId.toString()); e.dataTransfer.effectAllowed = 'move'; setTimeout(() => { const element = inputFieldsContainer.querySelector(`.input-group[data-field-id="${draggedItemId}"]`); if(element) element.classList.add('dragging'); }, 0); }
     function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; const targetGroup = e.target.closest('.input-group'); clearDragOverIndicators(); if (!targetGroup || !draggedItemId || parseInt(targetGroup.dataset.fieldId, 10) === draggedItemId) return; targetGroup.classList.add('drag-over-indicator'); }
-    function handleDragLeave(e) { if (!e.currentTarget.contains(e.relatedTarget)) { clearDragOverIndicators(); } else { const targetGroup = e.target.closest('.input-group'); if (targetGroup && !targetGroup.contains(e.relatedTarget)) { targetGroup.classList.remove('drag-over-indicator'); } } }
+    function handleDragLeave(e) { if (!e.currentTarget.contains(e.relatedTarget)) { clearDragOverIndicators(); } else { const targetGroup = e.target.closest('.input-group'); if (targetGroup && !targetGroup.contains(e.relatedTarget)) { targetGroup.classList.remove('drag-over-indicator'); targetGroup.style.marginTop = ''; targetGroup.style.marginBottom = ''; } } }
     function handleDrop(e) { e.preventDefault(); clearDragOverIndicators(); const targetGroup = e.target.closest('.input-group'); const droppedItemIdStr = e.dataTransfer.getData('text/plain'); if (!droppedItemIdStr || !targetGroup) { handleDragEndCleanup(null); return; } const draggedId = parseInt(droppedItemIdStr, 10); const targetId = parseInt(targetGroup.dataset.fieldId, 10); if (isNaN(draggedId) || isNaN(targetId) || draggedId === targetId) { handleDragEndCleanup(draggedId); return; } const draggedIndex = inputFieldsData.findIndex(field => field.id === draggedId); if (draggedIndex === -1) { console.error("Drag Error: Dragged item not found."); handleDragEndCleanup(draggedId); return; } const [draggedItem] = inputFieldsData.splice(draggedIndex, 1); const newTargetIndex = inputFieldsData.findIndex(field => field.id === targetId); if (newTargetIndex !== -1) { inputFieldsData.splice(newTargetIndex, 0, draggedItem); } else { inputFieldsData.push(draggedItem); console.warn("Drop target index issue, appended item."); } saveData(); renderInputFields(); }
     function handleDragEnd(e) { handleDragEndCleanup(draggedItemId); }
     function handleDragEndCleanup(itemId) { clearDragOverIndicators(); const draggedElement = inputFieldsContainer.querySelector(`.input-group.dragging`); if (draggedElement) draggedElement.classList.remove('dragging'); draggedItemId = null; }
-    function clearDragOverIndicators() { inputFieldsContainer.querySelectorAll('.drag-over-indicator').forEach(el => { el.classList.remove('drag-over-indicator'); }); }
+    function clearDragOverIndicators() { inputFieldsContainer.querySelectorAll('.drag-over-indicator').forEach(el => { el.classList.remove('drag-over-indicator'); el.style.marginTop = ''; el.style.marginBottom = ''; }); }
 
-    // --- Initialization ---
+    // --- Initialization --- (unchanged)
     document.addEventListener('DOMContentLoaded', () => {
         addFieldBtn.addEventListener('click', handleAddField);
         downloadTxtBtn.addEventListener('click', handleDownloadTxt);
@@ -409,4 +440,5 @@
         inputFieldsContainer.addEventListener('dragend', handleDragEnd);
     });
 </script>
-{% endblock %}
+
+</body></html>

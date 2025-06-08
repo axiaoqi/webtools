@@ -34,7 +34,33 @@ class XianyuTextGenerator(TextGenerator):
         return self.choice_items
 
     def __str__(self):
-        return '\n'.join(['\n' + element if '【' in element else element for element in self.choice_items])
+        # return '\n'.join(['\n' + element if '【' in element else element for element in self.choice_items]) # 原来的
+        items = [item.strip() for item in self.choice_items if item.strip()]
+
+        # 处理边界情况
+        if not items:
+            return ""
+
+        # 2. 拼接逻辑 (使用我们之前更简洁的“向前看”方案)
+        # 第一个元素总是直接添加
+        result = [items[0]]
+
+        # 从第二个元素开始遍历
+        for i in range(1, len(items)):
+            prev_element = items[i - 1]  # 前一个元素
+            current_element = items[i]  # 当前元素
+
+            # 如果前一个元素是标题，并且当前元素不是标题，则直接用一个空格连接
+            # 为什么是空格？因为标题【...】和正文之间通常需要一个空格来断开
+            if '【' in prev_element and '【' not in current_element:
+                result.append(' ' + current_element)
+            # 其他所有情况，都用两个换行符（一个空行）隔开
+            else:
+                result.append('\n\n' + current_element)
+
+        # 3. 用空字符串把所有部分连接起来
+        return "".join(result)
+
 
 
 class XianyuImgTxt(TextGenerator):
