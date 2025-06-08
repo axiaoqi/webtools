@@ -9,34 +9,29 @@ class TongYongXueXiJi(XianyuTextGenerator):
     def run(self, start=None, end=None):
 
         # 第1句，卖点--通用文案
-        first_list = self._open_file(self.data_dir / r'01通用文案\01_卖点.txt')
+        first_list = self._open_file_by_sep(self.data_dir / r'01通用文案\01_卖点.txt')
         choice_item = random.choice(first_list)
         self.choice_items.append(choice_item)
 
         # 第2句，标题
-        second_list = self._open_file(self.data_dir / r'文案素材2_抄王\1_名称.txt')
+        second_list = self._open_file_by_sep(self.data_dir / r'文案素材2_抄王\1_名称.txt')
         choice_item = random.choice(second_list)
         self.choice_items.append(choice_item)
 
         # 第3句，故事，售卖原因--通用文案
-        third_list = self._open_file(self.data_dir / r'01通用文案\03_故事.txt')
+        third_list = self._open_file_by_sep(self.data_dir / r'01通用文案\03_故事.txt')
         choice_item = random.choice(third_list)
         self.choice_items.append('\n' + choice_item)
 
         # 第4句，配置，分割符分割
-        fourth_list = self._open_file_by_sep(self.data_dir / r'文案素材2_抄王\3_参数.txt', sep='|||')
+        fourth_list = self._open_file_by_sep(self.data_dir / r'文案素材2_抄王\3_参数.txt', sep='\n\n')
         choice_item = random.choice(fourth_list)
         self.choice_items.append(choice_item)
 
         # 第5句，售后，分割符分割
-        fifth_list = self._open_file_by_sep(self.data_dir / r'文案素材2_抄王\4_售后.txt', sep='|||')
+        fifth_list = self._open_file_by_sep(self.data_dir / r'文案素材2_抄王\4_售后.txt', sep='\n\n')
         choice_item = random.choice(fifth_list)
         self.choice_items.append(choice_item)
-
-        # # 第8句，英语名言
-        # eighth_list = self._open_file(self.data_dir / r'01通用文案\152个名言警句-英文.txt')
-        # choice_item = '一天一句【英语写作素材】：' + random.choice(eighth_list) + '\n咨询客服，可免费赠送150多句英语名言警句txt文档，后期还可免费更新，小学初中高中英语作文神器！！'
-        # self.choice_items.append(choice_item)
 
         return self.choice_items
 

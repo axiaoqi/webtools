@@ -17,7 +17,7 @@ class FlaskDesktopApp(QMainWindow):
         self.setGeometry(100, 100, 1024, 768)
 
         # 设置窗口图标
-        self.setWindowIcon(QIcon('favicon.ico'))
+        self.setWindowIcon(QIcon('static/favicon.svg'))
 
         # 创建 WebEngineView
         self.web_view = QWebEngineView()

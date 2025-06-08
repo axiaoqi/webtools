@@ -1,14 +1,14 @@
 import datetime
 import time
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, url_for
 
 from html import escape
 
 from programs.music.music import add_music_url
 from programs.music.query_url_from_csv import query_musics
 from programs.quant.股票分红监控 import calculate_stock_dividends
-from programs.text import 闲鱼学习机文案_通用, 闲鱼_学习机_文案2_王, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_苏苏, 闲鱼学习机文案_花花
+from programs.text import 闲鱼学习机文案_通用, 闲鱼学习机文案_好好学习, 闲鱼学习机文案_苏苏
 from programs.text.违禁词检测.违禁词检测 import load_banned_words, check_for_banned_words
 from programs import 淘宝分享链接转真实URL
 from programs.xunfei.xunfei import xunfei_lite
@@ -20,6 +20,7 @@ app = Flask(__name__)
 @app.context_processor
 def inject_year():
     return {'current_year': datetime.datetime.now().year}
+
 
 # 首页
 @app.route('/')
@@ -35,14 +36,10 @@ def run_program(program_name):
     # 根据传入的 program_name 动态调用不同的程序
     if program_name == '闲鱼学习机文案_通用':
         result = 闲鱼学习机文案_通用.run()
-    elif program_name == '闲鱼_学习机_文案2_王':
-        result = 闲鱼_学习机_文案2_王.run()
     elif program_name == '闲鱼学习机文案_好好学习':
         result = 闲鱼学习机文案_好好学习.run()
     elif program_name == '闲鱼学习机文案_苏苏':
         result = 闲鱼学习机文案_苏苏.run()
-    elif program_name == '闲鱼学习机文案_花花':
-        result = 闲鱼学习机文案_花花.run()
 
     # 继续为其他程序添加分支
     return render_template('program.html', program_name=program_name, result=result)
@@ -128,16 +125,17 @@ def run_音乐添加_route():
 
         print(s)
 
-        return render_template("music_add.html", result_html=s, music_name=music_name, music_url_baidu=music_url_baidu, music_url_kuake=music_url_kuake)
+        return render_template("music_add.html", result_html=s, music_name=music_name, music_url_baidu=music_url_baidu,
+                               music_url_kuake=music_url_kuake)
 
     return render_template("music_add.html", music_names=s)
+
 
 @app.route('/xunfei', methods=['GET', 'POST'])
 def run_xunfei_route():
     s = ''
     master = '你是一个闲鱼卖家专家，帮我修改成原创文案。我是卖小品牌学习机的卖家，想蹭大品牌的流量，开发的同款学习机。文案修改后的格式跟原来差不多'
     if request.method == "POST":
-
         # 获取用户输入的数据
         content = request.form['content']
         master = request.form['master']

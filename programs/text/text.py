@@ -22,6 +22,7 @@ class TextGenerator(BaseTextGenerator):
     文案生成器基本功能的实现。
     实现的一些方法：
     """
+
     def __init__(self, data_dir: Path = None):
         self.data_dir = data_dir
         self.data_files_path = []  # 所有的txt文件的路径
@@ -30,19 +31,9 @@ class TextGenerator(BaseTextGenerator):
             self._add_data()  # 初始化文件名称列表
 
     @staticmethod
-    def _open_file(file_path: Path) -> list:
+    def _open_file_by_sep(file_path: Path, sep: str = '\n'):
         """
-        打开txt文件，每行，转为列表
-        """
-        with open(file_path, 'r', encoding='utf-8') as f:
-            file_list = f.readlines()
-        data = [item.strip() for item in file_list]  # 解析一下数据
-        return data
-
-    @staticmethod
-    def _open_file_by_sep(file_path: Path, sep: str):
-        """
-        打开txt文件，根据特殊字符分割成列表
+        打开txt文件，根据特殊字符分割成列表，默认就是换行
         """
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
@@ -55,7 +46,7 @@ class TextGenerator(BaseTextGenerator):
         """
         data_list = []
         for item in file_paths:
-            _data = self._open_file(item)
+            _data = self._open_file_by_sep(item)
             data_list.append(_data)
         return data_list
 
@@ -84,7 +75,7 @@ class TextGenerator(BaseTextGenerator):
     def _open_all_file(self):
         data_list = []
         for item in self.data_files_path:
-            _data = self._open_file(item)
+            _data = self._open_file_by_sep(item)
             data_list.append(_data)
         return data_list
 
