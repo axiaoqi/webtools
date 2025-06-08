@@ -17,7 +17,7 @@ class HaoHaoXueXi(XianyuTextGenerator):
         self.choice_items.append(xuexiji_name(name_file))
 
         # 第3句，故事，售卖原因--通用文案
-        third_list = self._open_file_by_sep(self.data_dir / r'01通用文案\03_故事.txt')
+        third_list = self._open_file_by_sep(self.data_dir / r'01通用文案\03_故事.txt', sep='\n\n')
         choice_item = random.choice(third_list)
         self.choice_items.append('\n' + choice_item)
 
