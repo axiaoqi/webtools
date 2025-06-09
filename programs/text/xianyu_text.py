@@ -2,6 +2,7 @@ import random
 from pathlib import Path
 from typing import List, Tuple
 
+from programs.gemini_text.gemini_text import gemini_text
 from programs.text.text import TextGenerator
 
 
@@ -59,8 +60,14 @@ class XianyuTextGenerator(TextGenerator):
                 result.append('\n\n' + current_element)
 
         # 3. 用空字符串把所有部分连接起来
-        return "".join(result)
-
+        all_text = "".join(result)
+        try:
+            # 用gemini改写文字
+            first_parts = "我是一名闲鱼卖家，为了防止系统查重，改写下面的句子。直接给出一个结果，无需其他提示，无需多版本。文案格式保持不变，不需要加粗文字。同款这两个字不能少，因为不是正品。可以适当口语化。文案如下:"
+            new_text = gemini_text(first_parts + '\n' + all_text, model='gemini-2.5-flash-preview-05-20')
+            return new_text
+        except Exception as e:
+            return all_text
 
 
 class XianyuImgTxt(TextGenerator):
